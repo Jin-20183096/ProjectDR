@@ -41,3 +41,21 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Object
+    uniqueID: 1674941535
+    locked: 0
+  - name: ObjectOver
+    uniqueID: 799948665
+    locked: 0
+  - name: Path
+    uniqueID: 3536612549
+    locked: 0
+  - name: BtlDefault
+    uniqueID: 213605299
+    locked: 0
+  - name: BtlObject
+    uniqueID: 1853274467
+    locked: 0
+  - name: BtlObjectOver
+    uniqueID: 3009001729
+    locked: 0

@@ -1,0 +1,36 @@
+tree("Root")
+	fallback
+		tree("Ap2Under")
+		tree("DgeSuccess")
+		tree("P_DefDgeFail")
+		tree("P_WaitAndAp4Over")
+		tree("Ap0Check")
+		Push_RandomAction
+
+///////////////////
+tree("Ap2Under")
+	sequence
+		Is_Ap_2Under
+		Is_TrueOrFalse
+		Push_Wait
+///////////////////
+tree("DgeSuccess")
+	sequence
+		Is_DgeSuccess
+		Push_RandomAtk
+///////////////////
+tree("P_DefDgeFail")
+	sequence
+		Is_P_FailDefDge
+		Push_RandomAtk
+///////////////////
+tree("P_WaitAndAp4Over")
+	sequence
+		Is_P_LastWait
+		Is_P_Ap_4Over
+		Push_RandomDge
+///////////////////
+tree("Ap0Check")
+	sequence
+		Is_P_Ap_0Under
+		Push_RandomAtk

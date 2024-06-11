@@ -1,0 +1,150 @@
+using System.Collections;
+using UnityEngine;
+using static HitBoxCollider;
+
+public class SpriteSystem : MonoBehaviour
+{
+    [SerializeField]
+    private BattleSystem _btlSys;
+
+    public enum AtkMoveSet { No, Atk }
+    public enum DefMoveSet { No, Def }
+    public enum DgeMoveSet { No, Dge }
+    public enum TacMoveSet { No, Tac }
+
+    public enum CommonTrigger { Idle, Dmg }
+
+    private SpriteRenderer _spr;
+    private Animator _anima;
+    private Rigidbody _rigid;
+
+    [SerializeField]
+    private HitBoxHost _hitBoxHost;
+    [SerializeField]
+    private bool _def_or_dge;
+    [SerializeField]
+    private HitBoxCollider _actHitBox;
+
+    [Header("# Move Animation Relate")]
+    private Vector3 _moveDest;  //이동 목적지 좌표
+    private Vector3 _homePos;   //이동 후 복귀 좌표
+
+    private string _actTrigger;
+
+    void Awake()
+    {
+        _spr = GetComponent<SpriteRenderer>();
+        _anima = GetComponent<Animator>();
+        _rigid = GetComponent<Rigidbody>();
+    }
+
+    void Start()
+    {
+        _rigid.isKinematic = true;
+        _homePos = transform.position;
+    }
+
+    public void Flip_X(bool isLeft)     //스프라이트 좌우 반전
+    {
+        _spr.flipX = isLeft;
+    }
+
+    public void Set_CommonMoveSet(CommonTrigger trigger)
+    {
+        _anima.SetTrigger(trigger.ToString());
+    }
+
+    public void Set_ActionMoveSet_Atk(AtkMoveSet atk, bool isTrue)
+    {
+        _anima.SetBool(atk.ToString(), isTrue);
+
+        _actTrigger = atk.ToString();
+    }
+
+    public void Set_ActionMoveSet_Def(DefMoveSet def, bool isTrue)
+    {
+        _anima.SetBool(def.ToString(), isTrue);
+
+        _actTrigger = def.ToString();
+    }
+
+    public void Set_ActionMoveSet_Dge(DgeMoveSet dge, bool isTrue)
+    {
+        _anima.SetBool(dge.ToString(), isTrue);
+
+        _actTrigger = dge.ToString();
+    }
+
+    public void Set_ActionMoveSet_Tac(TacMoveSet tac, bool isTrue)
+    {
+        _anima.SetBool(tac.ToString(), isTrue);
+
+        _actTrigger = tac.ToString();
+    }
+
+    public void Set_ActionTrigger()
+    {
+        var trigger = _actTrigger + "Start";
+
+        _anima.SetTrigger(trigger);
+    }
+
+    public void Set_ActHitBox(HitBoxType type)
+    {
+        if (type == HitBoxType.Atk || type == HitBoxType.Def)
+        {
+            _actHitBox.Set_HitBox(type);
+        }
+        else
+            _actHitBox.gameObject.SetActive(false);
+    }
+
+    public void ActHitBoxOn()
+        => _actHitBox.gameObject.SetActive(true);
+
+    public void Set_HitBoxState(bool def_or_dge)    //히트박스의 방어/회피 상태 여부 설정
+        => _def_or_dge = def_or_dge;
+
+    public void Set_SpriteMove(Vector3 dest) //목표 좌표로 이동
+    {
+        _moveDest = dest;
+        _rigid.isKinematic = false;
+
+        StartCoroutine("Move_Coroutine");
+    }
+
+    public IEnumerator Move_Coroutine()    //이동
+    {
+        yield return new WaitForFixedUpdate();
+
+        var dir = _moveDest - transform.position;
+
+        _rigid.MovePosition(transform.position + dir * Time.deltaTime * 20f);
+
+        if (Vector3.Distance(transform.position, _moveDest) <= 0.5f)
+        {
+            Set_ActionTrigger();
+            StopCoroutine(Move_Coroutine());
+        }
+        else
+            StartCoroutine(Move_Coroutine());
+    }
+
+    public IEnumerator Return_Coroutine()    //원위치로 복귀
+    {
+        yield return new WaitForFixedUpdate();
+
+        var dir = _homePos - transform.position;
+
+        _rigid.MovePosition(transform.position + dir * Time.deltaTime * 10f);
+
+        if (Vector3.Distance(transform.position, _homePos) <= 0.0001f)
+        {
+            transform.position = _homePos;
+            _rigid.isKinematic = true;
+            StopCoroutine(Return_Coroutine());
+        }
+        else
+            StartCoroutine(Return_Coroutine());
+    }
+}

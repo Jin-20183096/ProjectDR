@@ -598,6 +598,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3272278779746531681}
   - component: {fileID: 4876312039128968180}
+  - component: {fileID: 4829111795449868012}
   m_Layer: 0
   m_Name: UpStair
   m_TagString: Untagged
@@ -646,6 +647,29 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -2124705421725058983, guid: dd42d8e23a9ece5428e04ca7121bfc96, type: 3}
+--- !u!114 &4829111795449868012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1615907902403839250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d2d525926107f148b866b5c3f0739c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _dgnSys: {fileID: 0}
+  _spr_tile: {fileID: 9179174089830327172}
+  _spr_path: {fileID: 7905368812674111125}
+  _spr_event: {fileID: 0}
+  _anima_event: {fileID: 0}
+  _isExplored: 0
+  _isVisible: 0
+  _isUpStair: 1
+  _isDownStair: 0
+  _stair: {fileID: 4517160604254836854}
+  _stair_dark: {fileID: 4418214031520267092}
 --- !u!1 &1642300730309509970
 GameObject:
   m_ObjectHideFlags: 0

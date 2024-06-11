@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1939a4dae118b8409e226be6f082c86, type: 3}
+  m_Name: Enemy001
+  m_EditorClassIdentifier: 
+  Name: "\uACE0\uBE14\uB9B0"
+  _hp_minMax: 0600000008000000
+  AC: 0
+  ApMax: 4
+  STR: 
+  INT: 
+  DEX: 
+  AGI: 010000000100000001000000020000000200000003000000
+  CON: 
+  WIL: 
+  Act_Atk:
+  - Data: {fileID: 11400000, guid: 483c1e9784bd6f047b71941d350765d5, type: 2}
+    Stat: 4
+  Act_Def: []
+  Act_Dge:
+  - Data: {fileID: 11400000, guid: 16703902592f3264d9b74b455350efb7, type: 2}
+    Stat: 4
+  Act_Tac: []
+  BT: {fileID: 4900000, guid: 0ac1b24186640c04e9c4dd5b6bd852fc, type: 3}
+  DefaultSprite: {fileID: 1892043697, guid: 7e83bcd9fff855b4384f1b199ac901ed, type: 3}
+  Anima_Ctrl: {fileID: 9100000, guid: 45442f3b01a8e154582fe4aa00728ea5, type: 2}

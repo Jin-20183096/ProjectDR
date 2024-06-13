@@ -288,7 +288,14 @@ public class ActionController : MonoBehaviour
             case Situation.Battle: //전투 상황
                 if (_nowBtlAct.NoDice)  //주사위가 없는 행동일 때
                 {
-                    // 즉시 행동 결정
+                    _resultPannel.ActionInfoPannel_OnOff(true);     //행동 정보창 On
+                    if (_situation == Situation.Battle)
+                        _resultPannel.Change_ActInfo(_nowBtlAct.Type, _nowBtlAct.Name); //행동 타입 아이콘, 행동명 설정
+
+                    _resultPannel.DiceResultPannel_OnOff(true);     //주사위 결과창 On
+                    _resultPannel.Set_NewDiceTotal(_nowDice);       //주사위 결과창 초기화
+                    
+                    ActionStart();  // 즉시 행동 결정
                 }
                 else    //주사위가 있는 행동이면
                 {

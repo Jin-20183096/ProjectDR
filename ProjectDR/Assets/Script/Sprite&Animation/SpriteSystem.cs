@@ -147,4 +147,31 @@ public class SpriteSystem : MonoBehaviour
         else
             StartCoroutine(Return_Coroutine());
     }
+
+    void OnTriggerEnter(Collider other)
+    {
+        HitBoxCollider hitBox;
+
+        if (other.GetComponent<HitBoxCollider>())   //충돌한 대상이 히트박스 콜라이더를 가지고 있지 않으면 종료
+            hitBox = other.GetComponent<HitBoxCollider>();
+        else
+            return;
+
+        //자신의 히트박스이거나 충돌한 대상이 공격판정이 아닐 경우 종료
+        if (hitBox.HOST == _hitBoxHost || hitBox.TYPE != HitBoxType.Atk)
+            return;
+
+        //종료되지 않았을 경우(충돌한 대상은 공격 판정)
+        if (_def_or_dge)
+        {
+            if (_actHitBox.gameObject.activeSelf && _actHitBox.TYPE == HitBoxType.Def)
+                _btlSys.StartCoroutine(_btlSys.AtkDef(_hitBoxHost == HitBoxHost.Player));  //공격을 방어하는 코루틴
+            else
+                _btlSys.StartCoroutine(_btlSys.AtkDge(_hitBoxHost == HitBoxHost.Player));  //공격을 회피하는 코루틴
+        }
+        else
+            _btlSys.StartCoroutine(_btlSys.AtkHit(_hitBoxHost == HitBoxHost.Enemy));       //공격을 받는 코루틴  
+
+        hitBox.HitBoxOff();
+    }
 }

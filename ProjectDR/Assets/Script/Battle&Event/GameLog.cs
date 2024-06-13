@@ -67,7 +67,7 @@ public class GameLog : MonoBehaviour
         LogPrint_Start(LogSituation.ActEffect);
     }
 
-    public void SetLog_ActRun(bool isP, bool success) //로그 설정: 도망 행동
+    public void SetLog_RunAct(bool isP, bool success) //로그 설정: 도망 행동
     {
         if (success)
             NewLog(MakeSentence((isP ? _p_name : _e_name), success ? "도망쳤다" : "도망에 실패했다"));

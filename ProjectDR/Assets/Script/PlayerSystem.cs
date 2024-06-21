@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using static ICreature;
+using static SingleToneCanvas;
 
 public class PlayerSystem : MonoBehaviour, ICreature
 {
@@ -132,22 +135,58 @@ public class PlayerSystem : MonoBehaviour, ICreature
     private List<BtlActClass> _actList; //행동 리스트
     public List<BtlActClass> ActList
     {
-        get { return _actList; }
+        get
+        {
+            var actList = _actList.ToList();
+            actList.Add(_waitAct);
+            return _actList;
+        }
     }
 
-    [Header("# UI Reference")]
-    //플레이어 기본 정보 패널
     [SerializeField]
-    private PlayerInfoPannel _infoScr;
+    private BtlActClass _waitAct;   //대기 행동
+
+    [SerializeField]
+    private List<BtlActClass> _actList_unarm;   //맨손 행동 리스트
+
+    [Header("# Menu Screen")]
+    [Header("   > Info Pannel")]
+    [SerializeField]
+    private bool _isOn_infoPannel;
+    [SerializeField]
+    private PlayerInfoPannel _infoPannel;
+
+    [Header("   > Status Screen")]
+    [SerializeField]
+    private bool _isOn_statusScr;   //스테이터스창 활성화 여부
+    [SerializeField]
+    private PlayerMenuButton _btn_statusScr;    //스테이터스창 버튼
+    [SerializeField]
+    private StatusScreen _statusScr;    //스테이터스창 스크립트
+
+    [Header("   > Inventory Screen")]
+    [SerializeField]
+    private bool _isOn_inventoryScr;    //인벤토리창 활성화 여부
+    [SerializeField]
+    private PlayerMenuButton _btn_inventoryScr; //인벤토리창 버튼
+    [SerializeField]
+    private GameObject _inventoryScr;  //인벤토리창 스크립트
+
+    [Header("   > Action Screen")]
+    [SerializeField]
+    private bool _isOn_actScr;  //행동창 활성화 여부
+    [SerializeField]
+    private bool _isActChange;  //보유 행동의 변경 여부 (변경점이 있다면, 행동목록 창이 활성화될 때 목록 정보를 갱신해줌)
+    [SerializeField]
+    private PlayerMenuButton _btn_actScr;   //행동창 버튼
+    [SerializeField]
+    private ActionScreen _actScr;   //행동창 스크립트
 
     [Header("# Sprite Reference")]
     [SerializeField]
     private SpriteSystem _p_spr;
     [SerializeField]
     private SpriteSystem _p_spr_btl;
-
-    [SerializeField]
-    private GameObject _btn_fullRest;
 
     void Awake()
     {
@@ -253,12 +292,12 @@ public class PlayerSystem : MonoBehaviour, ICreature
             }
         }
 
-        _infoScr.Change_TextHp(_hp);
+        _infoPannel.Change_TextHp(_hp);
 
         if (_hp > old_hp)   //HP 회복 시
-            _infoScr.Change_HpMask(_hp / (float)_hpMax);    //HP 마스크 변경
+            _infoPannel.Change_HpMask(_hp / (float)_hpMax);    //HP 마스크 변경
         else                //HP 피해받았을 시
-            _infoScr.Change_HpMeter(_hp / (float)_hpMax);   //HP 미터 변경
+            _infoPannel.Change_HpMeter(_hp / (float)_hpMax);   //HP 미터 변경
     }
 
     public void Change_HpMax(bool plus, int value)  //최대 HP 변경
@@ -275,13 +314,13 @@ public class PlayerSystem : MonoBehaviour, ICreature
             _hp = _hpMax;       //낮아진 최대 HP만큼 현재 HP를 설정
 
         //변경된 비율만큼 HP바 변경
-        _infoScr.Change_TextHp(_hp);
-        _infoScr.Change_TextHpMax(_hpMax);
+        _infoPannel.Change_TextHp(_hp);
+        _infoPannel.Change_TextHpMax(_hpMax);
 
         if (_hpMax > old_hpMax)
-            _infoScr.Change_HpMeter(_hp / (float)_hpMax);
+            _infoPannel.Change_HpMeter(_hp / (float)_hpMax);
         else
-            _infoScr.Change_HpMask(_hp / (float)_hpMax);
+            _infoPannel.Change_HpMask(_hp / (float)_hpMax);
     }
 
     public void Change_AC(bool plus, int value) //방어도 변경
@@ -292,7 +331,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
             _ac -= value;
 
         //방어도 아이콘과 ui수치변경
-        _infoScr.Change_Ac(_ac);
+        _infoPannel.Change_Ac(_ac);
     }
 
     public void Change_Ap(bool plus, int value) //행동력 변경
@@ -328,14 +367,14 @@ public class PlayerSystem : MonoBehaviour, ICreature
         }
 
         //미터 갱신
-        _infoScr.Change_ApMeter(_ap);
-        _infoScr.Change_Ap_UsePreview(_apUse);
+        _infoPannel.Change_ApMeter(_ap);
+        _infoPannel.Change_Ap_UsePreview(_apUse);
     }
 
     public void Change_Ap_UsePreview(int use)
     {
         _apUse = use;
-        _infoScr.Change_Ap_UsePreview(_apUse);
+        _infoPannel.Change_Ap_UsePreview(_apUse);
     }
 
     public void Change_ApMax(bool plus, int value)
@@ -349,9 +388,9 @@ public class PlayerSystem : MonoBehaviour, ICreature
             _ap = _apMax;   //현재 행동력을 낮아진 최대 행동력만큼 변경
 
         //미터 갱신
-        _infoScr.Change_ApMeter(_ap);
-        _infoScr.Change_Ap_UsePreview(_apUse);
-        _infoScr.Change_ApMeterMax(_apMax);
+        _infoPannel.Change_ApMeter(_ap);
+        _infoPannel.Change_Ap_UsePreview(_apUse);
+        _infoPannel.Change_ApMeterMax(_apMax);
     }
 
     public void Change_ActionStat(bool plus, Stats stat, int[] stat_arr)
@@ -395,8 +434,211 @@ public class PlayerSystem : MonoBehaviour, ICreature
         //데미지 타입에 따른 피격음
     }
 
-    public void FullRest_OnOff(bool isOn)
+    public void Change_Reroll(bool plus, Stats stat, int value)
     {
-        _btn_fullRest.SetActive(isOn);
+        var reroll_stat = Stats.No;
+
+        switch (stat)
+        {
+            case Stats.RE_STR:
+                reroll_stat = Stats.STR;
+                break;
+            case Stats.RE_INT:
+                reroll_stat = Stats.INT;
+                break;
+            case Stats.RE_DEX:
+                reroll_stat = Stats.DEX;
+                break;
+            case Stats.RE_AGI:
+                reroll_stat = Stats.AGI;
+                break;
+            case Stats.RE_CON:
+                reroll_stat = Stats.CON;
+                break;
+            case Stats.RE_WIL:
+                reroll_stat = Stats.WIL;
+                break;
+        }
+
+        if (plus)
+            _reroll[(int)reroll_stat] += value;
+        else
+            _reroll[(int)reroll_stat] -= value;
+
+        //스테이터스 창에 정보 적용
+        if (_isOn_statusScr)
+            _statusScr.Change_Reroll(reroll_stat, _reroll[(int)reroll_stat]);
+    }
+
+    public void Change_BtlAct(bool plus, BtlActClass btlAct)
+    {
+        if (plus)   //행동 추가
+            _actList.Add(btlAct);
+        else
+            _actList.Remove(btlAct);
+
+        //행동들을 행동 타입에 맞게 정렬
+        _actList.Sort((x, y) => string.Compare(x.Data.Type.ToString(), y.Data.Type.ToString()));
+
+        //행동목록 창에 정보 연동
+        if (_isOn_actScr)
+            _actScr.Change_BtlActList();
+        else
+            _isActChange = true;
+    }
+
+    public void Armed_OnOff(bool b) //무장 or 맨손
+    {
+        if (b)  //무장했을 경우
+        {
+            foreach (BtlActClass act in _actList_unarm)
+                Change_BtlAct(false, act);  //맨손 행동을 전부 제거
+        }
+        else
+        {
+            foreach (BtlActClass act in _actList_unarm)
+                Change_BtlAct(true, act);   //맨손 행동을 전부 추가
+        }
+    }
+
+    public void InfoPannel_OnOff(bool b)    //플레이어 기본 정보창 OnOff
+    {
+        _isOn_infoPannel = b;
+        _infoPannel.gameObject.SetActive(b);
+
+        if (_isOn_infoPannel)
+        {
+            //플레이어 기본 정보 동기화
+            //HP바
+            _infoPannel.Change_HpBar(_hp, _hpMax);
+            //행동력
+            _infoPannel.Change_ApMeterMax(_apMax);
+            _infoPannel.Change_ApMeter(_ap);
+            //방어도
+            _infoPannel.Change_Ac(_ac);
+        }
+    }
+
+    public void StatusScreen_OnOff()    //스테이터스창 OnOff
+    {
+        if (STCanvas.DRAG == false)
+        {
+            _isOn_statusScr = !_isOn_statusScr;
+            _statusScr.gameObject.SetActive(_isOn_statusScr);
+
+            if (_isOn_statusScr)
+            {
+                //스테이터창의 UI 우선순위를 최상으로
+                _statusScr.transform.SetAsLastSibling();
+
+                //스테이터스 값 동기화
+                _statusScr.Change_Name(_name);  //이름
+                _statusScr.Change_Lv(_lv);      //레벨
+                _statusScr.Change_Exp(_exp);    //경험치
+                _statusScr.Change_ExpMax(_expMax);  //최대 경험치
+                _statusScr.Change_ExpMeter((float)_exp / _expMax);
+                _statusScr.Change_Hp(_hp);          //HP
+                _statusScr.Change_HpMax(_hpMax);    //최대 HP
+                _statusScr.Change_Ap(_ap);          //행동력
+                _statusScr.Change_ApMax(_apMax);    //최대 행동력
+                _statusScr.Change_AC(_ac);          //방어도
+
+                //힘 스탯
+                _statusScr.Change_Reroll(Stats.STR, _reroll[(int)Stats.STR]);
+                _statusScr.Change_DiceSide(Stats.STR, _stat_STR);
+                //지능 스탯
+                _statusScr.Change_Reroll(Stats.INT, _reroll[(int)Stats.INT]);
+                _statusScr.Change_DiceSide(Stats.INT, _stat_INT);
+                //손재주 스탯
+                _statusScr.Change_Reroll(Stats.DEX, _reroll[(int)Stats.DEX]);
+                _statusScr.Change_DiceSide(Stats.DEX, _stat_DEX);
+                //민첩 스탯
+                _statusScr.Change_Reroll(Stats.AGI, _reroll[(int)Stats.AGI]);
+                _statusScr.Change_DiceSide(Stats.AGI, _stat_AGI);
+                //건강 스탯
+                _statusScr.Change_Reroll(Stats.CON, _reroll[(int)Stats.CON]);
+                _statusScr.Change_DiceSide(Stats.CON, _stat_CON);
+                //의지 스탯
+                _statusScr.Change_Reroll(Stats.WIL, _reroll[(int)Stats.WIL]);
+                _statusScr.Change_DiceSide(Stats.WIL, _stat_WIL);
+            }
+        }
+    }
+
+    public void InventoryScreen_OnOff() //인벤토리창 OnOff
+    {
+        if (STCanvas.DRAG == false)
+        {
+            _isOn_inventoryScr = !_isOn_inventoryScr;
+            _inventoryScr.SetActive(_isOn_inventoryScr);
+
+            if (_isOn_inventoryScr)
+            {
+                //인벤토리 UI 우선순위를 최상으로
+                _inventoryScr.transform.SetAsLastSibling();
+
+                //장착한 장비 아이콘 할당
+                //인벤토리 아이콘 할당
+            }
+
+            //아이템 시스템: On_Inventory = !
+        }
+    }
+
+    public void ActionScreen_OnOff()    //행동창 OnOff
+    {
+        if (STCanvas.DRAG == false)
+        {
+            _isOn_actScr = !_isOn_actScr;
+            _actScr.gameObject.SetActive(_isOn_actScr);
+
+            if (_isOn_actScr)
+            {
+                //인벤토리 UI 우선순위 최상위
+                _actScr.transform.SetAsLastSibling();
+
+                if (_isActChange)   //보유한 행동에 변화가 생겼을 경우
+                {
+                    _actScr.Change_BtlActList();    //행동 목록 동기화
+                    _isActChange = false;           //행동 목록 변화 없음으로 처리
+                }
+            }
+        }
+    }
+
+    public void MenuButton_OnOff_Status(bool b)  //스테이터스창 버튼 OnOff (전투 <-> 비전투 전환시 사용)
+    {
+        //스테이터스 버튼을 비활성화 될때, 스테이터스창이 활성화 중이라면
+        if (b == false && _isOn_statusScr)
+        {
+            _btn_statusScr.Button_OnOff();   //버튼 Off 상태
+            StatusScreen_OnOff();               //스테이터스창 off 상태
+        }
+
+        _btn_statusScr.gameObject.SetActive(b);
+    }
+
+    public void MenuButton_OnOff_Inventory(bool b)
+    {
+        //인벤토리 버튼을 비활성화할 때, 인벤토리가 활성화 중이라면
+        if (b == false && _isOn_inventoryScr)
+        {
+            _btn_inventoryScr.Button_OnOff();    //버튼 Off 상태
+            InventoryScreen_OnOff();                //인벤토리창 Off 상태
+        }
+
+        _btn_inventoryScr.gameObject.SetActive(b);
+    }
+
+    public void MenuButton_OnOff_ActList(bool b)
+    {
+        //행동목록 버튼을 비활성화할 때, 행동목록이 활성화 중이라면
+        if (b == false && _isOn_actScr)
+        {
+            _btn_actScr.Button_OnOff();  //버튼 Off 상태
+            ActionScreen_OnOff();          //행동목록창 Off 상태
+        }
+
+        _btn_actScr.gameObject.SetActive(b);
     }
 }

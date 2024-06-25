@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Item", menuName = "ScrObj/ItemData")]
+[CreateAssetMenu(fileName = "Item", menuName = "ScrObj/ItemData")]  //커스텀 메뉴 추가
 
-public class ItemData : MonoBehaviour
+public class ItemData : ScriptableObject
 {
     public enum ItemType { Weapon, Head, Body, Leg, SubWp, Amulet, Ring }
 
@@ -23,7 +23,7 @@ public class ItemData : MonoBehaviour
     public ItemType Type { get { return _type; } }
 
     [Header("# Weapon -----")]
-    public WeaponClass Weapon;
+    public ActionClass Action;
 
     [Header("# Armor -----")]
     public ArmorClass Armor;
@@ -33,7 +33,7 @@ public class ItemData : MonoBehaviour
     public AnimationClip[] Clip_Atk1;
 
     [Serializable]
-    public class WeaponClass
+    public class ActionClass
     {
         public BtlActData[] AtkAct_Arr; //공격 행동 목록
 

@@ -29,9 +29,9 @@ public class SingleToneCanvas : MonoBehaviour
         }
     }
 
-    public void SetDrag(bool b)
+    public void Set_Drag(bool b)
         => DRAG = b;
 
-    public void SetItemDrag(bool b)
+    public void Set_ItemDrag(bool b)
         => ITEM_DRAG = b;
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using static ICreature;
+using static ItemSystem;
 using static SingleToneCanvas;
 
 public class PlayerSystem : MonoBehaviour, ICreature
@@ -243,7 +244,13 @@ public class PlayerSystem : MonoBehaviour, ICreature
 
     public bool IsPlayer() => true;
 
-    public void Change_Name(string name) => _name = name;   //이름 변경
+    public void Change_Name(string name)
+    {
+        _name = name;   //이름 변경
+
+        if (_isOn_statusScr)    //스테이터스창에 값 적용
+            _statusScr.Change_Name(_name);
+    }
 
     public void Change_Exp(bool plus, int value)    //경험치 획득, 감소
     {
@@ -267,6 +274,13 @@ public class PlayerSystem : MonoBehaviour, ICreature
                 _exp = 0;
             else
                 _exp -= value;
+        }
+
+        if (_isOn_statusScr)    //스테이터스창에 값 적용
+        {
+            _statusScr.Change_Lv(_lv);
+            _statusScr.Change_Exp(_exp);
+            _statusScr.Change_ExpMax(_expMax);
         }
     }
 
@@ -298,6 +312,9 @@ public class PlayerSystem : MonoBehaviour, ICreature
             _infoPannel.Change_HpMask(_hp / (float)_hpMax);    //HP 마스크 변경
         else                //HP 피해받았을 시
             _infoPannel.Change_HpMeter(_hp / (float)_hpMax);   //HP 미터 변경
+
+        if (_isOn_statusScr)    //스테이터스창에 값 적용
+            _statusScr.Change_Hp(_hp);
     }
 
     public void Change_HpMax(bool plus, int value)  //최대 HP 변경
@@ -321,6 +338,12 @@ public class PlayerSystem : MonoBehaviour, ICreature
             _infoPannel.Change_HpMeter(_hp / (float)_hpMax);
         else
             _infoPannel.Change_HpMask(_hp / (float)_hpMax);
+
+        if (_isOn_statusScr)    //스테이터스창에 값 적용
+        {
+            _statusScr.Change_Hp(_hp);
+            _statusScr.Change_HpMax(_hpMax);
+        }
     }
 
     public void Change_AC(bool plus, int value) //방어도 변경
@@ -332,6 +355,9 @@ public class PlayerSystem : MonoBehaviour, ICreature
 
         //방어도 아이콘과 ui수치변경
         _infoPannel.Change_Ac(_ac);
+
+        if (_isOn_statusScr)    //스테이터스창에 값 적용
+            _statusScr.Change_AC(_ac);
     }
 
     public void Change_Ap(bool plus, int value) //행동력 변경
@@ -369,6 +395,9 @@ public class PlayerSystem : MonoBehaviour, ICreature
         //미터 갱신
         _infoPannel.Change_ApMeter(_ap);
         _infoPannel.Change_Ap_UsePreview(_apUse);
+
+        if (_isOn_statusScr)
+            _statusScr.Change_Ap(_ap);
     }
 
     public void Change_Ap_UsePreview(int use)
@@ -391,41 +420,50 @@ public class PlayerSystem : MonoBehaviour, ICreature
         _infoPannel.Change_ApMeter(_ap);
         _infoPannel.Change_Ap_UsePreview(_apUse);
         _infoPannel.Change_ApMeterMax(_apMax);
+
+        if (_isOn_statusScr)
+        {
+            _statusScr.Change_Ap(_ap);
+            _statusScr.Change_ApMax(_apMax);
+        }
     }
 
     public void Change_ActionStat(bool plus, Stats stat, int[] stat_arr)
     {
-        int[] temp_stat = { };
+        int[] changingStat = { };
 
         switch (stat)
         {
             case Stats.STR:
-                temp_stat = _stat_STR;
+                changingStat = _stat_STR;
                 break;
             case Stats.INT:
-                temp_stat = _stat_INT;
+                changingStat = _stat_INT;
                 break;
             case Stats.DEX:
-                temp_stat = _stat_DEX;
+                changingStat = _stat_DEX;
                 break;
             case Stats.AGI:
-                temp_stat = _stat_AGI;
+                changingStat = _stat_AGI;
                 break;
             case Stats.CON:
-                temp_stat = _stat_CON;
+                changingStat = _stat_CON;
                 break;
             case Stats.WIL:
-                temp_stat = _stat_WIL;
+                changingStat = _stat_WIL;
                 break;
         }
 
-        for (int i = 0; i < temp_stat.Length; i++)
+        for (int i = 0; i < changingStat.Length; i++)
         {
             if (plus)
-                temp_stat[i] += stat_arr[i];
+                changingStat[i] += stat_arr[i];
             else
-                temp_stat[i] -= stat_arr[i];
+                changingStat[i] -= stat_arr[i];
         }
+
+        if (_isOn_statusScr)
+            _statusScr.Change_ActionStat(stat, changingStat);
     }
 
     public void TakeDamage(int dmg, BtlActData.DamageType dmgType)
@@ -545,22 +583,22 @@ public class PlayerSystem : MonoBehaviour, ICreature
 
                 //힘 스탯
                 _statusScr.Change_Reroll(Stats.STR, _reroll[(int)Stats.STR]);
-                _statusScr.Change_DiceSide(Stats.STR, _stat_STR);
+                _statusScr.Change_ActionStat(Stats.STR, _stat_STR);
                 //지능 스탯
                 _statusScr.Change_Reroll(Stats.INT, _reroll[(int)Stats.INT]);
-                _statusScr.Change_DiceSide(Stats.INT, _stat_INT);
+                _statusScr.Change_ActionStat(Stats.INT, _stat_INT);
                 //손재주 스탯
                 _statusScr.Change_Reroll(Stats.DEX, _reroll[(int)Stats.DEX]);
-                _statusScr.Change_DiceSide(Stats.DEX, _stat_DEX);
+                _statusScr.Change_ActionStat(Stats.DEX, _stat_DEX);
                 //민첩 스탯
                 _statusScr.Change_Reroll(Stats.AGI, _reroll[(int)Stats.AGI]);
-                _statusScr.Change_DiceSide(Stats.AGI, _stat_AGI);
+                _statusScr.Change_ActionStat(Stats.AGI, _stat_AGI);
                 //건강 스탯
                 _statusScr.Change_Reroll(Stats.CON, _reroll[(int)Stats.CON]);
-                _statusScr.Change_DiceSide(Stats.CON, _stat_CON);
+                _statusScr.Change_ActionStat(Stats.CON, _stat_CON);
                 //의지 스탯
                 _statusScr.Change_Reroll(Stats.WIL, _reroll[(int)Stats.WIL]);
-                _statusScr.Change_DiceSide(Stats.WIL, _stat_WIL);
+                _statusScr.Change_ActionStat(Stats.WIL, _stat_WIL);
             }
         }
     }
@@ -574,14 +612,14 @@ public class PlayerSystem : MonoBehaviour, ICreature
 
             if (_isOn_inventoryScr)
             {
-                //인벤토리 UI 우선순위를 최상으로
-                _inventoryScr.transform.SetAsLastSibling();
+                _inventoryScr.transform.SetAsLastSibling(); //인벤토리 UI 우선순위를 최상으로
 
-                //장착한 장비 아이콘 할당
-                //인벤토리 아이콘 할당
+                ItemSys.Set_EquipIcon();        //장착한 장비 아이콘 할당
+
+                ItemSys.Set_InventoryIcon();    //인벤토리 아이콘 할당
             }
 
-            //아이템 시스템: On_Inventory = !
+            ItemSys.ON_INVENTORY = _isOn_inventoryScr;
         }
     }
 
@@ -606,7 +644,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
         }
     }
 
-    public void MenuButton_OnOff_Status(bool b)  //스테이터스창 버튼 OnOff (전투 <-> 비전투 전환시 사용)
+    public void MenuButton_OnOff_Status(bool b)  //스테이터스창 버튼 OnOff
     {
         //스테이터스 버튼을 비활성화 될때, 스테이터스창이 활성화 중이라면
         if (b == false && _isOn_statusScr)
@@ -618,7 +656,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
         _btn_statusScr.gameObject.SetActive(b);
     }
 
-    public void MenuButton_OnOff_Inventory(bool b)
+    public void MenuButton_OnOff_Inventory(bool b)  //인벤토리창 버튼 OnOff
     {
         //인벤토리 버튼을 비활성화할 때, 인벤토리가 활성화 중이라면
         if (b == false && _isOn_inventoryScr)
@@ -630,7 +668,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
         _btn_inventoryScr.gameObject.SetActive(b);
     }
 
-    public void MenuButton_OnOff_ActList(bool b)
+    public void MenuButton_OnOff_ActList(bool b)    //행동창 버튼 OnOff
     {
         //행동목록 버튼을 비활성화할 때, 행동목록이 활성화 중이라면
         if (b == false && _isOn_actScr)
@@ -640,5 +678,31 @@ public class PlayerSystem : MonoBehaviour, ICreature
         }
 
         _btn_actScr.gameObject.SetActive(b);
+    }
+
+    public void EquipItem(ItemData item)    //아이템 장비
+    {
+        if (item.Type == ItemData.ItemType.Weapon)
+            Armed_OnOff(true);  //무기를 장비함
+
+        //무기, 방어구, 보조무기 타입의 장비의 경우 외형 변경
+        if (item.Type <= ItemData.ItemType.SubWp)
+        {
+            _p_spr.Change_Item(item, item.Type);
+            _p_spr_btl.Change_Item(item, item.Type);
+        }
+    }
+
+    public void UnequipItem(ItemData item)  //아이템 해제
+    {
+        if (item.Type == ItemData.ItemType.Weapon)
+            Armed_OnOff(true);  //무기를 해제함
+
+        //무기, 방어구, 보조무기 타입의 장비의 경우 외형 변경
+        if (item.Type <= ItemData.ItemType.SubWp)
+        {
+            _p_spr.Change_Item(item, item.Type);
+            _p_spr_btl.Change_Item(item, item.Type);
+        }
     }
 }

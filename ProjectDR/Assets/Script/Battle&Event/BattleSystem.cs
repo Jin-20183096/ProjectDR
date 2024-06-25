@@ -1207,9 +1207,9 @@ public class BattleSystem : MonoBehaviour
 
         //행동 직전, 직후 효과 체크 (isPre에 따라 갈림)
         if (isPre)
-            _e_act.Effect_Pre(true, this);
+            _e_act.Effect_Pre(false, this);
         else
-            _e_act.Effect_Post(true, this);
+            _e_act.Effect_Post(false, this);
 
         yield return new WaitUntil(() => _effectProcess == false);  //행동 효과 처리가 끝날 때까지 대기
 

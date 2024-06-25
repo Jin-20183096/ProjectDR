@@ -116,7 +116,7 @@ public class StatusScreen : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    public void Change_DiceSide(ICreature.Stats stat, int[] arr)
+    public void Change_ActionStat(ICreature.Stats stat, int[] arr)
     {
         Image[] temp_stat = null;
 

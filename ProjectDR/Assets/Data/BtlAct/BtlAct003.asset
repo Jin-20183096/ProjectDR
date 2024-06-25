@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BtlAct003
   m_EditorClassIdentifier: 
   Name: "\uD68C\uD53C"
-  Stats_Arr: 
+  Stats_Arr: 010000000200000003000000040000000500000006000000
   Type: 3
   DmgType: 0
   Dice_MinMax: 0100000004000000

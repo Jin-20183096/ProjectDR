@@ -63,8 +63,8 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         if (_isItemExist && STCanvas.DRAG == false)    //아이템이 존재하고, 드래그 중이 아닐 때
         {
-            //툴팁 준비
-            //툴팁 코루틴 on
+            ItemSys.ItemTooltip_On(_slotType, _slotIndex);  //툴팁 준비
+            StartCoroutine("Print_ItemTooltip");        //툴팁 코루틴 on
         }
     }
 
@@ -73,11 +73,9 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         if (_isItemExist)   //아이템이 존재할 때
         {
             if (STCanvas.DRAG == false) //드래그 중이 아닐 때
-            {
-                //툴팁 off
-            }
+                ItemSys.ItemTooltip_Off();  //툴팁 off
 
-            //툴팁 코루틴 정지
+            StopCoroutine("Print_ItemTooltip"); //툴팁 코루틴 정지
         }
     }
 
@@ -85,7 +83,7 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         yield return new WaitForSecondsRealtime(0.2f);
 
-        //툴팁 출력 함수 호출
+        ItemSys.Set_ItemTooltipPosition();  //툴팁 출력 함수 호출
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -95,20 +93,18 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
             if (STCanvas.DRAG == false) //드래그 중이 아닌 경우
             {
                 if (_isItemExist)
-                {
-                    //아이템 시스템에서 드래그 시작 요청
-                }
+                    ItemSys.Drag_Start(_slotType, _slotIndex);  //드래그 시작
             }
             else
-            {
-                //아이템 시스템에서 드래그 드롭 이벤트 실행
-            }
+                ItemSys.Drag_Drop(_slotType, _slotIndex);       //드래그 드롭
         }
         else if (eventData.button == PointerEventData.InputButton.Right)    //슬롯 위에서 우클릭 발생 시
         {
-            if (STCanvas.DRAG == false) //드래그 중이 아니며
+            if (STCanvas.DRAG == false &&   //드래그 중이 아니고
+                _isItemExist && _slotType != ItemSlotType.Equip)    //장비 슬롯이 아닌 슬롯의 아이템을 우클릭한 경우
             {
                 //아이템 시스템에서 아이템 장착 요청
+                ItemSys.Item_RightClick(_slotType, _slotIndex);
             }
         }
     }

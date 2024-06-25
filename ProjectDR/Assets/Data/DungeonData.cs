@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Dungeon", menuName = "ScrObj/Dungeon Data")]   //커스텀 메뉴 추가
+[CreateAssetMenu(fileName = "Dungeon", menuName = "ScrObj/DungeonData")]   //커스텀 메뉴 추가
 
 public class DungeonData : ScriptableObject
 {

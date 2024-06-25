@@ -5,7 +5,7 @@ using UnityEngine.Rendering;
 
 public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
 {
-    Color ColorUnknown = new Color32(25, 25, 25, 255);  //안 가본 색
+    Color ColorUnknown = new Color32(0, 0, 0, 255);  //안 가본 색
     Color ColorDark = new Color32(120, 120, 120, 255);  //시야 밖의 가본 색
     Color ColorSight = new Color32(255, 255, 255, 255); //시야 내의 색
 

@@ -29,6 +29,11 @@ public class SpriteSystem : MonoBehaviour
     private Vector3 _moveDest;  //이동 목적지 좌표
     private Vector3 _homePos;   //이동 후 복귀 좌표
 
+    [Header("# Equip Sprite")]
+    [SerializeField]
+    private EquipSprite[] _equipSpr;
+    private bool[] _isSomeEquip = new bool[5];
+
     private string _actTrigger;
 
     void Awake()
@@ -173,5 +178,15 @@ public class SpriteSystem : MonoBehaviour
             _btlSys.StartCoroutine(_btlSys.AtkHit(_hitBoxHost == HitBoxHost.Enemy));       //공격을 받는 코루틴  
 
         hitBox.HitBoxOff();
+    }
+
+    public void Change_Item(ItemData data, ItemData.ItemType type)  //장비 아이템 변경
+    {
+        //장비 타입에 따라 해당 equipSpr의 애니메이션 컨트롤러를 교체
+        _equipSpr[(int)type].Change_Sprite(data);
+
+        _isSomeEquip[(int)type] = (data != null);
+
+        _equipSpr[(int)type].Renderer_OnOff(data != null);
     }
 }

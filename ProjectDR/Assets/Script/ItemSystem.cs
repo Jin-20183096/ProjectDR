@@ -125,6 +125,13 @@ public class ItemSystem : MonoBehaviour
         _dragCursor = _dragIcon.transform.GetChild(0).gameObject;
 
         Create_Weapon(_test_item[0], ItemSlotType.Inventory, 0);
+        Create_Weapon(_test_item[0], ItemSlotType.Inventory, 1);
+
+        Create_Armor(_test_item[1], ItemSlotType.Inventory, 2);
+        Create_Armor(_test_item[1], ItemSlotType.Inventory, 3);
+
+        Create_Armor(_test_item[2], ItemSlotType.Inventory, 4);
+        Create_Armor(_test_item[2], ItemSlotType.Inventory, 5);
     }
 
     public bool Get_PlayerArmed()   //플레이어 무기 장비 여부 반환
@@ -173,15 +180,13 @@ public class ItemSystem : MonoBehaviour
     {
         //머리, 상의, 하의 방어구면
         if ((int)data.Type >= (int)ItemData.ItemType.Head && (int)data.Type <= (int)ItemData.ItemType.Leg)
-        {
-            //create 방어구 함수
-        }
+            Create_Armor(data, ItemSlotType.Reward, index);
         else
         {
             switch (data.Type)
             {
                 case ItemData.ItemType.Weapon:
-                    //create 무기 함수
+                    Create_Weapon(data, ItemSlotType.Reward, index);
                     break;
             }
         }
@@ -480,6 +485,272 @@ public class ItemSystem : MonoBehaviour
 
 
     //create 방어구
+    public void Create_Armor(ItemData data, ItemSlotType slot, int index)
+    {
+        //스탯1
+        ICreature.Stats stat1 = ICreature.Stats.No; //방어구 스탯1
+        int stat1_value = 0;                        // 일반 스탯: 정수 변수
+        int[] stat1_arr = { };                      // 행동 스탯: 정수 배열
+        //스탯2
+        ICreature.Stats stat2 = ICreature.Stats.No; //방어구 스탯2
+        int stat2_value = 0;                        // 일반 스탯: 정수 변수
+        int[] stat2_arr = { };                      // 행동 스탯: 정수 배열
+
+        //각 옵션에 부여된 코스트량
+        int cost_stat1 = 0;
+        int cost_stat2 = 0;
+        int cost_ability = 0;
+
+        //생성 방식에 따라 옵션 값 생성
+        //1) 옵션 생성에 필요한 코스트 설정
+        //2) 스탯1이 결정되는 아이템 재질의 경우, 스탯 1을 추가. 코스트 소모
+        //3) 보유한 코스트를 소모해서, 현재 방어구에 생성될 스탯, 특성에 코스트를 부여함.
+        //4) 모든 코스트를 소모한 뒤, 각 옵션에 부여된 코스트에 따라 옵션의 수치와 정보를 설정
+        //   이 때, 방어구 부위와 재질에 따른 특성을 반영
+        //5) 모든 옵션의 설정이 끝나면, 아이템 생성
+
+        //<<방어구 부위, 재질 별 특성>>
+        //  [금속]: HP와 방어도 스탯 생성 시, 추가 코스트 부여
+        //  [가죽]: 행동 스탯과 재굴림 스탯 생성 시, 추가 코스트 부여
+        //  [천]: 특성 생성 시 추가 코스트 부여
+        //  [머리]: 스탯1은 무작위 행동 스탯으로 결정
+        //  [상의]: 스탯1은 방어도로 결정
+        //  [하의]: 스탯1이 행동 스탯이면 스탯2는 그 스탯의 재굴림으로 결정
+        //          스탯1이 재굴림 스탯이면 스탯2는 그 재굴림의 행동 스탯으로 결정
+
+        //1) 옵션 생성에 필요한 코스트 설정
+        int cost = _cost;
+
+        //2) 스탯1이 결정되는 아이템 타입의 경우, 스탯 1을 추가. 코스트 소모
+        var material = data.Armor.Material;
+        var type = data.Type;
+
+        if (type == ItemData.ItemType.Head) //머리 방어구일 때
+        {
+            stat1 = (ICreature.Stats)Random.Range(1, (int)ICreature.Stats.HP);  //무작위 행동스탯
+            stat1_arr = new int[] { 0, 0, 0, 0, 0, 0 };
+
+            if (material == ItemData.ArmorMaterial.Leather) //가죽 방어구일 때
+                cost_stat1 += 1;    //행동 스탯 코스트 추가
+
+            cost -= _needCost_stat; //스탯 생성을 위한 코스트 소모
+        }
+        else if (type == ItemData.ItemType.Body)    //상의 방어구일 때
+        {
+            stat1 = ICreature.Stats.AC;
+            if (material == ItemData.ArmorMaterial.Metal)   //금속 방어구일 때
+                cost_stat1 += _needCost_ac / 2; //방어도 코스트 추가
+
+            cost -= _needCost_stat; //스탯 생성을 위한 코스트 소모
+        }
+
+        //3) 보유한 코스트를 소모해서, 현재 방어구에 생성될 스탯, 특성에 코스트를 부여함.
+        List<ItemOptionType> option_list = new List<ItemOptionType>()
+                { ItemOptionType.Stat, ItemOptionType.Ability };
+
+        while (cost > 0)
+        {
+            var option = option_list[Random.Range(0, option_list.Count)];
+            var use_cost = 0;
+
+            switch (option)
+            {
+                case ItemOptionType.Stat:
+                    if (stat1 == ICreature.Stats.No)        //스탯1이 없으면 스탯1 생성
+                    {
+                        stat1 = (ICreature.Stats)Random.Range(1, Enum.GetValues(typeof(ICreature.Stats)).Length);   //무작위 스탯
+
+                        if (stat1 < ICreature.Stats.HP) //행동 스탯이면
+                            stat1_arr = new int[] { 0, 0, 0, 0, 0, 0 };
+
+                        if (material == ItemData.ArmorMaterial.Metal)           //금속 방어구일 때
+                        {
+                            if (stat1 == ICreature.Stats.HP)                    //HP 스탯의 경우
+                                cost_stat1 += Random.Range(1, _needCost_ac);    //코스트 추가
+                            else if (stat1 == ICreature.Stats.AC)               //방어도 스탯의 경우
+                                cost_stat1 += _needCost_ac / 2;                     //코스트 추가
+                        }
+                        else if (material == ItemData.ArmorMaterial.Leather)    //가죽 방어구일 때
+                        {
+                            if (stat1 != ICreature.Stats.HP && stat1 == ICreature.Stats.AC) //HP나 방어도 스탯이 아닌 경우
+                                cost_stat1 += 1;
+                        }
+
+                        use_cost = _needCost_stat;  //스탯 생성을 위한 코스트 소모
+                    }
+                    else if (stat2 == ICreature.Stats.No)   //스탯2가 없으면 스탯2 생성
+                    {
+                        if (type == ItemData.ItemType.Leg)  //다리 방어구일 때
+                        {
+                            if (stat1 < ICreature.Stats.HP)             //스탯1이 행동 스탯인 경우
+                            {
+                                switch (stat1)  //스탯2를 스탯1에 대응되는 재굴림으로
+                                {
+                                    case ICreature.Stats.STR: stat2 = ICreature.Stats.RE_STR; break;
+                                    case ICreature.Stats.INT: stat2 = ICreature.Stats.RE_INT; break;
+                                    case ICreature.Stats.DEX: stat2 = ICreature.Stats.RE_DEX; break;
+                                    case ICreature.Stats.AGI: stat2 = ICreature.Stats.RE_AGI; break;
+                                    case ICreature.Stats.CON: stat2 = ICreature.Stats.RE_CON; break;
+                                    case ICreature.Stats.WIL: stat2 = ICreature.Stats.RE_WIL; break;
+                                }
+                            }
+                            else if (stat1 >= ICreature.Stats.RE_STR)   //스탯1이 재굴림인 경우
+                            {
+                                switch (stat1)  //스탯2를 스탯1에 대응되는 행동 스탯으로
+                                {
+                                    case ICreature.Stats.RE_STR: stat2 = ICreature.Stats.STR; break;
+                                    case ICreature.Stats.RE_INT: stat2 = ICreature.Stats.INT; break;
+                                    case ICreature.Stats.RE_DEX: stat2 = ICreature.Stats.DEX; break;
+                                    case ICreature.Stats.RE_AGI: stat2 = ICreature.Stats.AGI; break;
+                                    case ICreature.Stats.RE_CON: stat2 = ICreature.Stats.CON; break;
+                                    case ICreature.Stats.RE_WIL: stat2 = ICreature.Stats.WIL; break;
+                                }
+                            }
+                            else
+                                stat2 = (ICreature.Stats)Random.Range(1, Enum.GetValues(typeof(ICreature.Stats)).Length);   //무작위 스탯
+                        }
+                        else
+                            stat2 = (ICreature.Stats)Random.Range(1, Enum.GetValues(typeof(ICreature.Stats)).Length);   //무작위 스탯
+
+                        if (stat2 != stat1)
+                        {
+                            if (stat2 < ICreature.Stats.HP) //행동 스탯이면
+                                stat2_arr = new int[] { 0, 0, 0, 0, 0, 0 };
+
+                            if (material == ItemData.ArmorMaterial.Metal)           //금속 방어구일 때
+                            {
+                                //HP나 방어도의 경우, 코스트 추가
+                                if (stat2 == ICreature.Stats.HP) cost_stat2 += Random.Range(1, _needCost_ac);
+                                else if (stat2 == ICreature.Stats.AC) cost_stat2 += _needCost_ac / 2;
+                            }
+                            else if (material == ItemData.ArmorMaterial.Leather)    //가죽 방어구일 때
+                            {
+                                if (stat2 != ICreature.Stats.HP && stat2 == ICreature.Stats.AC) //HP나 방어도 스탯이 아닌 경우
+                                    cost_stat2 += 1;                                            //코스트 추가
+                            }
+
+                            use_cost = _needCost_stat;
+                        }
+                        else
+                        {
+                            stat2 = ICreature.Stats.No; //스탯2를 없애고, 스탯1과 통합
+
+                            //스탯 생성을 위해 소모할 코스트의 절반만큼 코스트 부여
+                            cost_stat1 += _needCost_stat / 2;
+                            use_cost = _needCost_stat / 2;
+                        }
+                    }
+                    else    //스탯1과 스탯2가 모두 있으면
+                    {
+                        use_cost = Random.Range(1, 4);  //무작위 코스트
+
+                        if (Random.value < 0.5f)    //스탯1 또는 스탯2에 무작위 코스트 부여
+                            cost_stat1 += use_cost;
+                        else
+                            cost_stat2 += use_cost;
+                    }
+                    break;
+                case ItemOptionType.Ability:
+                    //천 방어구는 특성 생성시 추가 코스트가 있음
+                    use_cost = 1;
+                    break;
+            }
+
+            cost -= use_cost;
+        }
+
+        //4) 모든 코스트를 소모한 뒤, 각 옵션에 부여된 코스트에 따라 옵션의 수치와 정보를 설정
+        //   이 때, 방어구 부위와 재질에 따른 특성을 반영
+
+        if (stat1 != ICreature.Stats.No)
+        {
+            if (cost_stat1 > 0) //스탯1 코스트가 1 이상이면
+            {
+                if (stat1 < ICreature.Stats.HP) //스탯1이 행동 스탯일 때
+                {
+                    for (int i = cost_stat1; i > 0; i--)    //해당 스탯의 무작위 위치에 스탯 1씩 증가
+                        stat1_arr[Random.Range(0, stat1_arr.Length)] += 1;
+                }
+                else
+                {
+                    stat1_value = Cost_To_StatValue(stat1, cost_stat1); //스탯에 따라 지정된 비율만큼 코스트를 수치로 변환
+
+                    if (stat1_value == 0)   //수치가 0인 경우
+                        stat1 = ICreature.Stats.No; //스탯 제거
+                }
+            }
+            else    //스탯1 코스트가 0이면
+            {
+                //스탯 제거
+                stat1 = ICreature.Stats.No;
+                stat1_value = 0;
+                stat1_arr = new int[] { };
+            }
+        }
+
+        if (stat2 != ICreature.Stats.No)
+        {
+            if (cost_stat2 > 0) //스탯2 코스트가 1 이상이면
+            {
+                if (stat2 < ICreature.Stats.HP) //스탯2가 행동 스탯일 때
+                {
+                    for (int i = cost_stat2; i > 0; i--)    //해당 스탯의 무작위 위치에 스탯 1씩 증가
+                        stat2_arr[Random.Range(0, stat2_arr.Length)] += 1;
+                }
+                else
+                {
+                    stat2_value = Cost_To_StatValue(stat2, cost_stat2); //스탯에 따라 지정된 비율만큼 코스트를 수치로 변환
+
+                    if (stat2_value == 0)   //수치가 0인 경우
+                        stat2 = ICreature.Stats.No; //스탯 제거
+                }
+            }
+            else    //스탯2 코스트가 0이면
+            {
+                //스탯 제거
+                stat2 = ICreature.Stats.No;
+                stat2_value = 0;
+                stat2_arr = new int[] { };
+            }
+        }
+
+        ItemClass[] createGroup = null;
+        ItemSlot[] createSlot = null;
+
+        switch (slot)
+        {
+            case ItemSlotType.Equip:
+                createGroup = _itemClass_equip;
+                createSlot = _slot_equip;
+                break;
+            case ItemSlotType.Inventory:
+                createGroup = _itemClass_inventory;
+                createSlot = _slot_inventory;
+                break;
+            case ItemSlotType.Reward:
+                createGroup = _itemClass_reward;
+                createSlot = _slot_reward;
+                break;
+        }
+
+        createGroup[index] = new ItemClass()
+        {
+            //아이템 데이터
+            Data = data,
+            //스탯1 & 스탯1 수치
+            Stat1 = stat1,
+            Stat1_Value = stat1_value,
+            Stat1_Arr = stat1_arr.ToArray(),
+            //스탯2 & 스탯2 수치
+            Stat2 = stat2,
+            Stat2_Value = stat2_value,
+            Stat2_Arr = stat2_arr.ToArray()
+            //특성
+        };
+
+        createSlot[index].EXIST = true; //아이템 생성 후 그 슬롯 아이템 존재 여부 true
+    }
+
 
     int Cost_To_StatValue(ICreature.Stats stat, int cost)   //코스트를 소모해 비율에 맞는 스탯값으로 반환
     {
@@ -595,6 +866,7 @@ public class ItemSystem : MonoBehaviour
                 _itemClass_equip[(int)item.Data.Type].Data != null)
             {
                 //장착 중 아이템 표시
+                ItemTooltip_Equip_On(item.Data.Type);
             }
         }
     }

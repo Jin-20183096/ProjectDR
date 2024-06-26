@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using static HitBoxCollider;
 
@@ -52,16 +53,31 @@ public class SpriteSystem : MonoBehaviour
     public void Flip_X(bool isLeft)     //스프라이트 좌우 반전
     {
         _spr.flipX = isLeft;
+
+        for (int i = 0; i < _equipSpr.Length; i++)
+            _equipSpr[i].Flip_X(isLeft);
     }
 
     public void Set_CommonMoveSet(CommonTrigger trigger)
     {
         _anima.SetTrigger(trigger.ToString());
+
+        for (int i = 0; i < _equipSpr.Length; i++)
+        {
+            _equipSpr[i].Renderer_OnOff(_isSomeEquip[i]);
+            _equipSpr[i].Set_AnimaTrigger(trigger.ToString());
+        }
     }
 
     public void Set_ActionMoveSet_Atk(AtkMoveSet atk, bool isTrue)
     {
         _anima.SetBool(atk.ToString(), isTrue);
+
+        for (int i = 0; i < _equipSpr.Length; i++)
+        {
+            _equipSpr[i].Renderer_OnOff(_isSomeEquip[i]);
+            _equipSpr[i].Set_AnimaBool(atk.ToString(), isTrue);
+        }
 
         _actTrigger = atk.ToString();
     }
@@ -70,6 +86,12 @@ public class SpriteSystem : MonoBehaviour
     {
         _anima.SetBool(def.ToString(), isTrue);
 
+        for (int i = 0; i < _equipSpr.Length; i++)
+        {
+            _equipSpr[i].Renderer_OnOff(_isSomeEquip[i]);
+            _equipSpr[i].Set_AnimaBool(def.ToString(), isTrue);
+        }
+
         _actTrigger = def.ToString();
     }
 
@@ -77,12 +99,24 @@ public class SpriteSystem : MonoBehaviour
     {
         _anima.SetBool(dge.ToString(), isTrue);
 
+        for (int i = 0; i < _equipSpr.Length; i++)
+        {
+            _equipSpr[i].Renderer_OnOff(_isSomeEquip[i]);
+            _equipSpr[i].Set_AnimaBool(dge.ToString(), isTrue);
+        }
+
         _actTrigger = dge.ToString();
     }
 
     public void Set_ActionMoveSet_Tac(TacMoveSet tac, bool isTrue)
     {
         _anima.SetBool(tac.ToString(), isTrue);
+
+        for (int i = 0; i < _equipSpr.Length; i++)
+        {
+            _equipSpr[i].Renderer_OnOff(_isSomeEquip[i]);
+            _equipSpr[i].Set_AnimaBool(tac.ToString(), isTrue);
+        }
 
         _actTrigger = tac.ToString();
     }
@@ -92,6 +126,12 @@ public class SpriteSystem : MonoBehaviour
         var trigger = _actTrigger + "Start";
 
         _anima.SetTrigger(trigger);
+
+        for (int i = 0; i < _equipSpr.Length; i++)
+        {
+            _equipSpr[i].Renderer_OnOff(_isSomeEquip[i]);
+            _equipSpr[i].Set_AnimaTrigger(trigger);
+        }
     }
 
     public void Set_ActHitBox(HitBoxType type)
@@ -112,6 +152,7 @@ public class SpriteSystem : MonoBehaviour
 
     public void Set_SpriteMove(Vector3 dest) //목표 좌표로 이동
     {
+        Debug.Log((_hitBoxHost == HitBoxHost.Player ? "플레이어 " : "적 ") + "이동 시작");
         _moveDest = dest;
         _rigid.isKinematic = false;
 

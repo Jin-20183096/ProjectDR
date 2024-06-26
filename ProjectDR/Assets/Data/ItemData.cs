@@ -22,7 +22,7 @@ public class ItemData : ScriptableObject
     private ItemType _type; //아이템 타입
     public ItemType Type { get { return _type; } }
 
-    [Header("# Weapon -----")]
+    [Header("# Action -----")]
     public ActionClass Action;
 
     [Header("# Armor -----")]

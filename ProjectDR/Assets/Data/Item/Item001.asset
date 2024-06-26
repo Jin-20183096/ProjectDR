@@ -25,5 +25,5 @@ MonoBehaviour:
     TacAct_Arr: []
   Armor:
     Material: 0
-  Clip_Idle: {fileID: 7400000, guid: 9178c9860cc2957448e5b718d5fc6e0c, type: 2}
+  Clip_Idle: {fileID: 7400000, guid: b87f3620c8835e14ba3376c89d9408c3, type: 2}
   Clip_Atk1: []

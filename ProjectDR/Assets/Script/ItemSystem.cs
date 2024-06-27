@@ -30,6 +30,9 @@ public class ItemSystem : MonoBehaviour
         //행동
         public ICreature.BtlActClass BtlAct1 = null;
         public ICreature.BtlActClass BtlAct2 = null;
+
+        //능력
+        public AbilityData Ability = null;
     }
 
     [SerializeField]
@@ -83,14 +86,15 @@ public class ItemSystem : MonoBehaviour
     }
 
     //아이템 생성시 활용되는 변수
-    private int _cost = 10;     //아이템 생성에 사용하는 코스트
+    private int _cost = 20;     //아이템 생성에 사용하는 코스트
 
     private int _needCost_stat = 2;     //스탯 추가 시 필요 코스트
     private int _needCost_hp = 1;       //HP 스탯 1 상승의 필요 코스트 
     private int _needCost_ac = 3;       //방어도 스탯 1 상승의 필요 코스트
     private int _needCost_re = 2;       //재굴림 스탯 1 상승의 필요 코스트
-
+    
     private int _needCost_btlAct = 4;   //행동 추가 시 필요 코스트
+    private int _needCost_ability = 4;       //능력 추가 시 필요한 코스트
 
     [SerializeField]
     private Sprite _spr_noItem;    //아이템 없는 슬롯의 스프라이트
@@ -210,7 +214,7 @@ public class ItemSystem : MonoBehaviour
         BtlActData btlAct2 = null;
         ICreature.Stats btlAct2_stat = ICreature.Stats.No;  //행동2 스탯
         //능력
-        //
+        AbilityData ability = null;
 
         //각 옵션에 부여된 코스트량
         int cost_stat1 = 0;
@@ -222,7 +226,7 @@ public class ItemSystem : MonoBehaviour
         //1. 옵션 생성에 필요한 코스트 설정
         //2. 데이터의 공격행동 목록에서 행동 하나를 무작위로 선택해 추가. 코스트 소모.
         //   그 행동의 보정스탯을 스탯1로 추가. 코스트 소모 
-        //3. 보유한 코스트를 소모해서, 현재 무기에 생성될 스탯, 행동, 특성에 코스트를 부여함.
+        //3. 보유한 코스트를 소모해서, 현재 무기에 생성될 스탯, 행동, 능력에 코스트를 부여함.
         //4) 모든 코스트를 소모한 뒤, 각 옵션의 세부정보를 부여받은 코스트에 따라 설정
         //5. 모든 옵션 설정이 끝나면, 아이템 생성
 
@@ -239,9 +243,16 @@ public class ItemSystem : MonoBehaviour
         cost_stat1 = _needCost_stat;
         cost -= cost_stat1;
 
-        //3. 보유한 코스트를 소모해서, 현재 무기에 생성될 스탯, 행동, 특성에 코스트를 부여함.
+        //3. 보유한 코스트를 소모해서, 현재 무기에 생성될 스탯, 행동, 능력에 코스트를 부여함.
         List<ItemOptionType> option_list = new List<ItemOptionType>()
-            { ItemOptionType.Stat, ItemOptionType.Action, ItemOptionType.Ability };
+            { ItemOptionType.Stat};
+
+        if (data.Action.AtkAct_Arr.Length > 0 || data.Action.DefAct_Arr.Length > 0
+            || data.Action.DgeAct_Arr.Length > 0 || data.Action.TacAct_Arr.Length > 0)  //아이템 데이터에 행동이 존재하는지 체크
+            option_list.Add(ItemOptionType.Action);
+
+        if (data.Ability_Arr.Length > 0)
+            option_list.Add(ItemOptionType.Ability);    //아이템 데이터에 능력이 존재하는지 체크
 
         while (cost > 0)
         {
@@ -292,7 +303,9 @@ public class ItemSystem : MonoBehaviour
                         use_cost = 1;
                     break;
                 case ItemOptionType.Ability:
-                    //특성 생성과 소모 코스트를 설정
+                    //능력 생성과 소모 코스트를 설정
+                    use_cost = Random.Range(1, 3);
+                    cost_ability += use_cost;
                     break;
             }
 
@@ -434,6 +447,12 @@ public class ItemSystem : MonoBehaviour
             btlAct2_stat = ICreature.Stats.No;
         }
 
+        if (cost_ability >= _needCost_ability)  //능력 생성에 필요한 만큼의 코스트가 있으면
+        {
+            Debug.Log("능력 생성. (코스트 " + cost_ability + ")");
+            ability = data.Ability_Arr[Random.Range(0, data.Ability_Arr.Length)];
+        }
+
         //5. 모든 옵션 설정이 끝나면, 아이템 생성
         ItemClass[] createGroup = null;
         ItemSlot[] createSlot = null;
@@ -477,7 +496,9 @@ public class ItemSystem : MonoBehaviour
             {
                 Data = btlAct2,
                 Stat = btlAct2_stat
-            }
+            },
+            //능력
+            Ability = ability
         };
 
         createSlot[index].EXIST = true; //아이템 생성 후 그 슬롯 아이템 존재 여부 true
@@ -495,6 +516,8 @@ public class ItemSystem : MonoBehaviour
         ICreature.Stats stat2 = ICreature.Stats.No; //방어구 스탯2
         int stat2_value = 0;                        // 일반 스탯: 정수 변수
         int[] stat2_arr = { };                      // 행동 스탯: 정수 배열
+        //능력
+        AbilityData ability = null;
 
         //각 옵션에 부여된 코스트량
         int cost_stat1 = 0;
@@ -504,15 +527,15 @@ public class ItemSystem : MonoBehaviour
         //생성 방식에 따라 옵션 값 생성
         //1) 옵션 생성에 필요한 코스트 설정
         //2) 스탯1이 결정되는 아이템 재질의 경우, 스탯 1을 추가. 코스트 소모
-        //3) 보유한 코스트를 소모해서, 현재 방어구에 생성될 스탯, 특성에 코스트를 부여함.
+        //3) 보유한 코스트를 소모해서, 현재 방어구에 생성될 스탯, 능력에 코스트를 부여함.
         //4) 모든 코스트를 소모한 뒤, 각 옵션에 부여된 코스트에 따라 옵션의 수치와 정보를 설정
-        //   이 때, 방어구 부위와 재질에 따른 특성을 반영
+        //   이 때, 방어구 부위와 재질에 따른 특징을 반영
         //5) 모든 옵션의 설정이 끝나면, 아이템 생성
 
-        //<<방어구 부위, 재질 별 특성>>
+        //<<방어구 부위, 재질 별 특징>>
         //  [금속]: HP와 방어도 스탯 생성 시, 추가 코스트 부여
         //  [가죽]: 행동 스탯과 재굴림 스탯 생성 시, 추가 코스트 부여
-        //  [천]: 특성 생성 시 추가 코스트 부여
+        //  [천]: 능력 생성 시 추가 코스트 부여
         //  [머리]: 스탯1은 무작위 행동 스탯으로 결정
         //  [상의]: 스탯1은 방어도로 결정
         //  [하의]: 스탯1이 행동 스탯이면 스탯2는 그 스탯의 재굴림으로 결정
@@ -544,9 +567,15 @@ public class ItemSystem : MonoBehaviour
             cost -= _needCost_stat; //스탯 생성을 위한 코스트 소모
         }
 
-        //3) 보유한 코스트를 소모해서, 현재 방어구에 생성될 스탯, 특성에 코스트를 부여함.
+        if (data.Armor.Material == ItemData.ArmorMaterial.Cloth)    //천 방어구일 때
+            cost_ability += 2;  //능력 생성을 위한 코스트 추가
+
+        //3) 보유한 코스트를 소모해서, 현재 방어구에 생성될 스탯, 능력에 코스트를 부여함.
         List<ItemOptionType> option_list = new List<ItemOptionType>()
-                { ItemOptionType.Stat, ItemOptionType.Ability };
+                { ItemOptionType.Stat };
+
+        if (data.Ability_Arr.Length > 0)
+            option_list.Add(ItemOptionType.Ability);    //아이템 데이터에 능력이 존재하는지 체크
 
         while (cost > 0)
         {
@@ -651,8 +680,8 @@ public class ItemSystem : MonoBehaviour
                     }
                     break;
                 case ItemOptionType.Ability:
-                    //천 방어구는 특성 생성시 추가 코스트가 있음
-                    use_cost = 1;
+                    use_cost = Random.Range(1, 3);
+                    cost_ability += use_cost;
                     break;
             }
 
@@ -660,7 +689,7 @@ public class ItemSystem : MonoBehaviour
         }
 
         //4) 모든 코스트를 소모한 뒤, 각 옵션에 부여된 코스트에 따라 옵션의 수치와 정보를 설정
-        //   이 때, 방어구 부위와 재질에 따른 특성을 반영
+        //   이 때, 방어구 부위와 재질에 따른 특징을 반영
 
         if (stat1 != ICreature.Stats.No)
         {
@@ -714,6 +743,12 @@ public class ItemSystem : MonoBehaviour
             }
         }
 
+        if (cost_ability >= _needCost_ability)  //능력 생성에 필요한 만큼의 코스트가 있으면
+        {
+            Debug.Log("능력 생성. (코스트 " + cost_ability + ")");
+            ability = data.Ability_Arr[Random.Range(0, data.Ability_Arr.Length)];
+        }
+
         ItemClass[] createGroup = null;
         ItemSlot[] createSlot = null;
 
@@ -744,13 +779,25 @@ public class ItemSystem : MonoBehaviour
             //스탯2 & 스탯2 수치
             Stat2 = stat2,
             Stat2_Value = stat2_value,
-            Stat2_Arr = stat2_arr.ToArray()
-            //특성
+            Stat2_Arr = stat2_arr.ToArray(),
+            //능력
+            Ability = ability
         };
 
         createSlot[index].EXIST = true; //아이템 생성 후 그 슬롯 아이템 존재 여부 true
     }
 
+    //목걸이 생성
+    public void Create_Amulet(ItemData data, ItemSlotType slot, int index)
+    {
+
+    }
+
+    //반지 생성
+    public void Create_Ring(ItemData data, ItemSlotType slot, int index)
+    {
+
+    }
 
     int Cost_To_StatValue(ICreature.Stats stat, int cost)   //코스트를 소모해 비율에 맞는 스탯값으로 반환
     {
@@ -856,8 +903,8 @@ public class ItemSystem : MonoBehaviour
             if (item.BtlAct2 != null)
                 _itemTooltip.Change_Action2(item.BtlAct2);  //행동2
 
-            //능력이 존재할 때
-            //툴팁에 능력 표기
+            if (item.Ability != null)
+                _itemTooltip.Change_Ability(item.Ability);  //능력
 
             //만약 해당 아이템이 장비 슬롯 밖의 장비 아이템인 경우
             //동일한 타입의 장비를 착용 중이라면, 장착 중 아이템의 툴팁 준비
@@ -903,10 +950,10 @@ public class ItemSystem : MonoBehaviour
                 _itemTooltip_equip.Change_Action1(item.BtlAct1);    //행동 1
             if (item.BtlAct2 != null)
                 _itemTooltip_equip.Change_Action2(item.BtlAct2);    //행동 2
-        }
 
-        //능력이 존재할 때
-        //툴팁에 능력 표기
+            if (item.Ability != null)
+                _itemTooltip_equip.Change_Ability(item.Ability);    //능력
+        }
     }
 
     //툴팁 출력 위치 설정
@@ -1282,7 +1329,7 @@ public class ItemSystem : MonoBehaviour
         if (itemClass.BtlAct2 != null)   //전투행동2가 존재할 경우
             Manage_BtlAct(isEquip, itemClass.BtlAct2);   //전투행동2 추가/제거
 
-        //특성 존재 시 추가/제거
+        //능력 존재 시 추가/제거
 
         if (isEquip)
             PlayerSys.EquipItem(itemClass.Data);    //아이템 장착

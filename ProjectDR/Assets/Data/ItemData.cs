@@ -15,6 +15,7 @@ public class ItemData : ScriptableObject
     public Sprite Icon { get { return _icon; } }
 
     [SerializeField]
+    [TextArea(1, 3)]
     private string _name;   //아이템 이름
     public string Name { get { return _name; } }
 
@@ -24,6 +25,9 @@ public class ItemData : ScriptableObject
 
     [Header("# Action -----")]
     public ActionClass Action;
+
+    [Header("# Ability -----")]
+    public AbilityData[] Ability_Arr;
 
     [Header("# Armor -----")]
     public ArmorClass Armor;

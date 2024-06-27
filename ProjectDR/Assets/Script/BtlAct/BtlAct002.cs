@@ -23,7 +23,7 @@ public class BtlAct002 : BtlActData
                 btlSys.Change_Ap_Player(false, myDice);
 
             //로그 출력
-            btlSys.SetLog_DefEffect(isP, btlSys.E_NAME + "행동력을 " + myDice + " 잃었다");
+            btlSys.SetLog_DefEffect(isP, btlSys.E_NAME + " 행동력을 " + myDice + " 잃었다");
         }
     }
 }

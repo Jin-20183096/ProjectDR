@@ -23,6 +23,8 @@ MonoBehaviour:
     DgeAct_Arr:
     - {fileID: 11400000, guid: 16703902592f3264d9b74b455350efb7, type: 2}
     TacAct_Arr: []
+  Ability_Arr:
+  - {fileID: 11400000, guid: d5ad3e474c14cd643a474634f0cb5f00, type: 2}
   Armor:
     Material: 0
   Clip_Idle: {fileID: 7400000, guid: b87f3620c8835e14ba3376c89d9408c3, type: 2}

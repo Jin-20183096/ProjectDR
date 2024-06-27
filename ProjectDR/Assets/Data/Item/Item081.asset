@@ -20,6 +20,7 @@ MonoBehaviour:
     DefAct_Arr: []
     DgeAct_Arr: []
     TacAct_Arr: []
+  Ability_Arr: []
   Armor:
     Material: 3
   Clip_Idle: {fileID: 7400000, guid: 561fce376f0cc0048898ca9a65670e28, type: 2}

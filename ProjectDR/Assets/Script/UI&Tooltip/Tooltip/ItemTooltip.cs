@@ -83,7 +83,7 @@ public class ItemTooltip : MonoBehaviour
     private Sprite[] _spr_typeIcon;
 
     private string[] _statName_arr = { "", "Èû", "Áö´É", "¼ÕÀçÁÖ", "¹ÎÃ¸", "°Ç°­", "ÀÇÁö", "HP", "¹æ¾îµµ",
-                                        "Èû Àç±¼¸²", "Áö´É Àç±¼¸²", "¹ÎÃ¸ Àç±¼¸²", "°Ç°­ Àç±¼¸²", "ÀÇÁö Àç±¼¸²" };
+                                        "Èû Àç±¼¸²", "Áö´É Àç±¼¸²", "¼ÕÀçÁÖ Àç±¼¸²", "¹ÎÃ¸ Àç±¼¸²", "°Ç°­ Àç±¼¸²", "ÀÇÁö Àç±¼¸²" };
 
     private void Start()
     {
@@ -247,6 +247,21 @@ public class ItemTooltip : MonoBehaviour
             _act2_typeIcon.sprite = _spr_typeIcon[(int)data.Type];
             _act2_name.text = data.Name;
             _act2_stat.text = _statName_arr[(int)btlAct.Stat];
+        }
+    }
+
+    public void Change_Ability(AbilityData ability)
+    {
+        if (ability == null)
+        {
+            if (_ability != null)
+                _ability.SetActive(false);
+        }
+        else
+        {
+            _ability.SetActive(true);
+            _ability_name.text = "[" + ability.NAME + "]";
+            _ability_info.text = ability.INFO;
         }
     }
 

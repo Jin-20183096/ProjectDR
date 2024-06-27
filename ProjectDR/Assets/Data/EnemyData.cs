@@ -34,4 +34,8 @@ public class EnemyData : ScriptableObject
     [Header("# Sprite Animation")]
     public Sprite DefaultSprite;    //적 기본 스프라이트
     public RuntimeAnimatorController Anima_Ctrl;    //적 애니메이션 컨트롤러
+
+    [Header("# Reward Info")]
+    public int[] Exp = new int[2];  //최소 경험치 ~ 최대 경험치
+    public ItemData[] Item;
 }

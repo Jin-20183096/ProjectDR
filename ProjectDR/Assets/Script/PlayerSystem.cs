@@ -231,6 +231,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
 
     public void Set_PlayerLocalPos(bool isCenter, bool isLeft)
     {
+        Debug.Log("플레이어 중앙에 있는가" + isCenter + " /\n 플레이어 좌측에 있는가" + isLeft);
         if (isCenter)
             _p_spr.transform.localPosition = new Vector3(0, 0, -1.25f);
         else

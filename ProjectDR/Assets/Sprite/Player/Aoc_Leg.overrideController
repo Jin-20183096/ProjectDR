@@ -8,4 +8,6 @@ AnimatorOverrideController:
   m_PrefabAsset: {fileID: 0}
   m_Name: Aoc_Leg
   m_Controller: {fileID: 9100000, guid: ee24f39cd879c834c80bc073f583e78e, type: 2}
-  m_Clips: []
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: fb04908f5866586428a9618109ab9d2f, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 18cbdec94ea9a354884fb89f8ea9ac16, type: 2}

@@ -136,6 +136,9 @@ public class ItemSystem : MonoBehaviour
 
         Create_Armor(_test_item[2], ItemSlotType.Inventory, 4);
         Create_Armor(_test_item[2], ItemSlotType.Inventory, 5);
+
+        Create_Armor(_test_item[3], ItemSlotType.Inventory, 6);
+        Create_Armor(_test_item[3], ItemSlotType.Inventory, 7);
     }
 
     public bool Get_PlayerArmed()   //플레이어 무기 장비 여부 반환

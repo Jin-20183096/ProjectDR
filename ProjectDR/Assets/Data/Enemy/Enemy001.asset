@@ -33,3 +33,8 @@ MonoBehaviour:
   BT: {fileID: 4900000, guid: 0ac1b24186640c04e9c4dd5b6bd852fc, type: 3}
   DefaultSprite: {fileID: 1892043697, guid: 7e83bcd9fff855b4384f1b199ac901ed, type: 3}
   Anima_Ctrl: {fileID: 9100000, guid: 45442f3b01a8e154582fe4aa00728ea5, type: 2}
+  Exp: 0200000005000000
+  Item:
+  - {fileID: 11400000, guid: c220993099025834abff4ba78971ccc2, type: 2}
+  - {fileID: 11400000, guid: d70470c69ad518b44a03dd669b40dbf5, type: 2}
+  - {fileID: 11400000, guid: 54900e305e1766645be589cbf49c37e0, type: 2}

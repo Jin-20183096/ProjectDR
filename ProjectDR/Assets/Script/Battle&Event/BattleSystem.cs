@@ -17,7 +17,11 @@ public class BattleSystem : MonoBehaviour
     [SerializeField]
     private DiceResultPannel _e_resultPannel;   //적 주사위 결과창
     [SerializeField]
-    private GameLog _btlLog;
+    private GameLog _btlLog;    //전투 로그
+    [SerializeField]
+    private ItemSystem _itemSys;                //아이템 시스템
+    [SerializeField]
+    private RewardPannel _rewardPannel;         //전리품 창
 
     [Header("# Camera")]
     [SerializeField]
@@ -517,6 +521,27 @@ public class BattleSystem : MonoBehaviour
         //어느 한 쪽 사망 시, 전투 종료
         if (_enemySys.HP <= 0)  //적 사망 시
         {
+            var data = _enemySys.Data;
+
+            //아이템 시스템을 통해 아이템 드랍
+            //----------------
+            _rewardPannel.RewardPannel_Exp_OnOff(true);     //경험치 획득 패널 On
+            _rewardPannel.RewardPannel_Item_OnOff(true);    //아이템 획득 패널 On
+            _itemSys.Reward_Clear();    //이전 전리품 모두 제거
+            _itemSys.ON_REWARD = true;  //전리품창 ON 상태
+
+            var exp = Random.Range(data.Exp[0], data.Exp[1]);
+            var amount = Random.Range(1, 4);
+
+            _rewardPannel.Set_RewardExpInfo();  //경험치 획득 패널의 수치 설정
+            _rewardPannel.Set_GetExpText(exp);//획득 경험치 표시
+            _playerSys.Change_Exp(true, exp);
+            
+            for (int i = 0; i < amount; i++)    //드랍할 아이템 개수만큼 아이템 드랍
+                _itemSys.Reward_Item(data.Item[Random.Range(0, data.Item.Length)], i);
+            _itemSys.Set_RewardIcon();  //드랍한 아이템 표시
+            //----------------
+
             _isNowBattleEnd = true;
 
             _btlLog.SetLog_BattleEnd(true);     //전투 종료 로그 출력
@@ -581,6 +606,10 @@ public class BattleSystem : MonoBehaviour
         _dgnSys.EVNT_PROCESS = false;   //이벤트 진행 상황 종료
 
         StopAllCoroutines();
+
+        _itemSys.Reward_Clear();    //전리품 모두 제거
+        _rewardPannel.RewardPannel_Exp_OnOff(false);
+        _rewardPannel.RewardPannel_Item_OnOff(false);
 
         _btn_eventEnd.SetActive(false);
     }

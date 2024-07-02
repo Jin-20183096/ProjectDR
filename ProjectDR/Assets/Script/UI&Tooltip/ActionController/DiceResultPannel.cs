@@ -75,7 +75,13 @@ public class DiceResultPannel : MonoBehaviour
     public void DiceResultPannel_OnOff(bool b)  //주사위 결과창 OnOff
         => _pannel_diceResult.SetActive(b);
 
-    public void Change_DiceResult(int order, int value) //주사위 결과창 결과 변경
+    public void Set_MomentDiceResult(int order, int value)  //주사위 결과창 결과 변경(순간적인 주사위의 결과)
+    {
+        _img_diceSide[order].color = new Color(1, 1, 1, 0.3f);
+        _img_diceSide[order].sprite = _spr_dice[value];
+    }
+
+    public void Set_StopDiceResult(int order, int value)    //주사위 결과창 결과 변경(멈춘 주사위의 결과)
     {
         _img_diceSide[order].color = new Color(1, 1, 1, 1);
         _img_diceSide[order].sprite = _spr_dice[value];

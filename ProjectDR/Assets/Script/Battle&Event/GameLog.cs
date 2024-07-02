@@ -7,7 +7,7 @@ public class GameLog : MonoBehaviour
 {
     public enum LogSituation
     {
-        No, ActEffect, BtlFlow, BtlEnd
+        No, ActEffect, BtlFlow, RunEnd, BtlEnd
     }
 
     [SerializeField]
@@ -72,7 +72,7 @@ public class GameLog : MonoBehaviour
         if (success)
             NewLog(MakeSentence((isP ? _p_name : _e_name), success ? "도망쳤다" : "도망에 실패했다"));
 
-        LogPrint_Start(LogSituation.BtlEnd);
+        LogPrint_Start(LogSituation.RunEnd);
     }
 
     public void SetLog_BattleFlow(string text)      //로그 설정: 전투 처리
@@ -221,8 +221,11 @@ public class GameLog : MonoBehaviour
             case LogSituation.BtlFlow:          //전투 처리 로그 출력
                 _btlSys.Set_BattleProcess(false);
                 break;
-            case LogSituation.BtlEnd:           //전투 종료 로그(보통은 도망 행동 시 사용됨)
-                _btlSys.BattleFlow_End();
+            case LogSituation.RunEnd:           //도망으로 전투 종료 로그
+                //_btlSys.StartCoroutine(_btlSys.BattleFlow_End());
+                break;
+            case LogSituation.BtlEnd:
+
                 break;
         }
     }

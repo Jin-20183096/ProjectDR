@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6500328b725676d4fa5b9dd95d180b00, type: 3}
   m_Name: Item001
   m_EditorClassIdentifier: 
-  _icon: {fileID: -488815497, guid: 832b35751793d10448ae1bd27b2f4046, type: 3}
+  _icon: {fileID: -934116231, guid: 832b35751793d10448ae1bd27b2f4046, type: 3}
   _name: "\uC20F\uC18C\uB4DC"
   _type: 0
   Action:

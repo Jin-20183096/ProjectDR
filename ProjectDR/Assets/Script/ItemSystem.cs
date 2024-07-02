@@ -35,6 +35,7 @@ public class ItemSystem : MonoBehaviour
         public AbilityData Ability = null;
     }
 
+    [Header("# Item Slots & Classes")]
     [SerializeField]
     private ItemSlot[] _slot_equip;         //장비 슬롯 (0: 무기 / 1: 머리 / 2: 상의 / 3: 하의 / 4: 보조 / 5: 목걸이 / 6&7: 반지)
     [SerializeField]
@@ -50,15 +51,23 @@ public class ItemSystem : MonoBehaviour
     [SerializeField]
     private ItemClass[] _itemClass_reward;      //보상 슬롯의 아이템 클래스들
 
+    [Header("# Item Cursor & Tooltip")]
+    [SerializeField]
+    private GameObject _itemCursor;     //아이템 커서(마우스 오버 시)
     [SerializeField]
     private ItemTooltip _itemTooltip;       //아이템 툴팁
     [SerializeField]
     private ItemTooltip _itemTooltip_equip; //장착 중인 아이템 툴팁
 
+    private ItemClass _tooltip_itemClass;    //툴팁 표시할 아이템 클래스
+    private ItemSlot _tooltip_itemSlot;    //툴팁 표시할 아이템 슬롯
+
+    [Header("# Item Drag")]
     [SerializeField]
     private GameObject _dragIcon;      //드래그 아이콘
     private Image _img_dragIcon;       //드래그 아이콘 이미지
-    private GameObject _dragCursor;    //드래그 중 커서
+    private GameObject _dragItemCursor; //드래그 중 아이템 커서
+    private GameObject _dragMouseCursor;    //드래그 중 마우스 커서
 
     private ItemClass _dragClass;       //드래그한 아이템의 클래스
     private ItemSlot _dragSlot;         //드래그한 아이템의 슬롯
@@ -70,9 +79,7 @@ public class ItemSystem : MonoBehaviour
     private ItemClass[] _dropGroup;     //드롭한 슬롯이 포함된 배열
     private int _dropIndex;             //드롭한 슬롯의 배열 내 인덱스
 
-    [SerializeField]
-    private GameObject _dragScreen;     //드래그 중 출력되는 화면
-
+    [Header("# UI Value")]
     [SerializeField]
     private bool _isOn_inventory;       //인벤토리창 활성화 여부
     public bool ON_INVENTORY
@@ -85,7 +92,7 @@ public class ItemSystem : MonoBehaviour
         set { _isOn_reward = value; }
     }
 
-    //아이템 생성시 활용되는 변수
+    [Header("# Item Create Value")] //아이템 생성시 활용되는 변수
     private int _cost = 20;     //아이템 생성에 사용하는 코스트
 
     private int _needCost_stat = 2;     //스탯 추가 시 필요 코스트
@@ -96,15 +103,13 @@ public class ItemSystem : MonoBehaviour
     private int _needCost_btlAct = 4;   //행동 추가 시 필요 코스트
     private int _needCost_ability = 4;       //능력 추가 시 필요한 코스트
 
+    [Header("# Sprite")]
     [SerializeField]
     private Sprite _spr_noItem;    //아이템 없는 슬롯의 스프라이트
     [SerializeField]
     private Sprite[] _spr_equipItemType;    //아이템 없는 장비 슬롯의 스프라이트
     [SerializeField]
     private Sprite[] _spr_dragItemType;     //드래그 장비와 동일 타입의 장비 슬롯 강조 스프라이트
-
-    private ItemClass _tooltip_itemClass;    //툴팁 표시할 아이템 클래스
-    private ItemSlot _tooltip_itemSlot;    //툴팁 표시할 아이템 슬롯
 
     [SerializeField]
     private ItemData[] _test_item;
@@ -126,7 +131,8 @@ public class ItemSystem : MonoBehaviour
     void Start()
     {
         _img_dragIcon = _dragIcon.GetComponent<Image>();
-        _dragCursor = _dragIcon.transform.GetChild(0).gameObject;
+        _dragItemCursor = _dragIcon.transform.GetChild(0).gameObject;
+        _dragMouseCursor = _dragIcon.transform.GetChild(1).gameObject;
 
         Create_Weapon(_test_item[0], ItemSlotType.Inventory, 0);
         Create_Weapon(_test_item[0], ItemSlotType.Inventory, 1);
@@ -880,6 +886,10 @@ public class ItemSystem : MonoBehaviour
 
         if (item != null)
         {
+            var itemPos = _tooltip_itemSlot.transform.position;
+            _itemCursor.SetActive(true);
+            _itemCursor.transform.position = new Vector2(itemPos.x + 36, itemPos.y - 36);
+
             _itemTooltip.Set_TooltipOutScreen();            //출력할 툴팁 화면 밖 좌표로 이동
             _itemTooltip.ItemTooltip_On();                  //아이템 툴팁 활성화
             _itemTooltip.Change_Name(item.Data.Name);       //아이템 이름
@@ -981,6 +991,7 @@ public class ItemSystem : MonoBehaviour
     {
         if (STCanvas.ITEM_DRAG == false)
         {
+            _itemCursor.SetActive(false);
             _itemTooltip.ItemTooltip_Off();
             _itemTooltip_equip.ItemTooltip_Off();
         }
@@ -1090,7 +1101,8 @@ public class ItemSystem : MonoBehaviour
         //드래그 아이콘을 표시
         _img_dragIcon.enabled = true;
         _img_dragIcon.sprite = tempSpr;
-        _dragCursor.SetActive(true);
+        _dragItemCursor.SetActive(true);
+        _dragMouseCursor.SetActive(true);
 
         //드래그 중 스크린 On
 
@@ -1223,7 +1235,8 @@ public class ItemSystem : MonoBehaviour
             }
 
             //드래그 커서 OFF
-            _dragCursor.SetActive(false);
+            _dragItemCursor.SetActive(false);
+            _dragMouseCursor.SetActive(false);
             //드래그 아이콘 이미지 OFF
             _img_dragIcon.enabled = false;
 

@@ -47,10 +47,39 @@ public class DiceSetting : MonoBehaviour
         transform.rotation = Quaternion.Euler(Random.Range(0, 360), Random.Range(0, 360), Random.Range(0, 360));
         _rigid.AddTorque(new Vector3(Random.value, Random.value, Random.value) * Random.Range(4, 12));
         _stopCounter = 0;
-        StartCoroutine(Check_DiceStop());
+        StartCoroutine("Check_DiceStop");
     }
+    
+    /*
+    IEnumerator Check_DiceStop()    //주사위 구르는 도중의 값을 족족 전달
+    {
+        while (true)
+        {
+            if (_originPos != null)
+            {
+                if ((transform.position - _originPos).magnitude < 0.005f)
+                {
+                    _stopCounter++;
+                    _actController.Get_DiceValue(_order, Check_DiceSide());  //결과값 전달
+                    
+                    if (_stopCounter >= _maxCounter)    //최대 정지 카운터에 도달하면, 이 주사위는 정지한 것
+                    {
+                        _actController.Add_StopDice(_order);      //주사위 하나가 정지되었다 알리기
+                        _actController.Check_AllDiceStop();   //모든 주사위가 정지되었는지 체크(모두 정지 시, 총합 산출)
 
-    IEnumerator Check_DiceStop()    //일정 시간동안 주사위 위치가 변하지 않으면, 정지했다고 판단하고 결과값을 actController에게 전달
+                        _stopCounter = 0;   //다음 번 정지 체크를 위한 카운터 초기화
+                        StopCoroutine("Check_DiceStop");
+                    }
+                }
+            }
+
+            _originPos = transform.position;
+            yield return new WaitForSecondsRealtime(0.01f);
+        }
+    }
+    */
+    
+    IEnumerator Check_DiceStop()    //주사위가 멈췄을 떄 값 전달
     {
         while (true)
         {
@@ -61,12 +90,12 @@ public class DiceSetting : MonoBehaviour
                     _stopCounter++;
                     if (_stopCounter >= _maxCounter)    //최대 정지 카운터에 도달하면, 이 주사위는 정지한 것
                     {
-                        _actController.DiceStop(_order, Check_DiceSide());  //결과값 전달
-                        _actController.Add_StopDice();      //주사위 하나가 정지되었다 알리기
-                        _actController.Check_DiceTotal();   //모든 주사위가 정지되었는지 체크(모두 정지 시, 총합 산출)
+                        _actController.Get_DiceValue(_order, Check_DiceSide()); //결과값 전달
+                        _actController.Add_StopDice(_order);    //주사위 하나가 정지되었다 알리기
+                        _actController.Check_AllDiceStop();     //모든 주사위가 정지되었는지 체크
 
                         _stopCounter = 0;   //다음 번 정지 체크를 위한 카운터 초기화
-                        StopCoroutine(Check_DiceStop());
+                        StopCoroutine("Check_DiceStop");
                     }
                 }
             }
@@ -75,6 +104,7 @@ public class DiceSetting : MonoBehaviour
             yield return new WaitForSecondsRealtime(0.01f);
         }
     }
+    
 
     //주사위 결과 체크
     public int Check_DiceSide()

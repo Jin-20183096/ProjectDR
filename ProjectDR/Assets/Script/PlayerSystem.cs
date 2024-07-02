@@ -253,10 +253,56 @@ public class PlayerSystem : MonoBehaviour, ICreature
             _statusScr.Change_Name(_name);
     }
 
+    public void LvUp(int value)     //레벨 업
+    {
+        _exp = 0;   //경험치 초기화
+        var val = value;
+
+        while (val > 0)
+        {
+            val--;  //상승할 레벨 1 계산
+            _lv++;  //레벨 1 상승
+
+            //레벨대에 따른 최대 경험치량 증가
+            if (_lv >= 1 && _lv <= 2)
+            {
+                Debug.Log(_expMax + "+" + (_expMax * 1.6f));
+                _expMax = (int)(_expMax + (_expMax * 1.6f));
+            }
+            else if (_lv >= 3 && _lv <= 4)
+            {
+                Debug.Log(_expMax + "+" + (_expMax * 1.3f));
+                _expMax = (int)(_expMax + (_expMax * 1.3f));
+            }
+            else if (_lv >= 5 && _lv <= 7)
+            {
+                Debug.Log(_expMax + "+" + (_expMax * 0.9f));
+                _expMax = (int)(_expMax + (_expMax * 0.9f));
+            }
+            else if (_lv >= 8 && _lv <= 10)
+            {
+                Debug.Log(_expMax + "+" + (_expMax * 0.5f));
+                _expMax = (int)(_expMax + (_expMax * 0.5f));
+            }
+            else
+            {
+                Debug.Log(_expMax + "+" + (_expMax * 0.2f));
+                _expMax = (int)(_expMax + (_expMax * 0.2f));
+            }
+        }
+
+        if (_isOn_statusScr)
+        {
+            _statusScr.Change_Lv(_lv);
+            _statusScr.Change_Exp(_exp);
+            _statusScr.Change_ExpMax(_expMax);
+        }
+    }
+
     public void Change_Exp(bool plus, int value)    //경험치 획득, 감소
     {
         if (plus)
-        {
+        {/*
             if (_expMax <= _exp + value)    //획득한 경험치로 레벨업이 발생할 경우
             {
                 while (_expMax <= _exp + value) //레벨업 종료까지 경험치 체크
@@ -266,7 +312,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
                     _expMax += (int)(_expMax * 1.75);   //최대 경험치량 증가
                 }
             }
-            else
+            else*/
                 _exp += value;
         }
         else

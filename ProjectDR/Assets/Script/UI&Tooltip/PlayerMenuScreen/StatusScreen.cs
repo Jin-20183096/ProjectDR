@@ -31,27 +31,27 @@ public class StatusScreen : MonoBehaviour, IPointerClickHandler
     [SerializeField]
     private TextMeshProUGUI _txt_reroll_STR;    //»˚ ¿Á±º∏≤
     [SerializeField]
-    private Image[] _diceSide_STR;              //»˚ ¡÷ªÁ¿ß Ω∫≈»
+    private Image[] _img_STR;              //»˚ ¡÷ªÁ¿ß Ω∫≈»
     [SerializeField]
     private TextMeshProUGUI _txt_reroll_INT;    //¡ˆ¥… ¿Á±º∏≤
     [SerializeField]
-    private Image[] _diceSide_INT;              //¡ˆ¥… ¡÷ªÁ¿ß Ω∫≈»
+    private Image[] _img_INT;              //¡ˆ¥… ¡÷ªÁ¿ß Ω∫≈»
     [SerializeField]
     private TextMeshProUGUI _txt_reroll_DEX;    //º’¿Á¡÷ ¿Á±º∏≤
     [SerializeField]
-    private Image[] _diceSide_DEX;              //º’¿Á¡÷ ¡÷ªÁ¿ß Ω∫≈»
+    private Image[] _img_DEX;              //º’¿Á¡÷ ¡÷ªÁ¿ß Ω∫≈»
     [SerializeField]
     private TextMeshProUGUI _txt_reroll_AGI;    //πŒ√∏ ¿Á±º∏≤
     [SerializeField]
-    private Image[] _diceSide_AGI;              //πŒ√∏ ¡÷ªÁ¿ß Ω∫≈»
+    private Image[] _img_AGI;              //πŒ√∏ ¡÷ªÁ¿ß Ω∫≈»
     [SerializeField]
     private TextMeshProUGUI _txt_reroll_CON;    //∞«∞≠ ¿Á±º∏≤
     [SerializeField]
-    private Image[] _diceSide_CON;              //∞«∞≠ ¡÷ªÁ¿ß Ω∫≈»
+    private Image[] _img_CON;              //∞«∞≠ ¡÷ªÁ¿ß Ω∫≈»
     [SerializeField]
     private TextMeshProUGUI _txt_reroll_WIL;    //¿«¡ˆ ¿Á±º∏≤
     [SerializeField]
-    private Image[] _diceSide_WIL;              //¿«¡ˆ ¡÷ªÁ¿ß Ω∫≈»
+    private Image[] _img_WIL;              //¿«¡ˆ ¡÷ªÁ¿ß Ω∫≈»
 
     [SerializeField]
     private Sprite[] _spr_diceSide;
@@ -123,22 +123,22 @@ public class StatusScreen : MonoBehaviour, IPointerClickHandler
         switch (stat)
         {
             case ICreature.Stats.STR:
-                temp_stat = _diceSide_STR;
+                temp_stat = _img_STR;
                 break;
             case ICreature.Stats.INT:
-                temp_stat = _diceSide_INT;
+                temp_stat = _img_INT;
                 break;
             case ICreature.Stats.DEX:
-                temp_stat = _diceSide_DEX;
+                temp_stat = _img_DEX;
                 break;
             case ICreature.Stats.AGI:
-                temp_stat = _diceSide_AGI;
+                temp_stat = _img_AGI;
                 break;
             case ICreature.Stats.CON:
-                temp_stat = _diceSide_CON;
+                temp_stat = _img_CON;
                 break;
             case ICreature.Stats.WIL:
-                temp_stat = _diceSide_WIL;
+                temp_stat = _img_WIL;
                 break;
             default:
                 Debug.Log("¿ﬂ∏¯µ» «¸Ωƒ¿« Ω∫≈» ≥—æÓø»");

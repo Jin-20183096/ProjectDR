@@ -398,7 +398,7 @@ public class ActionController : MonoBehaviour
             _nowReroll--;
 
             _resultPannel.SetAble_RerollButton(false);      //재굴림 버튼 상호작용 불가 처리
-            _resultPannel.SetAble_ActStartButton(false);    //행동 개시 버튼 상호작용 불가 처리
+            //_resultPannel.SetAble_ActStartButton(false);    //행동 개시 버튼 상호작용 불가 처리
 
             Set_DiceObj();  //주사위 오브젝트 배치
         }
@@ -431,7 +431,7 @@ public class ActionController : MonoBehaviour
         }
     }
 
-    public void DiceStop(int order, int result) //정지한 주사위 하나의 값을 기록
+    public void Get_DiceValue(int order, int result) //정지한 주사위 하나의 값을 기록
     {
         var value = -1;
 
@@ -464,37 +464,46 @@ public class ActionController : MonoBehaviour
         else
             _nowResult[order] = value;
 
-        _resultPannel.Change_DiceResult(order, _nowResult[order]);
+        _resultPannel.Set_MomentDiceResult(order, _nowResult[order]);
+        Calc_DiceTotal();
     }
 
-    public void Add_StopDice()
-        => _stopDice++; //멈춘 주사위 하나 추가
-
-    public void Check_DiceTotal()   //굴린 주사위가 전부 멈췄는지 체크, 전부 멈췄을 시 총합을 기록
+    public void Add_StopDice(int order)
     {
-        if (_stopDice == _nowDice)  //모든 주사위가 멈췄다면
+        _stopDice++; //멈춘 주사위 하나 추가
+        _resultPannel.Set_StopDiceResult(order, _nowResult[order]);
+    }
+
+    public void Calc_DiceTotal()   //혀재 주사위 총합을 기록
+    {
+        _nowTotal = 0;
+
+        for (int i = 0; i < _nowDice; i++)
+            _nowTotal += _nowResult[i];
+
+        _resultPannel.Change_DiceTotal(_nowTotal.ToString());
+
+        _resultPannel.SetAble_ActStartButton(true);    //행동 개시 버튼 상호작용 Off
+    }
+
+    public void Check_AllDiceStop()
+    {
+        if (_stopDice >= _nowDice)  //모든 주사위가 멈췄다면
         {
-            _nowTotal = 0;
-
-            for (int i = 0; i < _nowDice; i++)
-                _nowTotal += _nowResult[i];
-
-            if (_situation == Situation.Battle) //전투 중인 경우
-                _resultPannel.SetAble_ActStartButton(true); //행동 개시 버튼 상호작용 On
-
             if (_nowReroll > 0)
                 _resultPannel.SetAble_RerollButton(true);   //남은 재굴림 횟수 > 0이면, 재굴림 버튼 상호작용 가능
         }
-        else
-            return;
-
-        _resultPannel.Change_DiceTotal(_nowTotal.ToString());
     }
 
     public void ActionStart()
     {
         Dice_Off(); //주사위 오브젝트 Off
         _diceBoard.SetActive(false);    //주사위 보드 Off
+
+        for (int i = 0; i < _nowDice; i++)
+        {
+            _resultPannel.Set_StopDiceResult(i, _nowResult[i]);
+        }
 
         _resultPannel.RerollButton_OnOff(false);    //재굴림 버튼 Off
         _resultPannel.ActStartButton_OnOff(false);  //행동 개시 버튼 Off

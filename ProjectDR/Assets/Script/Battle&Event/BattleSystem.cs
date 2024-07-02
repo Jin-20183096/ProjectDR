@@ -88,13 +88,13 @@ public class BattleSystem : MonoBehaviour
 
     [Header("# Battle Condition")]  //전투 처리 중의 상태 변수
     [SerializeField]
-    private bool _isNowBattleEnd;
-    [SerializeField]
     private bool _p_isSlow;     //플레이어 우선도가 더 낮은지 여부
     [SerializeField]
     private bool _effectProcess = false;    //이 변수가 false일 때, 효과를 처리
     [SerializeField]
     private bool _battleProcess = false;    //이 변수가 false일 때, 전투 행동간 상호작용을 처리
+    [SerializeField]
+    private bool _rewardExpProcess = false; //이 변수가 true면, 적 처치 경험치처리 중인것
 
     public class BtlActInQueue
     {
@@ -242,6 +242,11 @@ public class BattleSystem : MonoBehaviour
 
         _camera_btl.SetActive(true);    //전투 카메라 활성화.
         _camera_dgn.SetActive(false);   //던전 카메라 비활성화
+
+        //플레이어 메뉴 버튼 Off
+        _playerSys.MenuButton_OnOff_Status(false);
+        _playerSys.MenuButton_OnOff_Inventory(false);
+        _playerSys.MenuButton_OnOff_ActList(false);
 
         _enemySys.Set_BattleEnemy(true, enemy); //전투 시 상대하는 적 설정
 
@@ -467,8 +472,10 @@ public class BattleSystem : MonoBehaviour
             StartCoroutine(AbilityProcess_Player(false));
     }
 
+
     //전투 턴 종료
-    public void BattleFlow_End()
+    /*
+    public IEnumerator BattleFlow_End()
     {
         DiceResult_Off(true);   //플레이어 주사위 결과창 Off
         DiceResult_Off(false);  //적 주사위 결과창 Off
@@ -521,30 +528,31 @@ public class BattleSystem : MonoBehaviour
         //어느 한 쪽 사망 시, 전투 종료
         if (_enemySys.HP <= 0)  //적 사망 시
         {
+            _btlLog.SetLog_BattleEnd(true);     //전투 종료 로그 출력
+
             var data = _enemySys.Data;
 
-            //아이템 시스템을 통해 아이템 드랍
-            //----------------
+            //경험치 획득
+            var exp = Random.Range(data.Exp[0], data.Exp[1]);
+            var amount = Random.Range(1, 4);
             _rewardPannel.RewardPannel_Exp_OnOff(true);     //경험치 획득 패널 On
+
+            _rewardPannel.Set_RewardExpInfo();  //경험치 획득 패널의 수치 설정
+            _rewardPannel.Set_GetExpText(exp);//획득 경험치 표시
+
+            //모든 경험치 획득이 끝날 때까지 대기
+            yield return new WaitUntil(() => _rewardExpProcess == false);
+
             _rewardPannel.RewardPannel_Item_OnOff(true);    //아이템 획득 패널 On
             _itemSys.Reward_Clear();    //이전 전리품 모두 제거
             _itemSys.ON_REWARD = true;  //전리품창 ON 상태
 
-            var exp = Random.Range(data.Exp[0], data.Exp[1]);
-            var amount = Random.Range(1, 4);
-
-            _rewardPannel.Set_RewardExpInfo();  //경험치 획득 패널의 수치 설정
-            _rewardPannel.Set_GetExpText(exp);//획득 경험치 표시
-            _playerSys.Change_Exp(true, exp);
-            
             for (int i = 0; i < amount; i++)    //드랍할 아이템 개수만큼 아이템 드랍
                 _itemSys.Reward_Item(data.Item[Random.Range(0, data.Item.Length)], i);
+
             _itemSys.Set_RewardIcon();  //드랍한 아이템 표시
-            //----------------
 
             _isNowBattleEnd = true;
-
-            _btlLog.SetLog_BattleEnd(true);     //전투 종료 로그 출력
         }
         else if (_playerSys.HP <= 0) //플레이어 사망 시
         {
@@ -573,6 +581,11 @@ public class BattleSystem : MonoBehaviour
             _p_lastActType = BtlActData.ActionType.No;
             _e_lastActType = BtlActData.ActionType.No;
 
+            //플레이어 메뉴 버튼 On
+            _playerSys.MenuButton_OnOff_Status(true);
+            _playerSys.MenuButton_OnOff_Inventory(true);
+            _playerSys.MenuButton_OnOff_ActList(true);
+
             _enemySys.Set_BattleEnemy(false, null); //적 데이터 Off
             //전투 행동 리스트, 주사위 보드, 재굴림 버튼, 행동 개시 버튼 Off
             _actController.Set_ActListSituation(ActionController.Situation.No);
@@ -594,11 +607,187 @@ public class BattleSystem : MonoBehaviour
             _actController.Set_ActListSituation(ActionController.Situation.Battle);
         }
     }
+    */
+
+    //전투 턴 종료
+    public void BattleFlow_End()
+    {
+        DiceResult_Off(true);   //플레이어 주사위 결과창 Off
+        DiceResult_Off(false);  //적 주사위 결과창 Off
+
+        //양측의 행동모션 원상복구
+        switch (_p_act.Type)
+        {
+            case BtlActData.ActionType.Atk:
+                _p_spr.Set_ActionMoveSet_Atk(_p_act.AtkMS, false);
+                break;
+            case BtlActData.ActionType.Def:
+                _p_spr.Set_ActionMoveSet_Def(_p_act.DefMS, false);
+                break;
+            case BtlActData.ActionType.Dge:
+                _p_spr.Set_ActionMoveSet_Dge(_p_act.DgeMS, false);
+                break;
+            case BtlActData.ActionType.Tac:
+                _p_spr.Set_ActionMoveSet_Tac(_p_act.TacMS, false);
+                break;
+        }
+        _p_spr.StartCoroutine(_p_spr.Return_Coroutine());
+
+        switch (_e_act.Type)
+        {
+            case BtlActData.ActionType.Atk:
+                _e_spr.Set_ActionMoveSet_Atk(_e_act.AtkMS, false);
+                break;
+            case BtlActData.ActionType.Def:
+                _e_spr.Set_ActionMoveSet_Def(_e_act.DefMS, false);
+                break;
+            case BtlActData.ActionType.Dge:
+                _e_spr.Set_ActionMoveSet_Dge(_e_act.DgeMS, false);
+                break;
+            case BtlActData.ActionType.Tac:
+                _e_spr.Set_ActionMoveSet_Tac(_e_act.TacMS, false);
+                break;
+        }
+        _e_spr.StartCoroutine(_e_spr.Return_Coroutine());
+
+        //양측의 행동정보 초기화
+        _p_lastActType = _p_act.Type;
+        _e_lastActType = _e_act.Type;
+
+        _p_act = null;
+        _e_act = null;
+
+        Set_EffectProcess(false);   //행동 효과 처리 종료
+        Set_BattleProcess(false);   //전투 행동 처리 종료
+
+        //어느 한 쪽 사망 시, 전투 종료
+        if (_enemySys.HP <= 0 || _playerSys.HP <= 0)
+        {
+            //양측의 행동 상태 변수 초기화
+            _p_endAct = false;
+            _e_endAct = false;
+
+            _p_hitAtk = false;
+            _p_makeDmg = false;
+            _p_hitDef = false;
+            _p_hitDge = false;
+            _p_hitTac = false;
+            _e_hitAtk = false;
+            _e_makeDmg = false;
+            _e_hitDef = false;
+            _e_hitDge = false;
+            _e_hitTac = false;
+
+            _p_lastActType = BtlActData.ActionType.No;
+            _e_lastActType = BtlActData.ActionType.No;
+
+            //플레이어 메뉴 버튼 On
+            _playerSys.MenuButton_OnOff_Status(true);
+            _playerSys.MenuButton_OnOff_Inventory(true);
+            _playerSys.MenuButton_OnOff_ActList(true);
+
+            var enemy = _enemySys.Data;
+
+            _enemySys.Set_BattleEnemy(false, null); //적 데이터 Off
+            //전투 행동 리스트, 주사위 보드, 재굴림 버튼, 행동 개시 버튼 Off
+            _actController.Set_ActListSituation(ActionController.Situation.No);
+            _actController.Dice_Off();  //주사위 오브젝트 Off
+
+            _actController.DiceSelectPannel_OnOff(false);   //주사위 선택창 Off
+            _actController.NoDiceButton_OnOff(false);       //주사위 없는 행동 개시 버튼 Off
+            _actController.DiceResultPannel_Off();          //주사위 결과창 Off
+
+            StopAllCoroutines();
+
+            if (_enemySys.HP <= 0)  //적 사망 시
+            {
+                _btlLog.SetLog_BattleEnd(true);     //적 사망 로그
+
+                StartCoroutine(Enemy_Reward(enemy));
+            }
+            else    //플레이어 사망 시
+            {
+                _btlLog.SetLog_BattleEnd(false);    //플레이어 사망 로그
+
+                _btn_eventEnd.SetActive(true);
+            }
+        }
+        else    //전투가 끝나지 않은 경우
+        {
+            //적 다음 행동 요청
+            _enemySys.Request_NextAction();
+            //플레이어 행동목록 재출력
+            _actController.Set_ActListSituation(ActionController.Situation.Battle);
+        }
+    }
+
+    public void Set_RewardExpProcess(bool b) => _rewardExpProcess = b;
+
+    IEnumerator Enemy_Reward(EnemyData enemy)
+    {
+        var data = enemy;
+
+        //경험치 획득
+        var exp = Random.Range(data.Exp[0], data.Exp[1]);
+        var amount = Random.Range(1, 4);
+        _rewardPannel.RewardPannel_Exp_OnOff(true);     //경험치 획득 패널 On
+
+        _rewardPannel.Set_RewardExpInfo();  //경험치 획득 패널의 수치 설정
+        _rewardPannel.Set_GetExpText(exp);//획득 경험치 표시
+
+        //모든 경험치 획득이 끝날 때까지 대기
+        yield return new WaitUntil(() => _rewardExpProcess == false);
+
+        _rewardPannel.RewardPannel_Item_OnOff(true);    //아이템 획득 패널 On
+        _itemSys.Reward_Clear();    //이전 전리품 모두 제거
+        _itemSys.ON_REWARD = true;  //전리품창 ON 상태
+
+        for (int i = 0; i < amount; i++)    //드랍할 아이템 개수만큼 아이템 드랍
+            _itemSys.Reward_Item(data.Item[Random.Range(0, data.Item.Length)], i);
+
+        _itemSys.Set_RewardIcon();  //드랍한 아이템 표시
+
+        //---------------
+
+        //양측의 행동 상태 변수 초기화
+        _p_endAct = false;
+        _e_endAct = false;
+
+        _p_hitAtk = false;
+        _p_makeDmg = false;
+        _p_hitDef = false;
+        _p_hitDge = false;
+        _p_hitTac = false;
+        _e_hitAtk = false;
+        _e_makeDmg = false;
+        _e_hitDef = false;
+        _e_hitDge = false;
+        _e_hitTac = false;
+
+        _p_lastActType = BtlActData.ActionType.No;
+        _e_lastActType = BtlActData.ActionType.No;
+
+        //플레이어 메뉴 버튼 On
+        _playerSys.MenuButton_OnOff_Status(true);
+        _playerSys.MenuButton_OnOff_Inventory(true);
+        _playerSys.MenuButton_OnOff_ActList(true);
+
+        _enemySys.Set_BattleEnemy(false, null); //적 데이터 Off
+                                                //전투 행동 리스트, 주사위 보드, 재굴림 버튼, 행동 개시 버튼 Off
+        _actController.Set_ActListSituation(ActionController.Situation.No);
+        _actController.Dice_Off();  //주사위 오브젝트 Off
+
+        _actController.DiceSelectPannel_OnOff(false);   //주사위 선택창 Off
+        _actController.NoDiceButton_OnOff(false);       //주사위 없는 행동 개시 버튼 Off
+        _actController.DiceResultPannel_Off();          //주사위 결과창 Off
+
+        StopAllCoroutines();
+
+        _btn_eventEnd.SetActive(true);
+    }
 
     public void BattleEnd() //전투 종료
     {
-        _isNowBattleEnd = false;
-
         _btlLog.gameObject.SetActive(false);
         _camera_dgn.SetActive(true);    //던전 카메라 활성화
         _camera_btl.SetActive(false);   //전투 카메라 비활성화
@@ -633,7 +822,7 @@ public class BattleSystem : MonoBehaviour
         for (int i = 0; i < result.Length; i++) //주사위 결과 설정
         {
             if (result[i] != -1)
-                pannel.Change_DiceResult(i, result[i]);
+                pannel.Set_StopDiceResult(i, result[i]);
         }
     }
 
@@ -656,7 +845,7 @@ public class BattleSystem : MonoBehaviour
         for (int i = 0; i < result.Length; i++) //주사위 결과 설정
         {
             if (result[i] != -1)
-                pannel.Change_DiceResult(i, result[i]);
+                pannel.Set_StopDiceResult(i, result[i]);
         }
     }
 
@@ -1280,8 +1469,10 @@ public class BattleSystem : MonoBehaviour
         Refresh_Log();
         _btlLog.SetLog_RunAct(isP, success);
 
+        /*
         if (success)
             _isNowBattleEnd = true;
+        */
     }
 
     //-------------------------행동 효과 처리에 의한 양측의 수치 조정-------------------------
@@ -1289,30 +1480,21 @@ public class BattleSystem : MonoBehaviour
     {
         _playerSys.Change_Hp(plus, value);  
         if (_playerSys.HP <= 0)
-        {
-            _isNowBattleEnd = true; //전투 종료
             _btlLog.SetLog_BattleEnd(false);    //플레이어 사망
-        }
     }
 
     public void Change_Hp_Enemy(bool plus, int value)   //적 HP 조정
     {
         _enemySys.Change_Hp(plus, value);
         if (_enemySys.HP <= 0)
-        {
-            _isNowBattleEnd = true; //전투 종료
             _btlLog.SetLog_BattleEnd(true);    //적 사망
-        }
     }
 
     public void TakeDamage_Player(int value, BtlActData.DamageType dmgType)
     {
         _playerSys.TakeDamage(value, dmgType);  //플레이어 데미지
         if (_playerSys.HP <= 0)
-        {
-            _isNowBattleEnd = true; //전투 종료
             _btlLog.SetLog_BattleEnd(false);    //플레이어 사망
-        }
     }
 
     public void TakeDamage_Enemy(int value, BtlActData.DamageType dmgType)
@@ -1320,10 +1502,7 @@ public class BattleSystem : MonoBehaviour
         _enemySys.TakeDamage(value, dmgType);   //적 데미지
 
         if (_enemySys.HP <= 0)
-        {
-            _isNowBattleEnd = true; //전투 종료
             _btlLog.SetLog_BattleEnd(true);     //적 사망
-        }
     }
 
     public void Change_Ap_Player(bool plus, int value) => _playerSys.Change_Ap(plus, value);

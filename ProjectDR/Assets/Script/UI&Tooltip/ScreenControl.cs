@@ -21,23 +21,31 @@ public class ScreenControl : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        _rect.transform.SetAsLastSibling();
+        if (STCanvas.DRAG == false)
+        {
+            _rect.transform.SetAsLastSibling();
+            STCanvas.Set_DragObj(gameObject);
+        }
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        _rect.transform.position += (Vector3)eventData.delta;
+        if (STCanvas.DRAG_OBJ == gameObject)
+        {
+            _rect.transform.position += (Vector3)eventData.delta;
 
-        Vector3 pos = _rect.anchoredPosition;
+            Vector3 pos = _rect.anchoredPosition;
 
-        pos.x = Mathf.Clamp(pos.x, 0, _screenBound.x - _rect.sizeDelta.x);
-        pos.y = Mathf.Clamp(pos.y, (_screenBound.y * -1) + _rect.sizeDelta.y, 0);
+            pos.x = Mathf.Clamp(pos.x, 0, _screenBound.x - _rect.sizeDelta.x);
+            pos.y = Mathf.Clamp(pos.y, (_screenBound.y * -1) + _rect.sizeDelta.y, 0);
 
-        _rect.anchoredPosition = pos;
+            _rect.anchoredPosition = pos;
+        }
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
         STCanvas.Set_Drag(false);
+        STCanvas.Set_DragObj(null);
     }
 }

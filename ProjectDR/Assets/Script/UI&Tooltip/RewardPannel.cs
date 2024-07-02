@@ -94,6 +94,11 @@ public class RewardPannel : MonoBehaviour
 
                 yield return new WaitUntil(() => _levelUpProcess == false);
                 PlayerSys.LvUp(1);
+
+                _text_lv.text = PlayerSys.LV.ToString();
+                _text_exp.text = PlayerSys.EXP.ToString();
+                _text_expMax.text = PlayerSys.EXP_MAX.ToString();
+                _expMeter.fillAmount = (float)PlayerSys.EXP / PlayerSys.EXP_MAX;
             }
         }
 

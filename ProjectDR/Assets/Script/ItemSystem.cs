@@ -53,7 +53,7 @@ public class ItemSystem : MonoBehaviour
 
     [Header("# Item Cursor & Tooltip")]
     [SerializeField]
-    private GameObject _itemCursor;     //아이템 커서(마우스 오버 시)
+    private RectTransform _itemCursor;     //아이템 커서(마우스 오버 시)
     [SerializeField]
     private ItemTooltip _itemTooltip;       //아이템 툴팁
     [SerializeField]
@@ -886,9 +886,14 @@ public class ItemSystem : MonoBehaviour
 
         if (item != null)
         {
+            _itemCursor.gameObject.SetActive(true);
+            _itemCursor.transform.SetParent(_tooltip_itemSlot.transform);
+            _itemCursor.anchoredPosition = new Vector2(0, 0);
+            /*
             var itemPos = _tooltip_itemSlot.transform.position;
             _itemCursor.SetActive(true);
             _itemCursor.transform.position = new Vector2(itemPos.x + 36, itemPos.y - 36);
+            */
 
             _itemTooltip.Set_TooltipOutScreen();            //출력할 툴팁 화면 밖 좌표로 이동
             _itemTooltip.ItemTooltip_On();                  //아이템 툴팁 활성화
@@ -991,7 +996,7 @@ public class ItemSystem : MonoBehaviour
     {
         if (STCanvas.ITEM_DRAG == false)
         {
-            _itemCursor.SetActive(false);
+            _itemCursor.gameObject.SetActive(false);
             _itemTooltip.ItemTooltip_Off();
             _itemTooltip_equip.ItemTooltip_Off();
         }

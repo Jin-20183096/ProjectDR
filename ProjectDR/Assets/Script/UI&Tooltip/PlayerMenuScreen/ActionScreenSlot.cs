@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
+using static SingleToneCanvas;
 
 public class ActionScreenSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -39,20 +40,26 @@ public class ActionScreenSlot : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        Set_SlotImage(true);
+        if (STCanvas.DRAG == false)
+        {
+            Set_SlotImage(true);
 
-        _actScreen.Set_ActionTooltipContent(_index);
+            _actScreen.Set_ActionTooltipContent(_index);
 
-        StartCoroutine("Print_Tooltip");
+            StartCoroutine("Print_Tooltip");
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        Set_SlotImage(false);
+        if (STCanvas.DRAG == false)
+        {
+            Set_SlotImage(false);
 
-        _actScreen.ActionTooltip_Off();
+            _actScreen.ActionTooltip_Off();
 
-        StopCoroutine("Print_Tooltip");
+            StopCoroutine("Print_Tooltip");
+        }
     }
 
     IEnumerator Print_Tooltip()

@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static ActionController;
+using static SingleToneCanvas;
 
 public class ActionListSlot : MonoBehaviour, IActionListSlot, IPointerEnterHandler, IPointerExitHandler
 {
@@ -47,24 +48,30 @@ public class ActionListSlot : MonoBehaviour, IActionListSlot, IPointerEnterHandl
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        SetSlotImage(true);
-
-        if (_actController.SITUATION == Situation.Battle)
+        if (STCanvas.DRAG == false)
         {
-            _actController.Set_ActionTooltipContent(_order);
-            StartCoroutine("PrintTooltip");
+            SetSlotImage(true);
+
+            if (_actController.SITUATION == Situation.Battle)
+            {
+                _actController.Set_ActionTooltipContent(_order);
+                StartCoroutine("PrintTooltip");
+            }
         }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        SetSlotImage(false);
-
-        if (_actController.SITUATION == Situation.Battle)
+        if (STCanvas.DRAG == false)
         {
-            _actController.ActionTooltip_Off();
+            SetSlotImage(false);
 
-            StopCoroutine("PrintTooltip");
+            if (_actController.SITUATION == Situation.Battle)
+            {
+                _actController.ActionTooltip_Off();
+
+                StopCoroutine("PrintTooltip");
+            }
         }
     }
 

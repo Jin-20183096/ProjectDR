@@ -26410,6 +26410,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c742e0dc1130e604dad51e6dfe9e2c83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _drag: 0
+  _item_drag: 0
 --- !u!1 &675624974
 GameObject:
   m_ObjectHideFlags: 0
@@ -69014,7 +69016,7 @@ MonoBehaviour:
       Data: {fileID: 0}
       Stat: 0
     Ability: {fileID: 0}
-  _itemCursor: {fileID: 29980883}
+  _itemCursor: {fileID: 29980884}
   _itemTooltip: {fileID: 1367461840}
   _itemTooltip_equip: {fileID: 1971485715}
   _dragIcon: {fileID: 66494578}

@@ -140,7 +140,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
         {
             var actList = _actList.ToList();
             actList.Add(_waitAct);
-            return _actList;
+            return actList;
         }
     }
 

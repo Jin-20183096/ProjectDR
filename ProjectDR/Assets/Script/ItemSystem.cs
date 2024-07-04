@@ -191,14 +191,14 @@ public class ItemSystem : MonoBehaviour
 
     public void Reward_Item(ItemData data, int index)
     {
-        //머리, 상의, 하의 방어구면
+        //머리, 상의, 하의 방어구인 경우
         if ((int)data.Type >= (int)ItemData.ItemType.Head && (int)data.Type <= (int)ItemData.ItemType.Leg)
             Create_Armor(data, ItemSlotType.Reward, index);
         else
         {
             switch (data.Type)
             {
-                case ItemData.ItemType.Weapon:
+                case ItemData.ItemType.Weapon:  //무기인 경우
                     Create_Weapon(data, ItemSlotType.Reward, index);
                     break;
             }
@@ -328,8 +328,14 @@ public class ItemSystem : MonoBehaviour
             {
                 if (stat1 < ICreature.Stats.HP) //스탯 1이 행동 스탯일 때
                 {
-                    for (int i = cost_stat1; i > 0; i--)    //해당 스탯의 무작위 위치에 스탯 1씩 증가
+                    for (int i = cost_stat1; i > 0; i--)    //해당 스탯의 무작위 위치에 코스트 1씩 증가
                         stat1_arr[Random.Range(0, stat1_arr.Length)] += 1;
+
+                    Debug.Log(stat1_arr[0] + ", " + stat1_arr[1] + ", " + stat1_arr[2] + ", "
+                            + stat1_arr[3] + ", " + stat1_arr[4] + ", " + stat1_arr[5]);
+
+                    for (int i = 0; i < stat1_arr.Length; i++)  //코스트를 실제 수치로
+                        stat1_arr[i] = Cost_To_ActStatValue(stat1_arr[i]);
                 }
                 else
                 {
@@ -356,6 +362,12 @@ public class ItemSystem : MonoBehaviour
                 {
                     for (int i = cost_stat2; i > 0; i--)    //해당 스탯의 무작위 위치에 스탯 1씩 증가
                         stat2_arr[Random.Range(0, stat2_arr.Length)] += 1;
+
+                    Debug.Log(stat2_arr[0] + ", " + stat2_arr[1] + ", " + stat2_arr[2] + ", "
+                            + stat2_arr[3] + ", " + stat2_arr[4] + ", " + stat2_arr[5]);
+
+                    for (int i = 0; i < stat2_arr.Length; i++)  //코스트를 실제 수치로
+                        stat2_arr[i] = Cost_To_ActStatValue(stat2_arr[i]);
                 }
                 else
                 {
@@ -708,6 +720,12 @@ public class ItemSystem : MonoBehaviour
                 {
                     for (int i = cost_stat1; i > 0; i--)    //해당 스탯의 무작위 위치에 스탯 1씩 증가
                         stat1_arr[Random.Range(0, stat1_arr.Length)] += 1;
+
+                    Debug.Log(stat1_arr[0] + ", " + stat1_arr[1] + ", " + stat1_arr[2] + ", "
+                            + stat1_arr[3] + ", " + stat1_arr[4] + ", " + stat1_arr[5]);
+
+                    for (int i = 0; i < stat1_arr.Length; i++)  //코스트를 실제 수치로
+                        stat1_arr[i] = Cost_To_ActStatValue(stat1_arr[i]);
                 }
                 else
                 {
@@ -734,6 +752,12 @@ public class ItemSystem : MonoBehaviour
                 {
                     for (int i = cost_stat2; i > 0; i--)    //해당 스탯의 무작위 위치에 스탯 1씩 증가
                         stat2_arr[Random.Range(0, stat2_arr.Length)] += 1;
+
+                    Debug.Log(stat2_arr[0] + ", " + stat2_arr[1] + ", " + stat2_arr[2] + ", "
+                            + stat2_arr[3] + ", " + stat2_arr[4] + ", " + stat2_arr[5]);
+
+                    for (int i = 0; i < stat2_arr.Length; i++)  //코스트를 실제 수치로
+                        stat2_arr[i] = Cost_To_ActStatValue(stat2_arr[i]);
                 }
                 else
                 {
@@ -819,6 +843,32 @@ public class ItemSystem : MonoBehaviour
             default:    //HP, 방어도가 아닌 스탯 => 재굴림
                 return cost / _needCost_re;
         }
+    }
+
+    int Cost_To_ActStatValue(int cost)  //코스트를 소모했을 때, 얼마만큼의 행동 스탯값을 얻는지 반환
+    {
+        if (cost <= 0)
+            return 0;
+        if (cost >= 1 && cost < 2)
+            return 1;
+        else if (cost >= 2 && cost < 4)
+            return 2;
+        else if (cost >= 4 && cost < 6)
+            return 3;
+        else if (cost >= 6 && cost < 9)
+            return 4;
+        else if (cost >= 9 && cost < 12)
+            return 5;
+        else if (cost >= 12 && cost < 16)
+            return 6;
+        else if (cost >= 16 && cost < 20)
+            return 7;
+        else if (cost >= 20 && cost < 25)
+            return 8;
+        else if (cost >= 25 && cost < 30)
+            return 9;
+        else
+            return 10;
     }
 
     //장비창 아이템의 아이콘 표시

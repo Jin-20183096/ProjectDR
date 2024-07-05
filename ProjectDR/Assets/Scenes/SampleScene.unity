@@ -16578,6 +16578,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 362269858}
   m_CullTransparentMesh: 1
+--- !u!1 &366747077
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 366747078}
+  m_Layer: 0
+  m_Name: Effect_Group
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &366747078
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 366747077}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &366944463
 GameObject:
   m_ObjectHideFlags: 0
@@ -17084,7 +17115,7 @@ GameObject:
   m_Component:
   - component: {fileID: 387094436}
   m_Layer: 5
-  m_Name: Effect_Group
+  m_Name: Effect_Group_UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35799,8 +35830,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _btlSys: {fileID: 885702282}
-  _enemySpr: {fileID: 1996183754}
-  _enemyAnima: {fileID: 1996183753}
+  _e_spr: {fileID: 1996183754}
+  _e_anima: {fileID: 1996183753}
   _pannel_info: {fileID: 699263133}
   _txt_name: {fileID: 1777259926}
   _hpMask: {fileID: 723637007}
@@ -35837,6 +35868,8 @@ MonoBehaviour:
   _nowDice: 0
   _result: 
   _banActType: 0000000000
+  _eff_group: {fileID: 366747078}
+  _eff_blood: {fileID: 8935228966599947917, guid: 5ced162703ab3a646aaec643448703b3, type: 3}
 --- !u!1 &766652633
 GameObject:
   m_ObjectHideFlags: 0
@@ -78871,6 +78904,8 @@ MonoBehaviour:
   _actScr: {fileID: 755941383}
   _p_spr: {fileID: 2044910159}
   _p_spr_btl: {fileID: 603999841}
+  _effect_group: {fileID: 366747078}
+  _effect_blood: {fileID: 8935228966599947917, guid: 5ced162703ab3a646aaec643448703b3, type: 3}
 --- !u!4 &1664815756
 Transform:
   m_ObjectHideFlags: 0
@@ -99703,3 +99738,4 @@ SceneRoots:
   - {fileID: 674779996}
   - {fileID: 1664815756}
   - {fileID: 1653168135}
+  - {fileID: 366747078}

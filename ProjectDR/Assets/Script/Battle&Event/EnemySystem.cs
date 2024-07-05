@@ -15,9 +15,9 @@ public class EnemySystem : MonoBehaviour, ICreature
 
     [Header("# Enemy Sprite")]
     [SerializeField]
-    private SpriteRenderer _enemySpr;
+    private SpriteRenderer _e_spr;
     [SerializeField]
-    private Animator _enemyAnima;
+    private Animator _e_anima;
 
     private PandaBehaviour _bt;
 
@@ -156,6 +156,12 @@ public class EnemySystem : MonoBehaviour, ICreature
 
     Stack<BtlActClass> _act_stack; //행동 스택
 
+    [Header("# Effect")]
+    [SerializeField]
+    private Transform _eff_group;
+    [SerializeField]
+    private ParticleSystem _eff_blood;
+
     void Awake()
     {
         _act_stack = new Stack<BtlActClass>();
@@ -173,8 +179,8 @@ public class EnemySystem : MonoBehaviour, ICreature
             Set_EnemyInfo(Random.Range(_data.HP_MIN, _data.HP_MAX + 1));
 
             //적인지, 보스인지에 따라 스프라이트 설정
-            _enemySpr.gameObject.SetActive(true);
-            _enemyAnima.runtimeAnimatorController = _data.Anima_Ctrl;
+            _e_spr.gameObject.SetActive(true);
+            _e_anima.runtimeAnimatorController = _data.Anima_Ctrl;
         }
         else    //전투 종료 시
         {
@@ -190,7 +196,7 @@ public class EnemySystem : MonoBehaviour, ICreature
             Destroy(_bt);
             _bt = null;
 
-            _enemySpr.gameObject.SetActive(false);  //적 스프라이트 off
+            _e_spr.gameObject.SetActive(false);  //적 스프라이트 off
         }
     }
 
@@ -414,6 +420,12 @@ public class EnemySystem : MonoBehaviour, ICreature
     public void TakeDamage(int dmg, BtlActData.DamageType dmgType)
     {
         Change_Hp(false, dmg);
+
+        var eff = Instantiate(_eff_blood, _eff_group);
+        var pos = _e_spr.transform.position;
+        var sizeY = _e_spr.bounds.size.y;
+        eff.transform.position = new Vector3(pos.x, pos.y + sizeY / 2, pos.z);
+        eff.transform.localScale = new Vector3(0.75f, 0.75f, 1f);
     }
 
     public void Request_NextAction()    //전투 시스템에서 다음 턴 행동을 요청

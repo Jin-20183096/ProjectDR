@@ -189,6 +189,12 @@ public class PlayerSystem : MonoBehaviour, ICreature
     [SerializeField]
     private SpriteSystem _p_spr_btl;
 
+    [Header("# Effect")]
+    [SerializeField]
+    private Transform _effect_group;
+    [SerializeField]
+    private ParticleSystem _effect_blood;
+
     void Awake()
     {
         if (PlayerSys)
@@ -516,6 +522,13 @@ public class PlayerSystem : MonoBehaviour, ICreature
     public void TakeDamage(int dmg, BtlActData.DamageType dmgType)
     {
         Change_Hp(false, dmg);
+
+        var eff = Instantiate(_effect_blood, _effect_group);
+        var pos = _p_spr_btl.transform.position;
+        var sizeY = _p_spr_btl.GetComponent<SpriteRenderer>().bounds.size.y;
+        eff.transform.position = new Vector3(pos.x, pos.y + sizeY / 2, pos.z);
+        eff.transform.localScale = new Vector3(0.75f, 0.75f, 1f);
+
         //데미지 타입에 따른 피격음
     }
 

@@ -254,6 +254,7 @@ public class LevelUpPannel : MonoBehaviour
         else
             diceImg[order].sprite = _spr_diceSide[statValue];
 
+
         //∆ƒ∆º≈¨ ¿Ã∆Â∆Æ
         var effect = Instantiate(_eff_statUp, _eff_group);  //¿Ã∆Â∆Æ
         var uiParticle = effect.AddComponent<UIParticle>(); 

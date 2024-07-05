@@ -3227,7 +3227,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 73437032}
         m_TargetAssemblyTypeName: PlayerMenuButton, Assembly-CSharp
-        m_MethodName: Button_OnOff
+        m_MethodName: IsActive_OnOff
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -47886,7 +47886,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 996050452}
         m_TargetAssemblyTypeName: PlayerMenuButton, Assembly-CSharp
-        m_MethodName: Button_OnOff
+        m_MethodName: IsActive_OnOff
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -64304,7 +64304,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1351822650}
         m_TargetAssemblyTypeName: PlayerMenuButton, Assembly-CSharp
-        m_MethodName: Button_OnOff
+        m_MethodName: IsActive_OnOff
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

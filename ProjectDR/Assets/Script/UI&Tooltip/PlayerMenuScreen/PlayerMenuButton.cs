@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static SingleToneCanvas;
+using static PlayerSystem;
 
 public class PlayerMenuButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -20,8 +21,13 @@ public class PlayerMenuButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
     public void OnPointerExit(PointerEventData eventData)
     {
         if (STCanvas.DRAG == false && _isActive == false)
+        {
             GetComponent<Image>().sprite = _spr_btn[0];
+        }
     }
+
+    public void IsActive_OnOff()
+        => _isActive = !_isActive;
 
     public void Button_OnOff()
     {

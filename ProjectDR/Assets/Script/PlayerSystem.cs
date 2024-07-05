@@ -302,25 +302,14 @@ public class PlayerSystem : MonoBehaviour, ICreature
             _statusScr.Change_Lv(_lv);
             _statusScr.Change_Exp(_exp);
             _statusScr.Change_ExpMax(_expMax);
+            _statusScr.Change_ExpMeter(_exp / (float)_expMax);
         }
     }
 
     public void Change_Exp(bool plus, int value)    //경험치 획득, 감소
     {
         if (plus)
-        {/*
-            if (_expMax <= _exp + value)    //획득한 경험치로 레벨업이 발생할 경우
-            {
-                while (_expMax <= _exp + value) //레벨업 종료까지 경험치 체크
-                {
-                    _exp = (_exp + value) - _expMax;    //경험치는 레벨업 종료 후 경험치만 남김
-                    _lv += 1;   //레벨 1 증가
-                    _expMax += (int)(_expMax * 1.75);   //최대 경험치량 증가
-                }
-            }
-            else*/
-                _exp += value;
-        }
+            _exp += value;
         else
         {
             if (_exp <= value)
@@ -334,6 +323,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
             _statusScr.Change_Lv(_lv);
             _statusScr.Change_Exp(_exp);
             _statusScr.Change_ExpMax(_expMax);
+            _statusScr.Change_ExpMeter(_exp / (float)_expMax);
         }
     }
 

@@ -44,33 +44,33 @@ public class GameLog : MonoBehaviour
 
     public void SetLog_BattleStart(string e_name)   //로그 설정: 전투의 시작 
     {
-        NewLog(MakeSentence(e_name, "나타났다"));
+        NewLog(MakeSentence(e_name, "[이/가]","나타났다"));
         LogPrint_Start(LogSituation.No);
         _e_name = e_name;
     }
 
     public void SetLog_DefEffect(bool isP, string effText)  //로그 설정: 방어 효과 출력
     {
-        NewLog(MakeSentence((isP ? _p_name : _e_name), "공격을 방어해,", effText));
+        NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", "공격을 방어해,", effText));
         LogPrint_Start(LogSituation.ActEffect);
     }
 
     public void SetLog_DgeEffect(bool isP, string effText)  //로그 설정: 회피 효과 출력
     {
-        NewLog(MakeSentence((isP ? _p_name : _e_name), "공격을 피해,", effText));
+        NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", "공격을 피해,", effText));
         LogPrint_Start(LogSituation.ActEffect);
     }
 
     public void SetLog_ActEffect(bool isP, string actName, string effText)  //로그 설정: 행동 효과 출력
     {
-        NewLog(MakeSentence((isP ? _p_name : _e_name), "\"" + actName + "\"의 효과로", effText));
+        NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", "\"" + actName + "\"의 효과로", effText));
         LogPrint_Start(LogSituation.ActEffect);
     }
 
     public void SetLog_RunAct(bool isP, bool success) //로그 설정: 도망 행동
     {
         if (success)
-            NewLog(MakeSentence((isP ? _p_name : _e_name), success ? "도망쳤다" : "도망에 실패했다"));
+            NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", success ? "도망쳤다" : "도망에 실패했다"));
 
         LogPrint_Start(LogSituation.RunEnd);
     }
@@ -84,9 +84,9 @@ public class GameLog : MonoBehaviour
     public void SetLog_BattleEnd(bool isPWin)
     {
         if (isPWin)
-            NewLog(MakeSentence(_e_name, "쓰러졌다"));
+            NewLog(MakeSentence(_e_name, "[은/는]", "쓰러졌다"));
         else
-            NewLog(MakeSentence(_p_name, "사망했다"));
+            NewLog(MakeSentence(_p_name, "[은/는]", "사망했다"));
 
         LogPrint_Start(LogSituation.No);
     }
@@ -94,7 +94,8 @@ public class GameLog : MonoBehaviour
     public string Log_AtkDmg(bool isP, int final_dmg)   //공격으로 피해 발생
     {
         //당신은 고블린을 공격해 X 피해를 주었다
-        return MakeSentence((isP ? _p_name : _e_name), (isP ? _e_name : _p_name), "공격해", final_dmg.ToString(), "피해를 주었다");
+        return MakeSentence((isP ? _p_name : _e_name), "[은/는]",
+                (isP ? _e_name : _p_name), "[을/를]", "공격해", final_dmg.ToString(), "피해를 주었다");
     }
 
     public string Log_Def(bool isP, int final_dmg)  //공격 방어
@@ -102,15 +103,16 @@ public class GameLog : MonoBehaviour
         //<받은 피해 1 이상>	당신은 공격을 막아 X 피해만 받았다
         //<받은 피해 0>		당신은 공격을 막아 피해를 받지 않았다
         if (final_dmg >= 1) //받은 피해가 1 이상
-            return MakeSentence((isP ? _p_name : _e_name), "공격을 막아,", final_dmg.ToString(), "피해만 받았다");
+            return MakeSentence((isP ? _p_name : _e_name), "[은/는]", "공격을 막아,", final_dmg.ToString(), "피해만 받았다");
         else
-            return MakeSentence((isP ? _p_name : _e_name), "공격을 막아, 피해를 받지 않았다");
+            return MakeSentence((isP ? _p_name : _e_name), "[은/는]", "공격을 막아, 피해를 받지 않았다");
     }
 
     public string Log_DefFail(bool isP) //방어 실패
     {
         //당신은 공격을 막으려 했지만 고블린은 공격하지 않았다
-        return MakeSentence((isP ? _p_name : _e_name), "공격을 막으려 했지만,", (isP ? _e_name : _p_name), "공격하지 않았다");
+        return MakeSentence((isP ? _p_name : _e_name), "[은/는]", "공격을 막으려 했지만,",
+                (isP ? _e_name : _p_name), "[은/는]", "공격하지 않았다");
     }
 
     public string Log_Dge(bool isP, bool success, int final_dmg)    //회피
@@ -118,15 +120,17 @@ public class GameLog : MonoBehaviour
         //<회피 성공>	당신은 공격을 피했다
         //<회피 실패>	당신은 공격을 피하지 못하고 X 피해를 받았다
         if (success)    //회피 성공
-            return MakeSentence((isP ? _p_name : _e_name), "공격을 피했다");
+            return MakeSentence((isP ? _p_name : _e_name), "[은/는]", "공격을 피했다");
         else
-            return MakeSentence((isP ? _p_name : _e_name), "공격을 피하지 못하고,", final_dmg.ToString(), "피해를 받았다");
+            return MakeSentence((isP ? _p_name : _e_name), "[은/는]", "공격을 피하지 못하고,",
+                    final_dmg.ToString(), "피해를 받았다");
     }
 
     public string Log_DgeFail(bool isP) //회피 실패
     {
         //당신은 공격을 피하려 했지만 고블린은 공격하지 않았다
-        return MakeSentence((isP ? _p_name : _e_name), "공격을 피하려 했지만,", (isP ? _e_name : _p_name), "공격하지 않았다");
+        return MakeSentence((isP ? _p_name : _e_name), "[은/는]", "공격을 피하려 했지만,",
+                (isP ? _e_name : _p_name), "[은/는]", "공격하지 않았다");
     }
 
     public string Log_TacCant(bool isP, string actName) //전술 불가
@@ -138,7 +142,7 @@ public class GameLog : MonoBehaviour
     public string Log_Wait(bool isP, int getAp)
     {
         //당신은 상황을 지켜보면서, 행동력을 X 얻었다.
-        return MakeSentence((isP ? _p_name : _e_name), "상황을 지켜보면서, 행동력을", getAp.ToString(), "얻었다");
+        return MakeSentence((isP ? _p_name : _e_name), "[은/는]", "상황을 지켜보면서, 행동력을", getAp.ToString(), "얻었다");
     }
 
     string MakeSentence(params string[] arr)    //인자로 주어진 단어들을 나열해서 문장 생성
@@ -147,10 +151,33 @@ public class GameLog : MonoBehaviour
 
         for (int i = 0; i < arr.Length; i++)
         {
-            if (i < arr.Length - 1) //마지막 단어가 아니면
-                s += arr[i] + " ";  //단어 뒤에 띄어주기
-            else                    //마지막 단어라면
-                s += arr[i] + ".";  //단어 뒤에 마침표 추가
+            if (i == 0) //첫 단어면 앞을 띄우지 않음
+                s += arr[i];
+            //종성에 따라 달라지는 조사가 있을 경우 띄우지 않음
+            else if (arr[i][0] == '[' && arr[i][arr[i].Length - 1] == ']')
+            {
+                string str;
+
+                if (arr[i].Length <= 2)
+                    str = "";
+                else
+                {
+                    var prevWordLast = arr[i - 1][arr[i - 1].Length - 1];   //앞 단어의 마지막 문자
+                    var thisWord = arr[i].Substring(1, arr[i].Length - 2);  //조사 선택지
+                    string[] split = thisWord.Split('/');   //조사 선택지를 /를 기준으로 둘로 분리
+                    var case1 = split[0];   //조사 선택지 1
+                    var case2 = split[1];   //조사 선택지 2
+
+                    str = CheckConsonant_Korean(prevWordLast, case1, case2);
+                }
+
+                s += str;
+            }
+            else    //이외에는 앞 단어와의 띄어쓰기를 추가
+                s += " " + arr[i];
+
+            if (i >= arr.Length - 1)    //마지막 단어라면
+                s += ".";      //단어 뒤에 마침표 추가
         }
 
         return s;
@@ -228,5 +255,27 @@ public class GameLog : MonoBehaviour
 
                 break;
         }
+    }
+
+    bool LastConsonant_Korean(char last)
+    {
+        //한글이 아니면 종성이 없다고 알림
+        if (last < 44032 || last > 55215)
+            return false;
+
+        int ch = last;
+
+        ch -= 44032;    //한글의 시작 위치 44032를 뺌
+
+        //28로 나눠서 나머지가 존재하면 종성으로 판단(28번째마다 종성이 없는 글자가 나오므로)
+        return (ch % 28) > 0;
+    }
+
+    string CheckConsonant_Korean(char prevLast, string case1, string case2)
+    {
+        if (LastConsonant_Korean(prevLast)) //이전 단어의 마지막 문자에 종성이 있다면
+            return case1;
+        else    //종성이 없다면
+            return case2;
     }
 }

@@ -381,6 +381,7 @@ public class EnemySystem : MonoBehaviour, ICreature
             }
         }
 
+        /*
         if (old_ap == 0)    //행동력이 0이었다가
         {
             if (_ap > 0)    //0이 아니게 되면, 방어도 회복
@@ -390,7 +391,7 @@ public class EnemySystem : MonoBehaviour, ICreature
         {
             Change_AC(false, 5);
         }
-
+        */
 
         //AP바 갱신
         for (int i = 0; i < _meter_ap.Length; i++)
@@ -424,8 +425,13 @@ public class EnemySystem : MonoBehaviour, ICreature
         var eff = Instantiate(_eff_blood, _eff_group);
         var pos = _e_spr.transform.position;
         var sizeY = _e_spr.bounds.size.y;
-        eff.transform.position = new Vector3(pos.x, pos.y + sizeY / 2, pos.z);
+        eff.transform.position = new Vector3(pos.x + 0.5f, pos.y + sizeY / 2, pos.z);
         eff.transform.localScale = new Vector3(0.75f, 0.75f, 1f);
+        //데미지량에 따른 유혈 파티클 개수 조정
+        var burst = eff.emission.GetBurst(0);
+        burst.count = dmg * 5;
+        eff.emission.SetBurst(0, burst);
+        eff.Play();
     }
 
     public void Request_NextAction()    //전투 시스템에서 다음 턴 행동을 요청

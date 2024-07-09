@@ -28,6 +28,7 @@ public class EquipSprite : MonoBehaviour
     {
         if (data != null)   //아이템을 장착한 경우
         {
+            Debug.Log("장착");
             _spr.color = Color.white;
 
             //_aoc에 연동될 클립들을 일일이 교체
@@ -35,6 +36,7 @@ public class EquipSprite : MonoBehaviour
         }
         else    //아이템을 해제한 경우
         {
+            Debug.Log("해제");
             _spr.color = noItemColor;
 
             //_aoc에 연동될 클립들을 일일이 null

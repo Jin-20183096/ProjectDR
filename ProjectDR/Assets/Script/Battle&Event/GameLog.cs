@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class GameLog : MonoBehaviour
 {
@@ -49,15 +50,74 @@ public class GameLog : MonoBehaviour
         _e_name = e_name;
     }
 
+    public void SetLog_AtkHit(bool isP, string effText) //로그 설정: 공격 명중 효과 출력
+    {
+        //당신의 공격이 명중해, ~~
+        NewLog(MakeSentence((isP ? _p_name : _e_name) + "의 공격이 명중해,\n", effText));
+        LogPrint_Start(LogSituation.ActEffect);
+    }
+
+    public void SetLog_AtkDmg(bool isP, string effText) //로그 설정: 공격 피해 주었을 때 효과 출력
+    {
+        //당신의 공격이 상대에게 피해를 주어, ~~
+        NewLog(MakeSentence((isP ? _p_name : _e_name) + "의 공격이", (isP ? _e_name : _p_name) + "에게 피해를 주어,\n",
+                            effText));
+        LogPrint_Start(LogSituation.ActEffect);
+    }
+
+    public void SetLog_AtkBlocked(bool isP, string effText) //로그 설정: 공격이 막혔을 때 효과 출력
+    {
+        //당신의 공격이 막혀, ~~
+        NewLog(MakeSentence((isP ? _p_name : _e_name) + "의 공격이 막혀,\n", effText));
+        LogPrint_Start(LogSituation.ActEffect);
+    }
+
+    public void SetLog_AtkMissed(bool isP, string effText)  //로그 설정: 공격이 빗나갔을 때 효과 출력
+    {
+        //당신의 공격이 빗나가, ~~
+        NewLog(MakeSentence((isP ? _p_name : _e_name) + "의 공격이 빗나가,\n", effText));
+        LogPrint_Start(LogSituation.ActEffect);
+    }
+
     public void SetLog_DefEffect(bool isP, string effText)  //로그 설정: 방어 효과 출력
     {
-        NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", "공격을 방어해,", effText));
+        //당신은 공격을 방어해, ~~
+        NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", "공격을 방어해,\n", effText));
+        LogPrint_Start(LogSituation.ActEffect);
+    }
+
+    public void SetLog_DefEffect_NoAtk(bool isP, string effText)    //로그 설정: 상대가 공격하지 않았을 때 방어 효과 출력
+    {
+        //상대가 당신을 공격하지 않아, ~~
+        NewLog(MakeSentence((isP ? _e_name : _p_name), "[이/가]", "공격하지 않아,\n", effText));
+        LogPrint_Start(LogSituation.ActEffect);
+    }
+
+    public void SetLog_DefEffect_Wait(bool isP, string effText)     //로그 설정: 상대가 대기했을 떄 방어 효과 출력
+    {
+        //상대가 상황을 지켜볼 때, ~~
+        NewLog(MakeSentence((isP ? _e_name : _p_name), "[이/가]", "상황을 지켜볼 때,\n", effText));
         LogPrint_Start(LogSituation.ActEffect);
     }
 
     public void SetLog_DgeEffect(bool isP, string effText)  //로그 설정: 회피 효과 출력
     {
-        NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", "공격을 피해,", effText));
+        //당신은 공격을 피해, ~~
+        NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", "공격을 피해,\n", effText));
+        LogPrint_Start(LogSituation.ActEffect);
+    }
+
+    public void SetLog_DgeEffect_Fail(bool isP, string effText) //로그 설정: 회피 조건 실패 시 효과 출력
+    {
+        //당신은 공격을 피하지 못해, ~~
+        NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", "공격을 피하지 못해,\n", effText));
+        LogPrint_Start(LogSituation.ActEffect);
+    }
+
+    public void SetLog_DgeEffect_NoAtk(bool isP, string effText)    //로그 설정: 상대가 공격하지 않았을 때 회피 효과 출력
+    {
+        //상대가 공격하지 않아, ~~
+        NewLog(MakeSentence((isP ? _e_name : _p_name), "[이/가]", "공격하지 않아,\n", effText));
         LogPrint_Start(LogSituation.ActEffect);
     }
 

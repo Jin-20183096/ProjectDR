@@ -114,6 +114,7 @@ public class LevelUpPannel : MonoBehaviour
                 _img_STR[i].sprite = _spr_diceSide[stat_str[i]];
 
             _statUpCursor_STR[i].SetActive(false);
+            _statUpText_STR[i].text = "";
         }
 
         ButtonActive_INT(true);
@@ -128,6 +129,7 @@ public class LevelUpPannel : MonoBehaviour
                 _img_INT[i].sprite = _spr_diceSide[stat_int[i]];
 
             _statUpCursor_INT[i].SetActive(false);
+            _statUpText_INT[i].text = "";
         }
 
         ButtonActive_DEX(true);
@@ -142,6 +144,7 @@ public class LevelUpPannel : MonoBehaviour
                 _img_DEX[i].sprite = _spr_diceSide[stat_dex[i]];
 
             _statUpCursor_DEX[i].SetActive(false);
+            _statUpText_DEX[i].text = "";
         }
 
         ButtonActive_AGI(true);
@@ -156,6 +159,7 @@ public class LevelUpPannel : MonoBehaviour
                 _img_AGI[i].sprite = _spr_diceSide[stat_agi[i]];
 
             _statUpCursor_AGI[i].SetActive(false);
+            _statUpText_AGI[i].text = "";
         }
 
         ButtonActive_CON(true);
@@ -170,6 +174,7 @@ public class LevelUpPannel : MonoBehaviour
                 _img_CON[i].sprite = _spr_diceSide[stat_con[i]];
 
             _statUpCursor_CON[i].SetActive(false);
+            _statUpText_CON[i].text = "";
         }
 
         ButtonActive_WIL(true);
@@ -184,6 +189,7 @@ public class LevelUpPannel : MonoBehaviour
                 _img_WIL[i].sprite = _spr_diceSide[stat_wil[i]];
 
             _statUpCursor_WIL[i].SetActive(false);
+            _statUpText_WIL[i].text = "";
         }
     }
 
@@ -265,7 +271,13 @@ public class LevelUpPannel : MonoBehaviour
 
         //커서와 상승값 표시
         cursor[order].SetActive(true);
-        statUpText[order].text = value.ToString();
+
+        int oldValue;
+        if (statUpText[order].text != "")
+            oldValue = int.Parse(statUpText[order].text);
+        else oldValue = 0;
+
+        statUpText[order].text = (oldValue + value).ToString();
     }
 
     public void ActiveUI_STR(bool b)  //힘 스탯 UI 활성화/비활성화

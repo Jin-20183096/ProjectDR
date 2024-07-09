@@ -13,7 +13,7 @@ public class SpriteSystem : MonoBehaviour
     public enum DgeMoveSet { No, Dge }
     public enum TacMoveSet { No, Tac }
 
-    public enum CommonTrigger { Idle, Dmg }
+    public enum CommonTrigger { Idle, Walk, Dmg }
 
     private SpriteRenderer _spr;
     private Animator _anima;

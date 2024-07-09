@@ -141,6 +141,12 @@ public class BattleSystem : MonoBehaviour
         get { return _p_hitTac; }
     }
     [SerializeField]
+    private bool _p_hitWait;        //플레이어 이번 턴 대기 사용 여부
+    public bool P_HIT_WAIT
+    {
+        get { return _p_hitWait; }
+    }
+    [SerializeField]
     private bool _e_hitAtk;         //적 이번 턴 공격 명중 여부
     public bool E_HIT_ATK
     {
@@ -169,6 +175,12 @@ public class BattleSystem : MonoBehaviour
     public bool E_HIT_TAC
     {
         get { return _e_hitTac; }
+    }
+    [SerializeField]
+    private bool _e_hitWait;        //적 이번 턴 대기 사용 여부
+    public bool E_HIT_WAIT
+    {
+        get { return _e_hitWait; }
     }
 
     [SerializeField]
@@ -265,11 +277,13 @@ public class BattleSystem : MonoBehaviour
         _p_hitDef = false;
         _p_hitDge = false;
         _p_hitTac = false;
+        _p_hitWait = false;
         _e_hitAtk = false;
         _e_makeDmg = false;
         _e_hitDef = false;
         _e_hitDge = false;
         _e_hitTac = false;
+        _e_hitWait = false;
 
         _p_lastActType = BtlActData.ActionType.No;
         _e_lastActType = BtlActData.ActionType.No;
@@ -370,11 +384,13 @@ public class BattleSystem : MonoBehaviour
         _p_hitDef = false;
         _p_hitDge = false;
         _p_hitTac = false;
+        _p_hitWait = false;
         _e_hitAtk = false;
         _e_makeDmg = false;
         _e_hitDef = false;
         _e_hitDge = false;
         _e_hitTac = false;
+        _e_hitWait = false;
 
         _p_lastActType = BtlActData.ActionType.No;
         _e_lastActType = BtlActData.ActionType.No;
@@ -472,143 +488,6 @@ public class BattleSystem : MonoBehaviour
             StartCoroutine(AbilityProcess_Player(false));
     }
 
-
-    //전투 턴 종료
-    /*
-    public IEnumerator BattleFlow_End()
-    {
-        DiceResult_Off(true);   //플레이어 주사위 결과창 Off
-        DiceResult_Off(false);  //적 주사위 결과창 Off
-
-        //양측의 행동모션 원상복구
-        switch (_p_act.Type)
-        {
-            case BtlActData.ActionType.Atk:
-                _p_spr.Set_ActionMoveSet_Atk(_p_act.AtkMS, false);
-                break;
-            case BtlActData.ActionType.Def:
-                _p_spr.Set_ActionMoveSet_Def(_p_act.DefMS, false);
-                break;
-            case BtlActData.ActionType.Dge:
-                _p_spr.Set_ActionMoveSet_Dge(_p_act.DgeMS, false);
-                break;
-            case BtlActData.ActionType.Tac:
-                _p_spr.Set_ActionMoveSet_Tac(_p_act.TacMS, false);
-                break;
-        }
-        _p_spr.StartCoroutine(_p_spr.Return_Coroutine());
-
-        switch (_e_act.Type)
-        {
-            case BtlActData.ActionType.Atk:
-                _e_spr.Set_ActionMoveSet_Atk(_e_act.AtkMS, false);
-                break;
-            case BtlActData.ActionType.Def:
-                _e_spr.Set_ActionMoveSet_Def(_e_act.DefMS, false);
-                break;
-            case BtlActData.ActionType.Dge:
-                _e_spr.Set_ActionMoveSet_Dge(_e_act.DgeMS, false);
-                break;
-            case BtlActData.ActionType.Tac:
-                _e_spr.Set_ActionMoveSet_Tac(_e_act.TacMS, false);
-                break;
-        }
-        _e_spr.StartCoroutine(_e_spr.Return_Coroutine());
-
-        //양측의 행동정보 초기화
-        _p_lastActType = _p_act.Type;
-        _e_lastActType = _e_act.Type;
-
-        _p_act = null;
-        _e_act = null;
-
-        Set_EffectProcess(false);   //행동 효과 처리 종료
-        Set_BattleProcess(false);   //전투 행동 처리 종료
-
-        //어느 한 쪽 사망 시, 전투 종료
-        if (_enemySys.HP <= 0)  //적 사망 시
-        {
-            _btlLog.SetLog_BattleEnd(true);     //전투 종료 로그 출력
-
-            var data = _enemySys.Data;
-
-            //경험치 획득
-            var exp = Random.Range(data.Exp[0], data.Exp[1]);
-            var amount = Random.Range(1, 4);
-            _rewardPannel.RewardPannel_Exp_OnOff(true);     //경험치 획득 패널 On
-
-            _rewardPannel.Set_RewardExpInfo();  //경험치 획득 패널의 수치 설정
-            _rewardPannel.Set_GetExpText(exp);//획득 경험치 표시
-
-            //모든 경험치 획득이 끝날 때까지 대기
-            yield return new WaitUntil(() => _rewardExpProcess == false);
-
-            _rewardPannel.RewardPannel_Item_OnOff(true);    //아이템 획득 패널 On
-            _itemSys.Reward_Clear();    //이전 전리품 모두 제거
-            _itemSys.ON_REWARD = true;  //전리품창 ON 상태
-
-            for (int i = 0; i < amount; i++)    //드랍할 아이템 개수만큼 아이템 드랍
-                _itemSys.Reward_Item(data.Item[Random.Range(0, data.Item.Length)], i);
-
-            _itemSys.Set_RewardIcon();  //드랍한 아이템 표시
-
-            _isNowBattleEnd = true;
-        }
-        else if (_playerSys.HP <= 0) //플레이어 사망 시
-        {
-            _isNowBattleEnd = true;
-
-            _btlLog.SetLog_BattleEnd(false);    //플레이어 사망 로그
-        }
-
-        if (_isNowBattleEnd)    //전투가 종료된 경우
-        {
-            //양측의 행동 상태 변수 초기화
-            _p_endAct = false;
-            _e_endAct = false;
-
-            _p_hitAtk = false;
-            _p_makeDmg = false;
-            _p_hitDef = false;
-            _p_hitDge = false;
-            _p_hitTac = false;
-            _e_hitAtk = false;
-            _e_makeDmg = false;
-            _e_hitDef = false;
-            _e_hitDge = false;
-            _e_hitTac = false;
-
-            _p_lastActType = BtlActData.ActionType.No;
-            _e_lastActType = BtlActData.ActionType.No;
-
-            //플레이어 메뉴 버튼 On
-            _playerSys.MenuButton_OnOff_Status(true);
-            _playerSys.MenuButton_OnOff_Inventory(true);
-            _playerSys.MenuButton_OnOff_ActList(true);
-
-            _enemySys.Set_BattleEnemy(false, null); //적 데이터 Off
-            //전투 행동 리스트, 주사위 보드, 재굴림 버튼, 행동 개시 버튼 Off
-            _actController.Set_ActListSituation(ActionController.Situation.No);
-            _actController.Dice_Off();  //주사위 오브젝트 Off
-
-            _actController.DiceSelectPannel_OnOff(false);   //주사위 선택창 Off
-            _actController.NoDiceButton_OnOff(false);       //주사위 없는 행동 개시 버튼 Off
-            _actController.DiceResultPannel_Off();          //주사위 결과창 Off
-
-            StopAllCoroutines();
-
-            _btn_eventEnd.SetActive(true);
-        }
-        else    //전투가 끝나지 않은 경우
-        {
-            //적 다음 행동 요청
-            _enemySys.Request_NextAction();
-            //플레이어 행동목록 재출력
-            _actController.Set_ActListSituation(ActionController.Situation.Battle);
-        }
-    }
-    */
-
     //전투 턴 종료
     public void BattleFlow_End()
     {
@@ -672,11 +551,13 @@ public class BattleSystem : MonoBehaviour
             _p_hitDef = false;
             _p_hitDge = false;
             _p_hitTac = false;
+            _p_hitWait = false;
             _e_hitAtk = false;
             _e_makeDmg = false;
             _e_hitDef = false;
             _e_hitDge = false;
             _e_hitTac = false;
+            _e_hitWait = false;
 
             _p_lastActType = BtlActData.ActionType.No;
             _e_lastActType = BtlActData.ActionType.No;
@@ -758,11 +639,13 @@ public class BattleSystem : MonoBehaviour
         _p_hitDef = false;
         _p_hitDge = false;
         _p_hitTac = false;
+        _p_hitWait = false;
         _e_hitAtk = false;
         _e_makeDmg = false;
         _e_hitDef = false;
         _e_hitDge = false;
         _e_hitTac = false;
+        _e_hitWait = false;
 
         _p_lastActType = BtlActData.ActionType.No;
         _e_lastActType = BtlActData.ActionType.No;
@@ -1169,6 +1052,8 @@ public class BattleSystem : MonoBehaviour
 
             //대기 로그 추가
             log += _btlLog.Log_Wait(true, 2);
+
+            _p_hitWait = true;  //플레이어 대기 처리
         }
         else            //적이 대기 행동 사용
         {
@@ -1183,6 +1068,8 @@ public class BattleSystem : MonoBehaviour
 
             //대기 로그 추가
             log += _btlLog.Log_Wait(false, 2);
+
+            _e_hitWait = true;  //적 대기 처리
         }
 
         Refresh_Log();
@@ -1285,11 +1172,11 @@ public class BattleSystem : MonoBehaviour
                 _p_makeDmg = true;
         }
 
-        log += _btlLog.Log_Def(fromEnemy, finalDmg);   //방어 로그 추가
+        log = _btlLog.Log_Def(fromEnemy, finalDmg);   //방어 로그 추가
         Refresh_Log();
         _btlLog.SetLog_BattleFlow(log); //로그 출력
-
         yield return new WaitUntil(() => _battleProcess == false);  //로그 출력이 끝날때까지 대기
+
         _p_endAct = true;   //플레이어 행동완료
         _e_endAct = true;   //적 행동완료
     }
@@ -1307,7 +1194,7 @@ public class BattleSystem : MonoBehaviour
 
                 _p_hitDge = true;   //플레이어 공격 회피 처리
 
-                log += _btlLog.Log_Dge(fromEnemy, true, 0); //플레이어 회피 성공 로그 추가
+                log = _btlLog.Log_Dge(fromEnemy, true, 0); //플레이어 회피 성공 로그 추가
                 Refresh_Log();
                 _btlLog.SetLog_BattleFlow(log); //로그 출력
             }
@@ -1328,7 +1215,7 @@ public class BattleSystem : MonoBehaviour
                 if (finalDmg > 0)   //적이 공격으로 피해를 주었는지 처리
                     _e_makeDmg = true;
 
-                log += _btlLog.Log_Dge(fromEnemy, false, finalDmg); //플레이어 회피 실패 로그 추가
+                log = _btlLog.Log_Dge(fromEnemy, false, finalDmg); //플레이어 회피 실패 로그 추가
                 Refresh_Log();
                 _btlLog.SetLog_BattleFlow(log); //로그 출력
             }
@@ -1343,7 +1230,7 @@ public class BattleSystem : MonoBehaviour
 
                 _e_hitDge = true;   //적 공격 회피 처리
 
-                log += _btlLog.Log_Dge(fromEnemy, true, 0); //적 회피 성공 로그 추가
+                log = _btlLog.Log_Dge(fromEnemy, true, 0); //적 회피 성공 로그 추가
                 Refresh_Log();
                 _btlLog.SetLog_BattleFlow(log); //로그 출력
             }
@@ -1364,7 +1251,7 @@ public class BattleSystem : MonoBehaviour
                 if (finalDmg > 0)   //플레이어가 공격으로 피해를 주었는지 처리
                     _p_makeDmg = true;
 
-                log += _btlLog.Log_Dge(fromEnemy, false, finalDmg); //적 회피 실패 로그 추가
+                log = _btlLog.Log_Dge(fromEnemy, false, finalDmg); //적 회피 실패 로그 추가
                 Refresh_Log();
                 _btlLog.SetLog_BattleFlow(log); //로그 출력
             }
@@ -1446,16 +1333,64 @@ public class BattleSystem : MonoBehaviour
 
     public void Set_EffectProcess(bool b) => _effectProcess = b;
 
+    public void SetLog_AtkHit(bool isP, string effText) //공격 명중 효과 로그
+    {
+        Refresh_Log();
+        _btlLog.SetLog_AtkHit(isP, effText);
+    }
+
+    public void SetLog_AtkDmg(bool isP, string effText) //공격 피해 주었을 때 효과 로그
+    {
+        Refresh_Log();
+        _btlLog.SetLog_AtkDmg(isP, effText);
+    }
+
+    public void SetLog_AtkBlocked(bool isP, string effText) //공격이 막혔을 때 효과 로그
+    {
+        Refresh_Log();
+        _btlLog.SetLog_AtkBlocked(isP, effText);
+    }
+
+    public void SetLog_AtkMissed(bool isP, string effText)  //공격이 빗나갔을 때 효과 로그
+    {
+        Refresh_Log();
+        _btlLog.SetLog_AtkMissed(isP, effText);
+    }
+
     public void SetLog_DefEffect(bool isP, string effText)  //방어 효과 로그
     {
         Refresh_Log();
         _btlLog.SetLog_DefEffect(isP, effText);
     }
 
+    public void SetLog_DefEffect_NoAtk(bool isP, string effText)    //상대가 공격하지 않았을 때 방어 효과 로그
+    {
+        Refresh_Log();
+        _btlLog.SetLog_DefEffect_NoAtk(isP, effText);
+    }
+
+    public void SetLog_DefEffect_Wait(bool isP, string effText)     //상대가 대기했을 떄 방어 효과 로그
+    {
+        Refresh_Log();
+        _btlLog.SetLog_DefEffect_Wait(isP, effText);
+    }
+
     public void SetLog_DgeEffect(bool isP, string effText)  //회피 효과 로그
     {
         Refresh_Log();
         _btlLog.SetLog_DgeEffect(isP, effText);
+    }
+
+    public void SetLog_DgeEffect_Fail(bool isP, string effText) //회피 조건 실패 시 효과 로그
+    {
+        Refresh_Log();
+        _btlLog.SetLog_DgeEffect_Fail(isP, effText);
+    }
+
+    public void SetLog_DgeEffect_NoAtk(bool isP, string effText)    //상대가 공격하지 않았을 때 회피 효과 로그
+    {
+        Refresh_Log();
+        _btlLog.SetLog_DgeEffect_NoAtk(isP, effText);
     }
 
     public void SetLog_ActEffect(bool isP, string actName, string effText)  //행동 효과 로그
@@ -1504,6 +1439,9 @@ public class BattleSystem : MonoBehaviour
         if (_enemySys.HP <= 0)
             _btlLog.SetLog_BattleEnd(true);     //적 사망
     }
+
+    public void Change_Ac_Player(bool plus, int value) => _playerSys.Change_AC(plus, value);
+    public void Change_Ac_Enemy(bool plus, int value) => _enemySys.Change_AC(plus, value);
 
     public void Change_Ap_Player(bool plus, int value) => _playerSys.Change_Ap(plus, value);
     public void Change_Ap_Enemy(bool plus, int value) => _enemySys.Change_Ap(plus, value);

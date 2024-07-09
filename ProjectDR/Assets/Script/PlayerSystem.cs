@@ -188,6 +188,10 @@ public class PlayerSystem : MonoBehaviour, ICreature
     private SpriteSystem _p_spr;
     [SerializeField]
     private SpriteSystem _p_spr_btl;
+    public SpriteSystem P_SPRITE
+    {
+        get { return _p_spr; }
+    }
 
     [Header("# Effect")]
     [SerializeField]
@@ -237,7 +241,6 @@ public class PlayerSystem : MonoBehaviour, ICreature
 
     public void Set_PlayerLocalPos(bool isCenter, bool isLeft)
     {
-        Debug.Log("플레이어 중앙에 있는가" + isCenter + " /\n 플레이어 좌측에 있는가" + isLeft);
         if (isCenter)
             _p_spr.transform.localPosition = new Vector3(0, 0, -1.25f);
         else
@@ -425,6 +428,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
             }
         }
 
+        /*
         if (old_ap == 0)    //행동력이 0이었다가
         {
             if (_ap > 0)    //0이 아니게 되면, 방어도 회복
@@ -434,6 +438,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
         {
             Change_AC(false, 5);
         }
+        */
 
         //미터 갱신
         _infoPannel.Change_ApMeter(_ap);
@@ -516,8 +521,13 @@ public class PlayerSystem : MonoBehaviour, ICreature
         var eff = Instantiate(_effect_blood, _effect_group);
         var pos = _p_spr_btl.transform.position;
         var sizeY = _p_spr_btl.GetComponent<SpriteRenderer>().bounds.size.y;
-        eff.transform.position = new Vector3(pos.x, pos.y + sizeY / 2, pos.z);
+        eff.transform.position = new Vector3(pos.x - 0.5f, pos.y + sizeY / 2, pos.z);
         eff.transform.localScale = new Vector3(0.75f, 0.75f, 1f);
+        //데미지량에 따른 유혈 파티클 개수 조정
+        var burst = eff.emission.GetBurst(0);
+        burst.count = dmg * 5;
+        eff.emission.SetBurst(0, burst);
+        eff.Play();
 
         //데미지 타입에 따른 피격음
     }
@@ -751,8 +761,8 @@ public class PlayerSystem : MonoBehaviour, ICreature
         //무기, 방어구, 보조무기 타입의 장비의 경우 외형 변경
         if (item.Type <= ItemData.ItemType.SubWp)
         {
-            _p_spr.Change_Item(item, item.Type);
-            _p_spr_btl.Change_Item(item, item.Type);
+            _p_spr.Change_Item(null, item.Type);
+            _p_spr_btl.Change_Item(null, item.Type);
         }
     }
 }

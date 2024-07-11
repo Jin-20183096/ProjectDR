@@ -6,6 +6,7 @@ public class BtlAct001 : BtlActData
 {
     //001 공격
 
+    /*
     public override void Effect_Post(bool isP, BattleSystem btlSys)
     {
         //공격이 막히면, 행동력 잃기
@@ -26,4 +27,5 @@ public class BtlAct001 : BtlActData
             btlSys.SetLog_AtkBlocked(isP, enDice + " 행동력을 소모했다");
         }
     }
+    */
 }

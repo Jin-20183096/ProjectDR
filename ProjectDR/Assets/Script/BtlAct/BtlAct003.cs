@@ -33,7 +33,7 @@ public class BtlAct003 : BtlActData
                 btlSys.Change_Ap_Enemy(true, myDice);
 
             //로그 출력
-            btlSys.SetLog_DgeEffect(isP, "소모한 행동력을 돌려받았다");
+            btlSys.SetLog_DgeEffect(isP, null, "소모한 행동력을 돌려받았다");
         }
     }
 }

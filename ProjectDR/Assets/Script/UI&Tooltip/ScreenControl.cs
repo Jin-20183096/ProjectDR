@@ -1,9 +1,10 @@
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static SingleToneCanvas;
 
-public class ScreenControl : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class ScreenControl : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField]
     private CanvasScaler _canvas;
@@ -13,6 +14,13 @@ public class ScreenControl : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     [SerializeField]
     private RectTransform _rect;
+
+    [SerializeField]
+    private Image _controlBar;
+    [SerializeField]
+    private Image _pannel_dragging;
+
+    bool _pointer = false;
 
     void Start()
     {
@@ -25,6 +33,7 @@ public class ScreenControl : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         {
             _rect.transform.SetAsLastSibling();
             STCanvas.Set_DragObj(gameObject);
+            _pannel_dragging.enabled = true;
         }
     }
 
@@ -47,5 +56,22 @@ public class ScreenControl : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     {
         STCanvas.Set_Drag(false);
         STCanvas.Set_DragObj(null);
+
+        _controlBar.enabled = _pointer;
+        _pannel_dragging.enabled = false;
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        _pointer = true;
+        _controlBar.enabled = true;
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        _pointer = false;
+
+        if (STCanvas.DRAG_OBJ != gameObject)
+            _controlBar.enabled = false;
     }
 }

@@ -7,6 +7,7 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
 {
     Color ColorUnknown = new Color32(0, 0, 0, 255);  //안 가본 색
     Color ColorDark = new Color32(120, 120, 120, 255);  //시야 밖의 가본 색
+    Color ColorSightAround = new Color32(170, 170, 170, 255);   //가장자리 시야의 색
     Color ColorSight = new Color32(255, 255, 255, 255); //시야 내의 색
 
     [SerializeField]
@@ -49,7 +50,7 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
     {
         NEIGHBOR = new List<Tile>();
 
-        SetVisible(false);
+        SetVisible(false, false);
         EventSpriteOnOff(false);
     }
 
@@ -174,7 +175,7 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
 
     public void SetExplored(bool b) => _isExplored = b;
 
-    public void SetVisible(bool b)
+    public void SetVisible(bool b, bool isCenter)
     {
         //시야에 들어온 순간 발견한 타일로 처리
         if (b && _isExplored == false)
@@ -184,12 +185,18 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
 
         if (b)
         {
-            _spr_tile.color = ColorSight;
+            if (isCenter)
+                _spr_tile.color = ColorSight;
+            else
+                _spr_tile.color = ColorSightAround;
 
             if (_spr_event != null)
             {
                 EventSpriteOnOff(true);
-                _spr_event.color = ColorSight;
+                if (isCenter)
+                    _spr_event.color = ColorSight;
+                else
+                    _spr_event.color = ColorSightAround;
             }
 
             if (_stair != null)

@@ -5,6 +5,7 @@ public class Wall : MonoBehaviour
 {
     Color ColorUnknown = new Color32(0, 0, 0, 255);  //안 가본 색
     Color ColorDark = new Color32(120, 120, 120, 255);  //시야 밖의 가본 색
+    Color ColorSightAround = new Color32(210, 210, 210, 255);   //가장자리 시야의 색
     Color ColorSight = new Color32(255, 255, 255, 255); //시야 내의 색
 
     [SerializeField]
@@ -23,7 +24,7 @@ public class Wall : MonoBehaviour
     void Awake()
     {
         for (int i = 0; i < _isVisible.Length; i++)
-            SetVisible(i, false);
+            SetVisible(i, false, false);
     }
 
     public void SetY(int y)
@@ -55,7 +56,7 @@ public class Wall : MonoBehaviour
     {
         return _isVisible[i];
     }
-    public void SetVisible(int i, bool b) //i번쨰 벽의 시야 내 여부
+    public void SetVisible(int i, bool b, bool isCenter) //i번쨰 벽의 시야 내 여부
     {
         //시야에 들어온 순간 발견한 벽으로 처리
         if (b && _isExplored[i] == false)
@@ -64,7 +65,14 @@ public class Wall : MonoBehaviour
         _isVisible[i] = b;
 
         if (b)
-            _wall[i].color = ColorSight;
+        {
+            /*
+            if (isCenter)
+                _wall[i].color = ColorSight;
+            else
+            */
+                _wall[i].color = ColorSightAround;
+        }
         else
             _wall[i].color = _isExplored[i] ? ColorDark : ColorUnknown;
     }

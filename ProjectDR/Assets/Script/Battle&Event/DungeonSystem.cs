@@ -627,7 +627,7 @@ public class DungeonSystem : MonoBehaviour
             //플레이어 시야 재설정
             ChangeVisibleTile();
 
-            _tilePath.Remove(tile); //도착한 타일을 경로에서 제거
+            _tilePath.Remove(tile);         //도착한 타일을 경로에서 제거
             tile.CONNECT.PathColorOff();    //도착한 타일의 경로표시 제거
 
             //도착한 타일에 이벤트가 있을 경우, 실행
@@ -664,6 +664,8 @@ public class DungeonSystem : MonoBehaviour
                     BtlSys.Record_DungeonScript(this, _camera_dgn); //이 스크립트와 던전 카메라를 할당해주기 위해 전달
                     BtlSys.BattleStart(_dgnData.TileEnemy[x][y]);   //해당 위치의 적과 전투 시작
                 }
+
+                PathClear();
             }
 
             yield return new WaitUntil(() => EVNT_PROCESS == false);
@@ -735,7 +737,7 @@ public class DungeonSystem : MonoBehaviour
 
     void PathClear()
     {
-        StopCoroutine("PathForward");
+        //StopCoroutine("PathForward");
 
         foreach (Tile t in _tilePath)
             t.PathColorOff();
@@ -755,17 +757,17 @@ public class DungeonSystem : MonoBehaviour
 
         if (_dgn_grid[x, y] != 0)
         {
-            _tile_dic[x][y].SetVisible(true);   //x, y 타일 시야에 들어옴
-            _visibleTile.Add(_tile_dic[x][y]);  //x, y 타일을 시야 목록에 추가
+            _tile_dic[x][y].SetVisible(true, true);   //플레이어가 위치한 타일 시야에 들어옴
+            _visibleTile.Add(_tile_dic[x][y]);  //플레이어가 위치한 타일을 시야 목록에 추가
         }
 
         //시야값 SIGHT에 따라 보이는 타일을 체크하는 재귀함수실행
-        CheckSight(s, SightDir.Left, x - 2, y);
-        CheckSight(s, SightDir.Right, x + 2, y);
-        CheckSight(s, SightDir.Up, x + 1, y + 1);
-        CheckSight(s, SightDir.Up, x - 1, y + 1);
-        CheckSight(s, SightDir.Down, x + 1, y - 1);
-        CheckSight(s, SightDir.Down, x - 1, y - 1);
+        CheckSight(s - 1, SightDir.Left, x - 2, y);
+        CheckSight(s - 1, SightDir.Right, x + 2, y);
+        CheckSight(s - 1, SightDir.Up, x + 1, y + 1);
+        CheckSight(s - 1, SightDir.Up, x - 1, y + 1);
+        CheckSight(s - 1, SightDir.Down, x + 1, y - 1);
+        CheckSight(s - 1, SightDir.Down, x - 1, y - 1);
         //
 
         //플레이어 1타일 이내 4-5-6-/6-7-8 방향 벽은 반투명화
@@ -778,36 +780,36 @@ public class DungeonSystem : MonoBehaviour
 
         foreach (var t in outSight)
         {
-            t.SetVisible(false);
+            t.SetVisible(false, false);
 
             var tx = t.X;
             var ty = t.Y;
 
             //t의 12-1-2 방향의 천장의 벽이 발견된 상태면, visible false
             if (_dgn_grid[tx + 1, ty + 1] == -1 && _wall_dic[tx + 1][ty + 1].GetVisible(3))
-                _wall_dic[tx + 1][ty + 1].SetVisible(3, false);
+                _wall_dic[tx + 1][ty + 1].SetVisible(3, false, false);
             //t의 2-3-4 방향의 천장의 벽이 발견된 상태면, visible false
             if (_dgn_grid[tx + 2, ty] == -1 && _wall_dic[tx + 2][ty].GetVisible(4))
-                _wall_dic[tx + 2][ty].SetVisible(4, false);
+                _wall_dic[tx + 2][ty].SetVisible(4, false, false);
             //t의 4-5-6 방향의 천장의 벽이 발견된 상태면, visible false
             if (_dgn_grid[tx + 1, ty - 1] == -1 && _wall_dic[tx + 1][ty - 1].GetVisible(5))
-                _wall_dic[tx + 1][ty - 1].SetVisible(5, false);
+                _wall_dic[tx + 1][ty - 1].SetVisible(5, false, false);
             //t의 6-7-8 방향의 천장의 벽이 발견된 상태면, visible false
             if (_dgn_grid[tx - 1, ty - 1] == -1 && _wall_dic[tx - 1][ty - 1].GetVisible(0))
-                _wall_dic[tx - 1][ty - 1].SetVisible(0, false);
+                _wall_dic[tx - 1][ty - 1].SetVisible(0, false, false);
             //t의 8-9-10 방향의 천장의 벽이 발견된 상태면, visible false
             if (_dgn_grid[tx - 2, ty] == -1 && _wall_dic[tx - 2][ty].GetVisible(1))
-                _wall_dic[tx - 2][ty].SetVisible(1, false);
+                _wall_dic[tx - 2][ty].SetVisible(1, false, false);
             //t의 10-11-12 방향의 천장의 벽이 발견된 상태면, visible false
             if (_dgn_grid[tx - 1, ty + 1] == -1 && _wall_dic[tx - 1][ty + 1].GetVisible(2))
-                _wall_dic[tx - 1][ty + 1].SetVisible(2, false);
+                _wall_dic[tx - 1][ty + 1].SetVisible(2, false, false);
         }
     }
 
     void CheckSight(int s, SightDir dir, int x, int y)
     {
         //s가 0이면 종료
-        if (s == 0)
+        if (s < 0)
             return;
 
         var gridValue = _dgn_grid[x, y];
@@ -820,9 +822,9 @@ public class DungeonSystem : MonoBehaviour
                 var tile = _tile_dic[x][y];
 
                 tile.SetExplored(true); //발견처리
-                tile.SetVisible(s > 1); //1 시야가 닿은 곳은 자세히 보이진 않음
+                tile.SetVisible(s > 0, false); //1 시야가 닿은 곳은 자세히 보이진 않음
 
-                if (s > 1 && !_visibleTile.Contains(tile))
+                if (s > 0 && !_visibleTile.Contains(tile))
                     _visibleTile.Add(tile); //시야 목록에 없는 타일이면 추가
 
                 //tile의 12-1-2 방향의 천장의 벽도 발견
@@ -851,42 +853,44 @@ public class DungeonSystem : MonoBehaviour
                 //우선 그 벽의 반투명화를 취소
                 wall.InvinsibleWall(false);
 
+                Debug.Log("[" + x + ", " + y + "]: " + s);
+
                 //빛 방향에 따라 특정 벽의 visible, explored를 조작
                 if (_dgn_grid[x + 1, y + 1] == 1 && _tile_dic[x + 1][y + 1].GetExplored() &&
                     (dir == SightDir.Down || dir == SightDir.Left))  //12-1-2 방향에 발견한 타일이 존재할 경우, 
                 {
                     wall.SetExplored(0, true);
-                    wall.SetVisible(0, (s > 1));
+                    wall.SetVisible(0, (s > 0), s == PlayerSys.SIGHT - 1);
                 }
                 if (_dgn_grid[x + 2, y] == 1 && _tile_dic[x + 2][y].GetExplored() &&
                     (dir == SightDir.Left))    //2-3-4 방향에 발견된 타일이 존재할 경우,
                 {
                     wall.SetExplored(1, true);
-                    wall.SetVisible(1, (s > 1));
+                    wall.SetVisible(1, (s > 0), s == PlayerSys.SIGHT - 1);
                 }
                 if (_dgn_grid[x + 1, y - 1] == 1 && _tile_dic[x + 1][y - 1].GetExplored() &&
                     (dir == SightDir.Left || dir == SightDir.Up))    //4-5-6 방향에 발견된 타일이 존재할 경우,
                 {
                     wall.SetExplored(2, true);
-                    wall.SetVisible(2, (s > 1));
+                    wall.SetVisible(2, (s > 0), s == PlayerSys.SIGHT - 1);
                 }
                 if (_dgn_grid[x - 1, y - 1] == 1 && _tile_dic[x - 1][y - 1].GetExplored() &&
                     (dir == SightDir.Up || dir == SightDir.Right))    //6-7-8 방향에 발견된 타일이 존재할 경우,
                 {
                     wall.SetExplored(3, true);
-                    wall.SetVisible(3, (s > 1));
+                    wall.SetVisible(3, (s > 0), s == PlayerSys.SIGHT - 1);
                 }
                 if (_dgn_grid[x - 2, y] == 1 && _tile_dic[x - 2][y].GetExplored() &&
                     (dir == SightDir.Right))    //8-9-10 방향에 발견된 타일이 존재할 경우,
                 {
                     wall.SetExplored(4, true);
-                    wall.SetVisible(4, (s > 1));
+                    wall.SetVisible(4, (s > 0), s == PlayerSys.SIGHT - 1);
                 }
                 if (_dgn_grid[x - 1, y + 1] == 1 && _tile_dic[x - 1][y + 1].GetExplored() &&
                     (dir == SightDir.Right || dir == SightDir.Down))    //10-11-12 방향에 발견된 타일이 존재할 경우,
                 {
                     wall.SetExplored(5, true);
-                    wall.SetVisible(5, (s > 1));
+                    wall.SetVisible(5, (s > 0), s == PlayerSys.SIGHT - 1);
                 }
 
                 //타일이 아닌 벽에 시야가 닿으면 시야 막힘 (재귀 종료)

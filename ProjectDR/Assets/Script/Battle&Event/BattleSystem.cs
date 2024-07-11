@@ -1333,70 +1333,70 @@ public class BattleSystem : MonoBehaviour
 
     public void Set_EffectProcess(bool b) => _effectProcess = b;
 
-    public void SetLog_AtkHit(bool isP, string effText) //공격 명중 효과 로그
+    public void SetLog_AtkHit(bool isP, string targetPost, string effText) //공격 명중 효과 로그
     {
         Refresh_Log();
-        _btlLog.SetLog_AtkHit(isP, effText);
+        _btlLog.SetLog_AtkHit(isP, targetPost, effText);
     }
 
-    public void SetLog_AtkDmg(bool isP, string effText) //공격 피해 주었을 때 효과 로그
+    public void SetLog_AtkDmg(bool isP, string targetPost, string effText) //공격 피해 주었을 때 효과 로그
     {
         Refresh_Log();
-        _btlLog.SetLog_AtkDmg(isP, effText);
+        _btlLog.SetLog_AtkDmg(isP, targetPost, effText);
     }
 
-    public void SetLog_AtkBlocked(bool isP, string effText) //공격이 막혔을 때 효과 로그
+    public void SetLog_AtkBlocked(bool isP, string targetPost, string effText) //공격이 막혔을 때 효과 로그
     {
         Refresh_Log();
-        _btlLog.SetLog_AtkBlocked(isP, effText);
+        _btlLog.SetLog_AtkBlocked(isP, targetPost, effText);
     }
 
-    public void SetLog_AtkMissed(bool isP, string effText)  //공격이 빗나갔을 때 효과 로그
+    public void SetLog_AtkMissed(bool isP, string targetPost, string effText)  //공격이 빗나갔을 때 효과 로그
     {
         Refresh_Log();
-        _btlLog.SetLog_AtkMissed(isP, effText);
+        _btlLog.SetLog_AtkMissed(isP, targetPost, effText);
     }
 
-    public void SetLog_DefEffect(bool isP, string effText)  //방어 효과 로그
+    public void SetLog_DefEffect(bool isP, string targetPost, string effText)  //방어 효과 로그
     {
         Refresh_Log();
-        _btlLog.SetLog_DefEffect(isP, effText);
+        _btlLog.SetLog_DefEffect(isP, targetPost, effText);
     }
 
-    public void SetLog_DefEffect_NoAtk(bool isP, string effText)    //상대가 공격하지 않았을 때 방어 효과 로그
+    public void SetLog_DefEffect_NoAtk(bool isP, string targetPost, string effText)    //상대가 공격하지 않았을 때 방어 효과 로그
     {
         Refresh_Log();
-        _btlLog.SetLog_DefEffect_NoAtk(isP, effText);
+        _btlLog.SetLog_DefEffect_NoAtk(isP, targetPost, effText);
     }
 
-    public void SetLog_DefEffect_Wait(bool isP, string effText)     //상대가 대기했을 떄 방어 효과 로그
+    public void SetLog_DefEffect_Wait(bool isP, string targetPost, string effText)     //상대가 대기했을 떄 방어 효과 로그
     {
         Refresh_Log();
-        _btlLog.SetLog_DefEffect_Wait(isP, effText);
+        _btlLog.SetLog_DefEffect_Wait(isP, targetPost, effText);
     }
 
-    public void SetLog_DgeEffect(bool isP, string effText)  //회피 효과 로그
+    public void SetLog_DgeEffect(bool isP, string targetPost, string effText)  //회피 효과 로그
     {
         Refresh_Log();
-        _btlLog.SetLog_DgeEffect(isP, effText);
+        _btlLog.SetLog_DgeEffect(isP, targetPost, effText);
     }
 
-    public void SetLog_DgeEffect_Fail(bool isP, string effText) //회피 조건 실패 시 효과 로그
+    public void SetLog_DgeEffect_Fail(bool isP, string targetPost, string effText)
     {
         Refresh_Log();
-        _btlLog.SetLog_DgeEffect_Fail(isP, effText);
+        _btlLog.SetLog_DgeEffect_Fail(isP, targetPost, effText);
     }
 
-    public void SetLog_DgeEffect_NoAtk(bool isP, string effText)    //상대가 공격하지 않았을 때 회피 효과 로그
+    public void SetLog_DgeEffect_NoAtk(bool isP, string targetPost, string effText)    //상대가 공격하지 않았을 때 회피 효과 로그
     {
         Refresh_Log();
-        _btlLog.SetLog_DgeEffect_NoAtk(isP, effText);
+        _btlLog.SetLog_DgeEffect_NoAtk(isP, targetPost, effText);
     }
 
-    public void SetLog_ActEffect(bool isP, string actName, string effText)  //행동 효과 로그
+    public void SetLog_ActEffect(bool isP, string actName, string targetPost, string effText)  //행동 효과 로그
     {
         Refresh_Log();
-        _btlLog.SetLog_ActEffect(isP, actName, effText);
+        _btlLog.SetLog_AbilityEffect(isP, actName, targetPost, effText);
     }
 
     public void SetLog_RunAct(bool isP, bool success)   //도망 행동 로그

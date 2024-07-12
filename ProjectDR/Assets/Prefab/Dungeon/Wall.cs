@@ -14,7 +14,7 @@ public class Wall : MonoBehaviour
     private SpriteRenderer[] _wall;
 
     [SerializeField]
-    private Sprite _spr_wall;
+    private Sprite[] _spr_wall;
 
     [SerializeField]
     private bool[] _isExplored = new bool[6];   //6개 벽의 발견 여부 (12_1_2부터 시계 방향)
@@ -38,7 +38,7 @@ public class Wall : MonoBehaviour
         }
     }
 
-    public void SetWallSprite(int i) => _wall[i].sprite = _spr_wall;
+    public void SetWallSprite(int i) => _wall[i].sprite = _spr_wall[Random.Range(0, _spr_wall.Length)];
 
     public bool GetExplored(int i)
     {

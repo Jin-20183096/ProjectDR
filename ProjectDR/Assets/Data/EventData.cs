@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class EventData : ScriptableObject
 {
-    public enum EventType
+    public enum EventType   //Battle 타입과 같은 전투 이벤트는 enum에서 항상 맨 뒤에 배치시켜야 함
     { No, Battle }
 
     public enum CheckStat { STR, INT, DEX, AGI, CON, WIL, LUC } //힘, 지능, 손재주, 민첩, 건강, 의지, 행운(D6)

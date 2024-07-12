@@ -331,9 +331,6 @@ public class ItemSystem : MonoBehaviour
                     for (int i = cost_stat1; i > 0; i--)    //해당 스탯의 무작위 위치에 코스트 1씩 증가
                         stat1_arr[Random.Range(0, stat1_arr.Length)] += 1;
 
-                    Debug.Log(stat1_arr[0] + ", " + stat1_arr[1] + ", " + stat1_arr[2] + ", "
-                            + stat1_arr[3] + ", " + stat1_arr[4] + ", " + stat1_arr[5]);
-
                     for (int i = 0; i < stat1_arr.Length; i++)  //코스트를 실제 수치로
                         stat1_arr[i] = Cost_To_ActStatValue(stat1_arr[i]);
                 }
@@ -720,9 +717,6 @@ public class ItemSystem : MonoBehaviour
                 {
                     for (int i = cost_stat1; i > 0; i--)    //해당 스탯의 무작위 위치에 스탯 1씩 증가
                         stat1_arr[Random.Range(0, stat1_arr.Length)] += 1;
-
-                    Debug.Log(stat1_arr[0] + ", " + stat1_arr[1] + ", " + stat1_arr[2] + ", "
-                            + stat1_arr[3] + ", " + stat1_arr[4] + ", " + stat1_arr[5]);
 
                     for (int i = 0; i < stat1_arr.Length; i++)  //코스트를 실제 수치로
                         stat1_arr[i] = Cost_To_ActStatValue(stat1_arr[i]);

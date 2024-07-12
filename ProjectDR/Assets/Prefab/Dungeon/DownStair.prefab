@@ -744,9 +744,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dgnSys: {fileID: 0}
-  _spr_tile: {fileID: 9179174089830327172}
-  _spr_path: {fileID: 7905368812674111125}
-  _spr_event: {fileID: 0}
+  _tile: {fileID: 9179174089830327172}
+  _path: {fileID: 7905368812674111125}
+  _eventSpr: {fileID: 0}
   _anima_event: {fileID: 0}
   _isExplored: 0
   _isVisible: 0
@@ -754,6 +754,8 @@ MonoBehaviour:
   _isDownStair: 1
   _stair: {fileID: 7184337892344060901}
   _stair_dark: {fileID: 5842170838153020769}
+  _spr_tile:
+  - {fileID: 21300000, guid: f1065011ec7743143b77ba29c77ae54c, type: 3}
 --- !u!1 &1628577437034647000
 GameObject:
   m_ObjectHideFlags: 0

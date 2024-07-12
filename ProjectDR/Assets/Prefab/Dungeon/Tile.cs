@@ -6,19 +6,19 @@ using UnityEngine.Rendering;
 public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
 {
     Color ColorUnknown = new Color32(0, 0, 0, 255);  //안 가본 색
-    Color ColorDark = new Color32(120, 120, 120, 255);  //시야 밖의 가본 색
-    Color ColorSightAround = new Color32(170, 170, 170, 255);   //가장자리 시야의 색
+    Color ColorDark = new Color32(80, 80, 80, 255);  //시야 밖의 가본 색
+    Color ColorSightAround = new Color32(150, 150, 150, 255);   //가장자리 시야의 색
     Color ColorSight = new Color32(255, 255, 255, 255); //시야 내의 색
 
     [SerializeField]
     private DungeonSystem _dgnSys;
 
     [SerializeField]
-    private SpriteRenderer _spr_tile;
+    private SpriteRenderer _tile;
     [SerializeField]
-    private SpriteRenderer _spr_path;
+    private SpriteRenderer _path;
     [SerializeField]
-    private SpriteRenderer _spr_event;
+    private SpriteRenderer _eventSpr;
     [SerializeField]
     private Animator _anima_event;
 
@@ -36,6 +36,9 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
     [SerializeField]
     private GameObject _stair_dark; //시야 밖 계단 오브젝트
 
+    [SerializeField]
+    private Sprite[] _spr_tile;
+
     public int X { get; private set; }
     public int Y { get; private set; }
 
@@ -51,6 +54,7 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
         NEIGHBOR = new List<Tile>();
 
         SetVisible(false, false);
+        SetTileSprite();
         EventSpriteOnOff(false);
     }
 
@@ -60,8 +64,8 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
     {
         Y = y;
 
-        if (_spr_event != null)
-            _spr_event.gameObject.GetComponent<SortingGroup>().sortingOrder = Y * -1;
+        if (_eventSpr != null)
+            _eventSpr.gameObject.GetComponent<SortingGroup>().sortingOrder = Y * -1;
         if (_stair != null)
             _stair.gameObject.GetComponent<SortingGroup>().sortingOrder = Y * -1;
         if (_stair_dark != null)
@@ -129,42 +133,44 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
         _dgnSys.TileMouseExit();
     }
 
+    public void SetTileSprite() => _tile.sprite = _spr_tile[Random.Range(0, _spr_tile.Length)];
+
     public void SetPathColor(Color color)   //이동 경로 타일 색 표시
     {
-        _spr_path.enabled = true;
-        _spr_path.color = color;
+        _path.enabled = true;
+        _path.color = color;
     }
 
     public void PathColorOff()  //이동 경로 타일 표시 off
     {
-        _spr_path.color = new Color(1, 1, 1);
-        _spr_path.enabled = false;
+        _path.color = new Color(1, 1, 1);
+        _path.enabled = false;
     }
 
     public void EventSpriteOnOff(bool b)    //이벤트 스프라이트 활성화 여부
     {
-        if (_spr_event != null)
-            _spr_event.enabled = b;
+        if (_eventSpr != null)
+            _eventSpr.enabled = b;
     }
 
     public void SetEventAnimation(RuntimeAnimatorController anima) //이벤트 애니메이션 컨트롤러 설정
     {
-        if (_spr_event != null)
+        if (_eventSpr != null)
             _anima_event.runtimeAnimatorController = anima;
     }
 
     public void SetEventSpritePosition(bool isCenter, bool isLeft)  //이벤트 스프라이트의 위치 조정
     {
         if (isCenter)
-            _spr_event.transform.localPosition = new Vector3(0, 0, -1.25f);
+            _eventSpr.transform.localPosition = new Vector3(0, 0, -1.25f);
         else
         {
-            _spr_event.flipX = isLeft;
+            _eventSpr.flipX = isLeft;
 
             if (isLeft)
-                _spr_event.transform.localPosition = new Vector3(-1.25f, 0, -1.25f);
+                _eventSpr.transform.localPosition = new Vector3(-1.25f, 0, -1.25f);
             else
-                _spr_event.transform.localPosition = new Vector3(1.25f, 0, -1.25f);
+                _eventSpr.transform.localPosition = new Vector3(1.25f, 0, -1.25f);
         }
     }
 
@@ -186,17 +192,17 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
         if (b)
         {
             if (isCenter)
-                _spr_tile.color = ColorSight;
+                _tile.color = ColorSight;
             else
-                _spr_tile.color = ColorSightAround;
+                _tile.color = ColorSightAround;
 
-            if (_spr_event != null)
+            if (_eventSpr != null)
             {
                 EventSpriteOnOff(true);
                 if (isCenter)
-                    _spr_event.color = ColorSight;
+                    _eventSpr.color = ColorSight;
                 else
-                    _spr_event.color = ColorSightAround;
+                    _eventSpr.color = ColorSightAround;
             }
 
             if (_stair != null)
@@ -207,10 +213,10 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
         }
         else
         {
-            _spr_tile.color = (_isExplored ? ColorDark : ColorUnknown);
-            if (_spr_event != null)
+            _tile.color = (_isExplored ? ColorDark : ColorUnknown);
+            if (_eventSpr != null)
             {
-                _spr_event.color = ColorUnknown;
+                _eventSpr.color = ColorUnknown;
                 EventSpriteOnOff(_isExplored ? true : false);
             }
             if (_stair != null)

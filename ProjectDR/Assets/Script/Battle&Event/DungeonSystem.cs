@@ -301,8 +301,7 @@ public class DungeonSystem : MonoBehaviour
                     _tile_list.Clear();
                     _dgnData.WallVec = _wall_list.ToList();
                     _wall_list.Clear();
-                    //_dgnData.DungeonMakeEnd = true;
-
+                    _dgnData.DungeonMakeEnd = true;
 
                     //플레이어 위치 이동
                     var ustVec = _dgnData.UpStairVec;
@@ -316,7 +315,125 @@ public class DungeonSystem : MonoBehaviour
         }
         else    //던전 데이터에서 데이터 불러오기
         {
+            if (_makeDungeonEnd == false)
+            {
+                _tile_dic.Clear();
+                _wall_dic.Clear();
 
+                var tile_list = _dgnData.TileVec.ToList();
+                var upStair = _dgnData.UpStairVec;
+                var downStair = _dgnData.DownStairVec;
+                var wall_list = _dgnData.WallVec.ToList();
+                
+                for (int i = 0; i < tile_list.Count; i++)
+                    LoadTile(tile_list[i].x, tile_list[i].y);
+
+                LoadUpStair(upStair.x, upStair.y);
+                LoadDownStair(downStair.x, downStair.y);
+
+                for (int i = 0; i < wall_list.Count; i++)
+                    LoadWall(wall_list[i].x, wall_list[i].y);
+
+                _makeDungeonEnd = true;
+
+                //타일 리스트를 돌면서, 벽과 천장 설정
+
+                int x, y;
+                Tile tile;
+
+                for (int i = 0; i < _tile_list.Count; i++)
+                {
+                    Vector2Int vec = _tile_list[i];
+                    x = vec.x;
+                    y = vec.y;
+                    tile = _tile_dic[x][y];
+
+                    //6방향을 체크한 뒤, 인접 타일이 있으면 NEIGHBOR로 등록, 아니면 벽 세우기
+                    //12-1-2 방향
+                    if (x + 1 <= _dgnSizeX && y + 1 <= _dgnSizeY && _dgn_grid[x + 1, y + 1] == 1)
+                        tile.AddNeighbor(_tile_dic[x + 1][y + 1]);
+                    else
+                    {
+                        if (x + 1 <= _dgnSizeX + 1 && y + 1 <= _dgnSizeY + 1)
+                        {
+                            if (_dgn_grid[x + 1, y + 1] != -1)  //12-1-2시 방향에 천장이 없다면 생성
+                                GenerateWall(x + 1, y + 1);
+                            _wall_dic[x + 1][y + 1].SetWallSprite(3);    //천장의 6-7-8에 벽 설정
+                        }
+                    }
+                    //2-3-4 방향
+                    if (x + 2 <= _dgnSizeX && _dgn_grid[x + 2, y] == 1)
+                        tile.AddNeighbor(_tile_dic[x + 2][y]);
+                    else
+                    {
+                        if (x + 2 <= _dgnSizeX + 1)
+                        {
+                            if (_dgn_grid[x + 2, y] != -1)      //2-3-4시 방향에 천장이 없다면 생성
+                                GenerateWall(x + 2, y);
+                            _wall_dic[x + 2][y].SetWallSprite(4);        //천장의 8-9-10에 벽 설정
+                        }
+                    }
+                    //4-5-6 방향
+                    if (x + 1 <= _dgnSizeX && y > 1 && _dgn_grid[x + 1, y - 1] == 1)
+                        tile.AddNeighbor(_tile_dic[x + 1][y - 1]);
+                    else
+                    {
+                        if (x + 1 <= _dgnSizeX + 1 && y > 0)
+                        {
+                            if (_dgn_grid[x + 1, y - 1] != -1)  //4-5-6시 방향에 천장이 없다면 생성
+                                GenerateWall(x + 1, y - 1);
+                            _wall_dic[x + 1][y - 1].SetWallSprite(5);    //천장의 10-11-12에 벽 설정
+                        }
+                    }
+                    //6-7-8 방향
+                    if (x > 1 && y > 1 && _dgn_grid[x - 1, y - 1] == 1)
+                        tile.AddNeighbor(_tile_dic[x - 1][y - 1]);
+                    else
+                    {
+                        if (x > 0 && y > 0)
+                        {
+                            if (_dgn_grid[x - 1, y - 1] != -1)   //6-7-8시 방향에 천장이 없다면 생성
+                                GenerateWall(x - 1, y - 1);
+                            _wall_dic[x - 1][y - 1].SetWallSprite(0);    //천장의 12-1-2에 벽 설정
+                        }
+                    }
+                    //8-9-10 방향
+                    if (x > 2 && _dgn_grid[x - 2, y] == 1)
+                        tile.AddNeighbor(_tile_dic[x - 2][y]);
+                    else
+                    {
+                        if (x > 1)
+                        {
+                            if (_dgn_grid[x - 2, y] != -1)      //8-9-10시 방향에 천장이 없다면 생성
+                                GenerateWall(x - 2, y);
+                            _wall_dic[x - 2][y].SetWallSprite(1);        //천장의 2-3-4에 벽 생성
+                        }
+                    }
+                    //10-11-12 방향
+                    if (x > 1 && y + 1 <= _dgnSizeY && _dgn_grid[x - 1, y + 1] == 1)
+                        tile.AddNeighbor(_tile_dic[x - 1][y + 1]);
+                    else
+                    {
+                        if (x > 0 && y + 1 <= _dgnSizeY + 1)
+                        {
+                            if (_dgn_grid[x - 1, y + 1] != -1)  //10-11-12시 방향에 천장이 없다면 생성
+                                GenerateWall(x - 1, y + 1);
+                            _wall_dic[x - 1][y + 1].SetWallSprite(2);    //천장의 4-5-6에 벽 생성
+                        }
+                    }
+                }
+
+                _tile_list.Clear();
+
+                //플레이어 위치 이동
+                var pos = _dgnData.UpStairVec;
+                PlayerSys.Move_PlayerPosition(_tile_dic[pos.x][pos.y].transform.position, false);
+                PlayerSys.X = pos.x;
+                PlayerSys.Y = pos.y;
+
+                //플레이어 시야 재설정
+                ChangeVisibleTile();
+            }
         }
     }
 
@@ -480,6 +597,122 @@ public class DungeonSystem : MonoBehaviour
         if (_dgn_grid[x, y] != 0)   //이미 타일이 존재하는 좌표면 생성 x
             return;
 
+        _dgn_grid[x, y] = -1;
+        //천장 프리팹 생성
+        var ceiling = Instantiate(_wall_prefab.transform);
+        var ceilingScr = ceiling.GetComponent<Wall>();
+
+        ceiling.position = GridIndex_ToPosition(x, y);
+        ceiling.parent = transform.GetChild(0).transform;
+        ceiling.name = "c_" + x + "." + y;
+        ceilingScr.SetY(y);
+        //프리팹의 정보를 딕셔너리에 저장
+        if (_wall_dic.ContainsKey(x) == false)
+            _wall_dic.Add(x, new Dictionary<int, Wall>());
+
+        _wall_dic[x].Add(y, ceilingScr);
+
+        _wall_list.Add(new Vector2Int(x, y));
+    }
+
+    void LoadTile(int x, int y) //타일 불러오기
+    {
+        _dgn_grid[x, y] = 1;
+        _tileCount++;
+        //타일 프리팹 생성
+        var tile = Instantiate(_tile_prefab.transform);
+        var tileScr = tile.GetComponent<Tile>();
+
+        tile.position = GridIndex_ToPosition(x, y);
+        tile.parent = transform.GetChild(0).transform;
+        tile.name = x + "." + y;
+        tileScr.SetX(x);
+        tileScr.SetY(y);
+        tileScr.SetDungeonSystem(this);
+
+        //프리팹의 정보를 딕셔너리에 저장, 타일 리스트에 추가
+        if (_tile_dic.ContainsKey(x) == false)
+            _tile_dic.Add(x, new Dictionary<int, Tile>());
+
+        _tile_dic[x].Add(y, tileScr);
+        _tile_list.Add(new Vector2Int(x, y));
+
+        //이벤트 로드
+        if (_dgnData.TileEvent.ContainsKey(x) && _dgnData.TileEvent[x].ContainsKey(y))
+        {
+            var evnt = _dgnData.TileEvent[x][y];
+            RuntimeAnimatorController anima = null;
+
+            if ((int)evnt.Event.Type >= (int)EventData.EventType.Battle)    //전투 이벤트인 경우
+            {
+                if (_dgnData.TileEnemy.ContainsKey(x) && _dgnData.TileEnemy[x].ContainsKey(y))
+                    anima = _dgnData.TileEnemy[x][y].Anima_Ctrl;
+                else
+                    Debug.Log("전투 이벤트의 적 불러오기 실패");
+            }
+            else
+                anima = evnt.Event.EventObj_Anima;
+
+            _tile_dic[x][y].SetEventAnimation(anima);
+        }
+    }
+
+    void LoadUpStair(int x, int y)  //위층 계단 불러오기
+    {
+        _dgn_grid[x, y] = 1;
+        _tileCount++;   
+        //타일 프리팹 생성
+        var tile = Instantiate(_upStair_prefab.transform);
+        var tileScr = tile.GetComponent<Tile>();
+
+        tile.position = GridIndex_ToPosition(x, y);
+        tile.parent = transform.GetChild(0).transform;
+        tile.name = x + "." + y;
+        tileScr.SetX(x);
+        tileScr.SetY(y);
+        tileScr.SetDungeonSystem(this);
+        tileScr.RotateStair(_dgnData.UpStairDir);
+
+        //프리팹의 정보를 딕셔너리에 저장, 타일리스트에 추가
+        if (_tile_dic.ContainsKey(x) == false)
+            _tile_dic.Add(x, new Dictionary<int, Tile>());
+
+        _tile_dic[x].Add(y, tileScr);
+
+        _tile_list.Add(new Vector2Int(x, y)); //천장 생성을 위해 임시로 리스트에 넣었다가 이후 삭제
+
+        //계단 이벤트 삽입
+    }
+
+    void LoadDownStair(int x, int y)    //아래층 계단 불러오기
+    {
+        _dgn_grid[x, y] = 1;
+        _tileCount++;
+        //타일 프리팹 생성
+        var tile = Instantiate(_downStair_prefab.transform);
+        var tileScr = tile.GetComponent<Tile>();
+
+        tile.position = GridIndex_ToPosition(x, y);
+        tile.parent = transform.GetChild(0).transform;
+        tile.name = x + "." + y;
+        tileScr.SetX(x);
+        tileScr.SetY(y);
+        tileScr.SetDungeonSystem(this);
+        tileScr.RotateStair(_dgnData.DownStairDir);
+
+        //프리팹의 정보를 딕셔너리에 저장, 타일리스트에 추가
+        if (_tile_dic.ContainsKey(x) == false)
+            _tile_dic.Add(x, new Dictionary<int, Tile>());
+
+        _tile_dic[x].Add(y, tileScr);
+
+        _tile_list.Add(new Vector2Int(x, y)); //천장 생성을 위해 임시로 리스트에 넣었다가 이후 삭제
+
+        //계단 이벤트 삽입
+    }
+
+    void LoadWall(int x, int y) //벽 불러오기
+    {
         _dgn_grid[x, y] = -1;
         //천장 프리팹 생성
         var ceiling = Instantiate(_wall_prefab.transform);
@@ -852,8 +1085,6 @@ public class DungeonSystem : MonoBehaviour
 
                 //우선 그 벽의 반투명화를 취소
                 wall.InvinsibleWall(false);
-
-                Debug.Log("[" + x + ", " + y + "]: " + s);
 
                 //빛 방향에 따라 특정 벽의 visible, explored를 조작
                 if (_dgn_grid[x + 1, y + 1] == 1 && _tile_dic[x + 1][y + 1].GetExplored() &&

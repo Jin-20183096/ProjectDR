@@ -134,17 +134,17 @@ public class ItemSystem : MonoBehaviour
         _dragItemCursor = _dragIcon.transform.GetChild(0).gameObject;
         _dragMouseCursor = _dragIcon.transform.GetChild(1).gameObject;
 
-        Create_Weapon(_test_item[0], ItemSlotType.Inventory, 0);
-        Create_Weapon(_test_item[0], ItemSlotType.Inventory, 1);
+        Create_Item(_test_item[0], ItemSlotType.Inventory, 0);
+        Create_Item(_test_item[0], ItemSlotType.Inventory, 1);
 
-        Create_Armor(_test_item[1], ItemSlotType.Inventory, 2);
-        Create_Armor(_test_item[1], ItemSlotType.Inventory, 3);
+        Create_Item(_test_item[1], ItemSlotType.Inventory, 2);
+        Create_Item(_test_item[1], ItemSlotType.Inventory, 3);
 
-        Create_Armor(_test_item[2], ItemSlotType.Inventory, 4);
-        Create_Armor(_test_item[2], ItemSlotType.Inventory, 5);
+        Create_Item(_test_item[2], ItemSlotType.Inventory, 4);
+        Create_Item(_test_item[2], ItemSlotType.Inventory, 5);
 
-        Create_Armor(_test_item[3], ItemSlotType.Inventory, 6);
-        Create_Armor(_test_item[3], ItemSlotType.Inventory, 7);
+        Create_Item(_test_item[3], ItemSlotType.Inventory, 6);
+        Create_Item(_test_item[3], ItemSlotType.Inventory, 7);
     }
 
     public bool Get_PlayerArmed()   //플레이어 무기 장비 여부 반환
@@ -189,17 +189,18 @@ public class ItemSystem : MonoBehaviour
         }
     }
 
-    public void Reward_Item(ItemData data, int index)
+    //아이템 생성
+    public void Create_Item(ItemData data, ItemSlotType slot, int index)
     {
         //머리, 상의, 하의 방어구인 경우
         if ((int)data.Type >= (int)ItemData.ItemType.Head && (int)data.Type <= (int)ItemData.ItemType.Leg)
-            Create_Armor(data, ItemSlotType.Reward, index);
+            Create_Armor(data, slot, index);
         else
         {
             switch (data.Type)
             {
-                case ItemData.ItemType.Weapon:  //무기인 경우
-                    Create_Weapon(data, ItemSlotType.Reward, index);
+                case ItemData.ItemType.Weapon:  //무기
+                    Create_Weapon(data, slot, index);
                     break;
             }
         }
@@ -303,7 +304,7 @@ public class ItemSystem : MonoBehaviour
                     }
                     break;
                 case ItemOptionType.Action:
-                    if (btlAct2 == null)    //행동2가 없는 이유
+                    if (btlAct2 == null)    //행동2가 없는 경우
                     {
                         cost_btlAct2 += _needCost_btlAct;
                         use_cost = _needCost_btlAct;

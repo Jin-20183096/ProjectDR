@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6500328b725676d4fa5b9dd95d180b00, type: 3}
+  m_Name: Item004
+  m_EditorClassIdentifier: 
+  _icon: {fileID: -1539877647, guid: 832b35751793d10448ae1bd27b2f4046, type: 3}
+  _name: "\uCC3D"
+  _type: 0
+  Action:
+    AtkAct_Arr:
+    - {fileID: 11400000, guid: 29b35bf4224c8364eb8e46000c35c056, type: 2}
+    - {fileID: 11400000, guid: a48f6b12b06810b42a896867d62bde9d, type: 2}
+    DefAct_Arr:
+    - {fileID: 11400000, guid: aea4259d0b821014e9cedccdf30d937e, type: 2}
+    DgeAct_Arr:
+    - {fileID: 11400000, guid: 16703902592f3264d9b74b455350efb7, type: 2}
+    TacAct_Arr: []
+  Ability_Arr:
+  - {fileID: 11400000, guid: d5ad3e474c14cd643a474634f0cb5f00, type: 2}
+  Armor:
+    Material: 0
+  Clip_Idle: {fileID: 7400000, guid: 52a171c8032f75a4f820ce83babbfab1, type: 2}
+  Clip_Atk1: []

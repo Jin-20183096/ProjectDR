@@ -23,7 +23,7 @@ MonoBehaviour:
   CON: 
   WIL: 
   Act_Atk:
-  - Data: {fileID: 11400000, guid: 483c1e9784bd6f047b71941d350765d5, type: 2}
+  - Data: {fileID: 11400000, guid: 29b35bf4224c8364eb8e46000c35c056, type: 2}
     Stat: 4
   Act_Def: []
   Act_Dge:
@@ -36,5 +36,9 @@ MonoBehaviour:
   Exp: 1400000032000000
   Item:
   - {fileID: 11400000, guid: c220993099025834abff4ba78971ccc2, type: 2}
+  - {fileID: 11400000, guid: 327946c1231836c468a3883ce48bb398, type: 2}
+  - {fileID: 11400000, guid: d6fd4800cbe7e434dbe95a3c9b9cf66c, type: 2}
+  - {fileID: 11400000, guid: d2013e6a2ede28b4ba893c7f97672068, type: 2}
   - {fileID: 11400000, guid: d70470c69ad518b44a03dd669b40dbf5, type: 2}
   - {fileID: 11400000, guid: 54900e305e1766645be589cbf49c37e0, type: 2}
+  - {fileID: 11400000, guid: ac5edffaf80644645ba48f2a5a6c0a41, type: 2}

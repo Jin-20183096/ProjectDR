@@ -161,6 +161,8 @@ public class EnemySystem : MonoBehaviour, ICreature
     private Transform _eff_group;
     [SerializeField]
     private ParticleSystem _eff_blood;
+    [SerializeField]
+    private ParticleSystem _eff_block;
 
     void Awake()
     {
@@ -422,16 +424,33 @@ public class EnemySystem : MonoBehaviour, ICreature
     {
         Change_Hp(false, dmg);
 
-        var eff = Instantiate(_eff_blood, _eff_group);
+        ParticleSystem eff;
+
+        if (dmgType == BtlActData.DamageType.Defense)
+        {
+            eff = Instantiate(_eff_block, _eff_group);
+        }
+        else
+        {
+            eff = Instantiate(_eff_blood, _eff_group);
+
+            //데미지량에 따른 유혈 파티클 개수 조정
+            var burst1 = eff.emission.GetBurst(0);
+            var burst2 = eff.emission.GetBurst(1);
+
+            burst1.count = dmg;
+            burst2.count = dmg;
+            eff.emission.SetBurst(0, burst1);
+            eff.emission.SetBurst(1, burst2);
+        }
+
         var pos = _e_spr.transform.position;
-        var sizeY = _e_spr.bounds.size.y;
+        var sizeY = _e_spr.GetComponent<SpriteRenderer>().bounds.size.y;
         eff.transform.position = new Vector3(pos.x + 0.5f, pos.y + sizeY / 2, pos.z);
         eff.transform.localScale = new Vector3(0.75f, 0.75f, 1f);
-        //데미지량에 따른 유혈 파티클 개수 조정
-        var burst = eff.emission.GetBurst(0);
-        burst.count = dmg * 5;
-        eff.emission.SetBurst(0, burst);
         eff.Play();
+
+        //데미지 타입에 따른 피격음
     }
 
     public void Request_NextAction()    //전투 시스템에서 다음 턴 행동을 요청

@@ -184,9 +184,9 @@ public class GameLog : MonoBehaviour
     public void SetLog_AbilityEffect(bool isP, string ability, string targetPost, string effText)  //로그 설정: 능력 효과 출력
     {
         if (targetPost == null)
-            NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", "\"" + ability + "\"의 효과로", effText));
+            NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", "\"" + ability + "\"의 효과로\n", effText));
         else
-            NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", "\"" + ability + "\"의 효과로",
+            NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", "\"" + ability + "\"의 효과로\n",
                                 (isP ? _e_name : _p_name), targetPost, effText));
 
         LogPrint_Start(LogSituation.ActEffect);

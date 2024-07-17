@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f26c6d8e55814d438a907741e08fca8, type: 3}
   m_Name: BtlAct001
   m_EditorClassIdentifier: 
-  Name: "\uACF5\uACA9"
-  Stats_Arr: 010000000200000003000000040000000500000006000000
+  Name: "\uC8FC\uBA39\uC9C8"
+  Stats_Arr: 0100000005000000
   Type: 1
-  DmgType: 1
+  DmgType: 2
   Dice_MinMax: 0100000002000000
   ActionInfo: "\uC8FC\uC0AC\uC704 \uCD1D\uD569\uB9CC\uD07C \uC0C1\uB300\uB97C \uACF5\uACA9\uD55C\uB2E4."
   NoDice: 0

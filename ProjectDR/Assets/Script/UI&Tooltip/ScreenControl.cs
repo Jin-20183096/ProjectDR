@@ -17,8 +17,6 @@ public class ScreenControl : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     [SerializeField]
     private Image _controlBar;
-    [SerializeField]
-    private Image _pannel_dragging;
 
     bool _pointer = false;
 
@@ -33,7 +31,7 @@ public class ScreenControl : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         {
             _rect.transform.SetAsLastSibling();
             STCanvas.Set_DragObj(gameObject);
-            _pannel_dragging.enabled = true;
+            _controlBar.color = new Color32(255, 255, 255, 128);
         }
     }
 
@@ -58,7 +56,7 @@ public class ScreenControl : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         STCanvas.Set_DragObj(null);
 
         _controlBar.enabled = _pointer;
-        _pannel_dragging.enabled = false;
+        _controlBar.color = new Color32(255, 255, 255, 64);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

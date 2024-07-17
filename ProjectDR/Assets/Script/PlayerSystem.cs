@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 using static ICreature;
 using static ItemSystem;
 using static SingleToneCanvas;
@@ -20,7 +20,11 @@ public class PlayerSystem : MonoBehaviour, ICreature
     public int Y
     {
         get { return _grid.y; }
-        set { _grid.y = value; }
+        set
+        {
+            _grid.y = value;
+            _sorting.sortingOrder = (value * -1) + 1;
+        }
     }
     [SerializeField]
     private int _sight; //시야
@@ -192,12 +196,15 @@ public class PlayerSystem : MonoBehaviour, ICreature
     {
         get { return _p_spr; }
     }
+    private SortingGroup _sorting;
 
     [Header("# Effect")]
     [SerializeField]
-    private Transform _effect_group;
+    private Transform _eff_group;
     [SerializeField]
-    private ParticleSystem _effect_blood;
+    private ParticleSystem _eff_blood;
+    [SerializeField]
+    private ParticleSystem _eff_block;
 
     void Awake()
     {
@@ -231,6 +238,9 @@ public class PlayerSystem : MonoBehaviour, ICreature
         _ap = Random.Range(1, _apMax + 1);
         Change_ApMax(true, 0);
         Change_Ap(true, 0);
+
+        Armed_OnOff(ItemSys.Get_PlayerArmed()); //무기 장비 상태 체크
+        _sorting = GetComponent<SortingGroup>();
     }
 
     public void Move_PlayerPosition(Vector3 vec3, bool isLeft)
@@ -518,15 +528,30 @@ public class PlayerSystem : MonoBehaviour, ICreature
     {
         Change_Hp(false, dmg);
 
-        var eff = Instantiate(_effect_blood, _effect_group);
+        ParticleSystem eff;
+
+        if (dmgType == BtlActData.DamageType.Defense)
+        {
+            eff = Instantiate(_eff_block, _eff_group);
+        }
+        else
+        {
+            eff = Instantiate(_eff_blood, _eff_group);
+
+            //데미지량에 따른 유혈 파티클 개수 조정
+            var burst1 = eff.emission.GetBurst(0);
+            var burst2 = eff.emission.GetBurst(1);
+
+            burst1.count = dmg;
+            burst2.count = dmg;
+            eff.emission.SetBurst(0, burst1);
+            eff.emission.SetBurst(1, burst2);
+        }
+
         var pos = _p_spr_btl.transform.position;
         var sizeY = _p_spr_btl.GetComponent<SpriteRenderer>().bounds.size.y;
         eff.transform.position = new Vector3(pos.x - 0.5f, pos.y + sizeY / 2, pos.z);
         eff.transform.localScale = new Vector3(0.75f, 0.75f, 1f);
-        //데미지량에 따른 유혈 파티클 개수 조정
-        var burst = eff.emission.GetBurst(0);
-        burst.count = dmg * 5;
-        eff.emission.SetBurst(0, burst);
         eff.Play();
 
         //데미지 타입에 따른 피격음

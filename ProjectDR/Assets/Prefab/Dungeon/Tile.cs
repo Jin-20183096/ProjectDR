@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
+using static SingleToneCanvas;
 
 public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
 {
@@ -118,13 +119,13 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (_isExplored || _isVisible)
+        if (STCanvas.DRAG == false && (_isExplored || _isVisible))
             _dgnSys.TileMouseOver(this);
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if ((_isExplored || _isVisible) && eventData.button == PointerEventData.InputButton.Left)
+        if (STCanvas.DRAG == false && (_isExplored || _isVisible) && eventData.button == PointerEventData.InputButton.Left)
             _dgnSys.TileClick();
     }
 

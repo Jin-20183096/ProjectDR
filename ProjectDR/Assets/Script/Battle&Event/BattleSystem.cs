@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static AudioSystem;
 
 public class BattleSystem : MonoBehaviour
 {
@@ -54,11 +55,16 @@ public class BattleSystem : MonoBehaviour
     }
     [SerializeField]
     private int[] _p_result;            //플레이어 주사위 결과
+    public int[] P_RESULT
+    {
+        get { return _p_result; }
+    }
     [SerializeField]
     private int _p_total;               //플레이어 주사위 총합
     public int P_TOTAL
     {
         get { return _p_total; }
+
     }
 
     [Header("# Enemy Info")]
@@ -78,6 +84,10 @@ public class BattleSystem : MonoBehaviour
     }
     [SerializeField]
     private int[] _e_result;            //적 주사위 결과
+    public int[] E_RESULT
+    {
+        get { return _e_result; }
+    }
     [SerializeField]
     private int _e_total;               //적 주사위 총합
     public int E_TOTAL
@@ -197,6 +207,8 @@ public class BattleSystem : MonoBehaviour
     }
 
     [Header("# Background")]
+    [SerializeField]
+    private Transform _tileSet_center;
     [SerializeField]
     private Transform _tileSet_1_2;
     [SerializeField]
@@ -404,8 +416,8 @@ public class BattleSystem : MonoBehaviour
         var actType_speed = new List<BtlActData.ActionType>()
         {
             BtlActData.ActionType.Tac,
-            BtlActData.ActionType.Def,
             BtlActData.ActionType.Dge,
+            BtlActData.ActionType.Def,
             BtlActData.ActionType.Atk,
             BtlActData.ActionType.Wait
         };
@@ -624,7 +636,7 @@ public class BattleSystem : MonoBehaviour
         _itemSys.ON_REWARD = true;  //전리품창 ON 상태
 
         for (int i = 0; i < amount; i++)    //드랍할 아이템 개수만큼 아이템 드랍
-            _itemSys.Reward_Item(data.Item[Random.Range(0, data.Item.Length)], i);
+            _itemSys.Create_Item(data.Item[Random.Range(0, data.Item.Length)], ItemSystem.ItemSlotType.Reward, i);
 
         _itemSys.Set_RewardIcon();  //드랍한 아이템 표시
 
@@ -746,43 +758,84 @@ public class BattleSystem : MonoBehaviour
     }
 
     //던전 시스템으로부터 주변 지형 정보를 받아, 전투 배경을 조정함
-    public void Set_BattleField(bool c_1_2, bool c_1_2_b, bool c_3, bool c_3_b,
-                                bool c_4_5, bool c_7_8,
-                                bool c_9, bool c_9_b, bool c_10_11, bool c_10_11_b,
-                                bool c_12_b)
+    public void Set_BattleField(bool[] wall, Sprite[] tileSprite, Sprite[] wallSprite)
     {
-        // 1_2
-        _tileSet_1_2.GetChild(0).gameObject.SetActive(c_1_2);
-        _tileSet_1_2.GetChild(1).gameObject.SetActive(c_1_2);
-        // 1_2_beyond
-        _tileSet_1_2_beyond.GetChild(0).gameObject.SetActive(c_1_2_b);
-        _tileSet_1_2_beyond.GetChild(1).gameObject.SetActive(c_1_2_b);
-        // 3
-        _tileSet_3.GetChild(0).gameObject.SetActive(c_3);
-        _tileSet_3.GetChild(1).gameObject.SetActive(c_3);
-        // 3_beyond
-        _tileSet_3_beyond.GetChild(0).gameObject.SetActive(c_3_b);
-        _tileSet_3_beyond.GetChild(1).gameObject.SetActive(c_3_b);
-        // 4_5
-        _tileSet_4_5.GetChild(0).gameObject.SetActive(c_4_5);
-        // 7_8
-        _tileSet_7_8.GetChild(0).gameObject.SetActive(c_7_8);
-        // 9
-        _tileSet_9.GetChild(0).gameObject.SetActive(c_9);
-        _tileSet_9.GetChild(1).gameObject.SetActive(c_9);
-        // 9_beyond
-        _tileSet_9_beyond.GetChild(0).gameObject.SetActive(c_9_b);
-        _tileSet_9_beyond.GetChild(1).gameObject.SetActive(c_9_b);
-        // 10_11
-        _tileSet_10_11.GetChild(0).gameObject.SetActive(c_10_11);
-        _tileSet_10_11.GetChild(1).gameObject.SetActive(c_10_11);
-        // 10_11_beyond
-        _tileSet_10_11_beyond.GetChild(0).gameObject.SetActive(c_10_11_b);
-        _tileSet_10_11_beyond.GetChild(1).gameObject.SetActive(c_10_11_b);
-        // 12
-        _tileSet_12.GetChild(0).gameObject.SetActive(c_1_2 || c_10_11); //1_2 또는 10_11에 천장이 존재할 경우
-        // 12_beyond
-        _tileSet_12_beyond.GetChild(0).gameObject.SetActive(c_12_b);
+        //벽 유무 배열
+        var wallBool = wall.ToArray();   // [1_2] [1_2_b] [3] [3_b] [4_5] [7_8] [9] [9_b] [10_11] [10_11_b] [12_b] 
+        //타일 스프라이트 배열
+        var spr_tile = tileSprite.ToArray();
+        //벽 스프라이트 배열
+        var spr_wall = wallSprite.ToArray();
+
+        _tileSet_1_2.GetChild(0).gameObject.SetActive(wallBool[0]);
+        _tileSet_1_2.GetChild(1).gameObject.SetActive(wallBool[0]);
+
+        _tileSet_1_2_beyond.GetChild(0).gameObject.SetActive(wallBool[1]);
+        _tileSet_1_2_beyond.GetChild(1).gameObject.SetActive(wallBool[1]);
+
+        _tileSet_3.GetChild(0).gameObject.SetActive(wallBool[2]);
+        _tileSet_3.GetChild(1).gameObject.SetActive(wallBool[2]);
+
+        _tileSet_3_beyond.GetChild(0).gameObject.SetActive(wallBool[3]);
+        _tileSet_3_beyond.GetChild(1).gameObject.SetActive(wallBool[3]);
+
+        _tileSet_4_5.GetChild(0).gameObject.SetActive(wallBool[4]);
+
+        _tileSet_7_8.GetChild(0).gameObject.SetActive(wallBool[5]);
+
+        _tileSet_9.GetChild(0).gameObject.SetActive(wallBool[6]);
+        _tileSet_9.GetChild(1).gameObject.SetActive(wallBool[6]);
+
+        _tileSet_9_beyond.GetChild(0).gameObject.SetActive(wallBool[7]);
+        _tileSet_9_beyond.GetChild(1).gameObject.SetActive(wallBool[7]);
+
+        _tileSet_10_11.GetChild(0).gameObject.SetActive(wallBool[8]);
+        _tileSet_10_11.GetChild(1).gameObject.SetActive(wallBool[8]);
+
+        _tileSet_10_11_beyond.GetChild(0).gameObject.SetActive(wallBool[9]);
+        _tileSet_10_11_beyond.GetChild(1).gameObject.SetActive(wallBool[9]);
+
+        _tileSet_12.GetChild(0).gameObject.SetActive(wallBool[0] || wallBool[8]); //1_2 또는 10_11에 천장이 존재할 경우
+
+        _tileSet_12_beyond.GetChild(0).gameObject.SetActive(wallBool[10]);
+
+        //벽 그래픽 조정
+        if (wallSprite != null)
+        {
+            
+        }
+
+        //타일 그래픽 조정
+        if (tileSprite != null)
+        {
+            //center 타일 랜덤 스프라이트
+            for (int i = 0; i < _tileSet_center.childCount; i++)
+            {
+                _tileSet_center.GetChild(i).gameObject.GetComponent<SpriteRenderer>().sprite
+                    = spr_tile[Random.Range(0, spr_tile.Length)];
+            }
+
+            //1_2 타일에 벽이 없다면 랜덤 스프라이트
+            if (wallBool[0] == false)
+            {
+                for (int i = 2; i < _tileSet_1_2.childCount; i++)
+                {
+                    _tileSet_1_2.GetChild(i).gameObject.GetComponent<SpriteRenderer>().sprite
+                        = spr_tile[Random.Range(0, spr_tile.Length)];
+                }
+            }
+            //10_11 타일에 벽이 없다면 랜덤 스프라이트
+            if (wallBool[8] == false)
+            {
+                for (int i = 2; i < _tileSet_10_11.childCount; i++)
+                {
+                    _tileSet_10_11.GetChild(i).gameObject.GetComponent<SpriteRenderer>().sprite
+                        = spr_tile[Random.Range(0, spr_tile.Length)];
+                }
+            }
+        }
+
+        //타일 장식 조정
     }
 
     //-------------------------행동 타입의 기본적인 상호작용-------------------------
@@ -940,6 +993,7 @@ public class BattleSystem : MonoBehaviour
 
                 var dgePos = new Vector3(_p_spr.transform.position.x - 3f, _p_spr.transform.position.y, _p_spr.transform.position.z);
                 _p_spr.Set_SpriteMove(dgePos);
+                AudioSys.Play_Sfx(Sfx.Dge);
 
                 var log = _btlLog.Log_DgeFail(true);    //플레이어 회피 실패 로그
 
@@ -965,6 +1019,7 @@ public class BattleSystem : MonoBehaviour
                 var dgePos = new Vector3(_e_spr.transform.position.x + 3f, _e_spr.transform.position.y, _e_spr.transform.position.z);
                 _e_spr.Set_SpriteMove(dgePos);
                 _e_spr.Set_ActionMoveSet_Dge(_e_act.DgeMS, true);
+                AudioSys.Play_Sfx(Sfx.Dge);
 
                 var log = _btlLog.Log_DgeFail(false);   //적 회피 실패 로그
 
@@ -983,6 +1038,8 @@ public class BattleSystem : MonoBehaviour
         Set_BattleProcess(true);
 
         Vector3 dest;
+
+        AudioSys.Play_Sfx(Sfx.Atk);
 
         //공격 상태 돌입 (이 상태에서 행동 히트박스가 충돌했을 때, 공격 체크 코루틴을 호출하는 방식)
         if (isPlayer)
@@ -1093,6 +1150,7 @@ public class BattleSystem : MonoBehaviour
 
             _enemySys.TakeDamage(finalDmg, _p_act.DmgType); //적의 방어도를 반영한 피해를 줌
             _e_spr.Set_CommonMoveSet(SpriteSystem.CommonTrigger.Dmg);   //피격 애니메이션
+            AudioSys.Play_Sfx(Sfx.Dmg);
 
             //적 넉백
             var pos = _e_spr.transform.position;
@@ -1110,6 +1168,7 @@ public class BattleSystem : MonoBehaviour
 
             _playerSys.TakeDamage(finalDmg, _e_act.DmgType); //플레이어의 방어도를 반영한 피해를 줌
             _p_spr.Set_CommonMoveSet(SpriteSystem.CommonTrigger.Dmg);   //피격 애니메이션
+            AudioSys.Play_Sfx(Sfx.Dmg);
 
             //플레이어 넉백
             var pos = _p_spr.transform.position;
@@ -1141,7 +1200,8 @@ public class BattleSystem : MonoBehaviour
         {
             finalDmg = (_e_total - _p_total) > 0 ? _e_total - _p_total : 0;
 
-            _playerSys.TakeDamage(finalDmg, _e_act.DmgType); //플레이어의 방어 총합과 방어도를 반영한 피해를 줌
+            _playerSys.TakeDamage(finalDmg, BtlActData.DamageType.Defense); //플레이어의 방어 총합과 방어도를 반영한 피해를 줌
+            AudioSys.Play_Sfx(Sfx.Def);
 
             //플레이어 살짝 밀림
             var pos = _p_spr.transform.position;
@@ -1158,7 +1218,8 @@ public class BattleSystem : MonoBehaviour
         {
             finalDmg = (_p_total - _e_total) > 0 ? _p_total - _e_total : 0;
 
-            _enemySys.TakeDamage(finalDmg, _p_act.DmgType); //적의 방어 총합과 방어도를 반영한 피해를 줌
+            _enemySys.TakeDamage(finalDmg, BtlActData.DamageType.Defense); //적의 방어 총합과 방어도를 반영한 피해를 줌
+            AudioSys.Play_Sfx(Sfx.Def);
 
             //적 살짝 밀림
             var pos = _e_spr.transform.position;
@@ -1191,6 +1252,7 @@ public class BattleSystem : MonoBehaviour
             {
                 var dgePos = new Vector3(_p_spr.transform.position.x - 3f, _p_spr.transform.position.y, _p_spr.transform.position.z);
                 _p_spr.Set_SpriteMove(dgePos);
+                AudioSys.Play_Sfx(Sfx.Dge);
 
                 _p_hitDge = true;   //플레이어 공격 회피 처리
 
@@ -1204,6 +1266,7 @@ public class BattleSystem : MonoBehaviour
 
                 _playerSys.TakeDamage(finalDmg, _e_act.DmgType); //플레이어의 방어도를 반영한 피해를 줌
                 _p_spr.Set_CommonMoveSet(SpriteSystem.CommonTrigger.Dmg);
+                AudioSys.Play_Sfx(Sfx.Dmg);
 
                 _e_hitAtk = true;   //적의 공격 명중 처리
 
@@ -1227,6 +1290,7 @@ public class BattleSystem : MonoBehaviour
                 var dgePos = new Vector3(_e_spr.transform.position.x + 3f, _e_spr.transform.position.y, _e_spr.transform.position.z);
                 _e_spr.Set_SpriteMove(dgePos);
                 _e_spr.Set_ActionMoveSet_Dge(_e_act.DgeMS, true);
+                AudioSys.Play_Sfx(Sfx.Dge);
 
                 _e_hitDge = true;   //적 공격 회피 처리
 
@@ -1240,6 +1304,7 @@ public class BattleSystem : MonoBehaviour
 
                 _enemySys.TakeDamage(finalDmg, _p_act.DmgType); //적의 방어도를 반영한 피해를 줌
                 _e_spr.Set_CommonMoveSet(SpriteSystem.CommonTrigger.Dmg);
+                AudioSys.Play_Sfx(Sfx.Dmg);
 
                 _p_hitAtk = true;   //플레이어의 공격 명중 처리
 
@@ -1445,6 +1510,22 @@ public class BattleSystem : MonoBehaviour
 
     public void Change_Ap_Player(bool plus, int value) => _playerSys.Change_Ap(plus, value);
     public void Change_Ap_Enemy(bool plus, int value) => _enemySys.Change_Ap(plus, value);
+
+    public void Change_DiceTotal_Player(bool plus, int value)
+    {
+        if (plus)
+            _p_total += value;
+        else
+            _p_total -= value;
+    }
+
+    public void Change_DiceTotal_Enemy(bool plus, int value)
+    {
+        if (plus)
+            _e_total += value;
+        else
+            _e_total -= value;
+    }
 
     void Refresh_Log()
     {

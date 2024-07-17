@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using static AudioSystem;
 
 public class DiceSetting : MonoBehaviour
 {
@@ -121,5 +122,10 @@ public class DiceSetting : MonoBehaviour
         }
 
         return stopSide;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        AudioSys.Play_Sfx(Sfx.DiceRoll);
     }
 }

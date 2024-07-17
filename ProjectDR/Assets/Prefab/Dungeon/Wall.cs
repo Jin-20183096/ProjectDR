@@ -66,11 +66,11 @@ public class Wall : MonoBehaviour
 
         if (b)
         {
-            /*
+            
             if (isCenter)
                 _wall[i].color = ColorSight;
             else
-            */
+            
                 _wall[i].color = ColorSightAround;
         }
         else

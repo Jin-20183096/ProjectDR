@@ -260,7 +260,7 @@ public class ItemTooltip : MonoBehaviour
         else
         {
             _ability.SetActive(true);
-            _ability_name.text = "[" + ability.NAME + "]";
+            _ability_name.text = ability.NAME;
             _ability_info.text = ability.INFO;
         }
     }

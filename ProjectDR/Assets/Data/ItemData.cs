@@ -39,6 +39,8 @@ public class ItemData : ScriptableObject
     [Serializable]
     public class ActionClass
     {
+        public BtlActData[] NormalAtk_Arr;  //기본 공격 행동 목록
+
         public BtlActData[] AtkAct_Arr; //공격 행동 목록
 
         public BtlActData[] DefAct_Arr; //방어 행동 목록

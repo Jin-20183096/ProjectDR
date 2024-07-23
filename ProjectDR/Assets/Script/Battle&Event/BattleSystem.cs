@@ -119,6 +119,10 @@ public class BattleSystem : MonoBehaviour
     private bool _p_endAct;         //플레이어 행동 처리 완료 여부
     [SerializeField]
     private bool _e_endAct;         //적 행동 처리 완료 여부
+    [SerializeField]
+    private bool _p_extraTurn;      //플레이어 이번 턴 추가 턴 여부
+    [SerializeField]
+    private bool _e_extraTurn;      //적 이번 턴 추가 턴 여부
 
     [SerializeField]
     private bool _p_hitAtk;         //플레이어 이번 턴 공격 명중 여부
@@ -607,6 +611,12 @@ public class BattleSystem : MonoBehaviour
         }
         else    //전투가 끝나지 않은 경우
         {
+            //추가 턴 관련 처리
+            if (_p_extraTurn)   //플레이어 추가 턴이 있을 때
+            {
+                
+            }
+
             //적 다음 행동 요청
             _enemySys.Request_NextAction();
             //플레이어 행동목록 재출력
@@ -1060,7 +1070,7 @@ public class BattleSystem : MonoBehaviour
             var pos = _e_spr.transform.position;
             dest = new Vector3(pos.x - _e_sprRend.bounds.size.x, pos.y, pos.z);
 
-            _p_spr.ActHitBoxOn();
+            _p_spr.ActHitBoxOn();   //<<<<<<<<<<<<<<추후에 모든 공격 행동의 모션이 완성되면 주석처리해야할 코드>>>>>>>>>>>>>>
             _p_spr.Set_ActHitBox(HitBoxCollider.HitBoxType.Atk);    //플레이어 행동 히트박스: 공격
             _p_spr.Set_SpriteMove(dest);                            //플레이어의 공격을 위한 이동
             _p_spr.Set_ActionMoveSet_Atk(_p_act.AtkMS, true);       //공격 무브셋

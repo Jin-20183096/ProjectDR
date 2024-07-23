@@ -35,5 +35,7 @@ public class EventData : ScriptableObject
     {
         [TextArea(3, 5)]
         public string Name; //이벤트 행동명
+
+
     }
 }

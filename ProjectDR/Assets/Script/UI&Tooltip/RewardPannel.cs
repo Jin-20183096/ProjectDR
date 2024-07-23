@@ -300,5 +300,8 @@ public class RewardPannel : MonoBehaviour
 
         PlayerSys.Change_ActionStat(true, stat, statArr);   //플레이어에게 레벨업 스탯 적용
         _pannel_lvUp.Set_StatUpCursor(stat, order, 1);      //스탯 커서 적용
+
+        //스탯 상승이 완료되었으므로, 레벨업
+        _pannel_lvUp.LevelUpEndButton_OnOff(true);
     }
 }

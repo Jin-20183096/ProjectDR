@@ -16,6 +16,7 @@ MonoBehaviour:
   _name: "\uAE30\uC0AC \uAC01\uBC18"
   _type: 3
   Action:
+    NormalAtk_Arr: []
     AtkAct_Arr: []
     DefAct_Arr: []
     DgeAct_Arr: []
@@ -25,4 +26,6 @@ MonoBehaviour:
   Armor:
     Material: 3
   Clip_Idle: {fileID: 7400000, guid: 18cbdec94ea9a354884fb89f8ea9ac16, type: 2}
-  Clip_Atk1: []
+  Clip_Atk1:
+  - {fileID: 7400000, guid: d5e02e58648a3a544b7a851b7a1ee811, type: 2}
+  - {fileID: 7400000, guid: 91bfefbb3777d4141bab6f7f2cd6a666, type: 2}

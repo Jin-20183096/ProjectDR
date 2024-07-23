@@ -16,8 +16,9 @@ MonoBehaviour:
   _name: "\uBABD\uB465\uC774"
   _type: 0
   Action:
-    AtkAct_Arr:
+    NormalAtk_Arr:
     - {fileID: 11400000, guid: 34eab5d4383510445bacba0fd2dea740, type: 2}
+    AtkAct_Arr:
     - {fileID: 11400000, guid: c4de770d3928e704dbdd4fb2a7b70117, type: 2}
     DefAct_Arr:
     - {fileID: 11400000, guid: aea4259d0b821014e9cedccdf30d937e, type: 2}

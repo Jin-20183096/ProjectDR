@@ -8,7 +8,7 @@ public class SpriteSystem : MonoBehaviour
     [SerializeField]
     private BattleSystem _btlSys;
 
-    public enum AtkMoveSet { No, Atk }
+    public enum AtkMoveSet { No, Atk1 }
     public enum DefMoveSet { No, Def }
     public enum DgeMoveSet { No, Dge }
     public enum TacMoveSet { No, Tac }
@@ -129,6 +129,7 @@ public class SpriteSystem : MonoBehaviour
 
         for (int i = 0; i < _equipSpr.Length; i++)
         {
+            Debug.Log(i + "¹ø¤Š Àåºñ: " + trigger);
             _equipSpr[i].Renderer_OnOff(_isSomeEquip[i]);
             _equipSpr[i].Set_AnimaTrigger(trigger);
         }

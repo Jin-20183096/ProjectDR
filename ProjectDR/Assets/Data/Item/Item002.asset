@@ -16,9 +16,10 @@ MonoBehaviour:
   _name: "\uC190\uB3C4\uB07C"
   _type: 0
   Action:
-    AtkAct_Arr:
+    NormalAtk_Arr:
     - {fileID: 11400000, guid: 2fe8d8e8c10f4a148809fbb659bbc033, type: 2}
     - {fileID: 11400000, guid: 34eab5d4383510445bacba0fd2dea740, type: 2}
+    AtkAct_Arr:
     - {fileID: 11400000, guid: 8188ad7884e76c446984efa79d987986, type: 2}
     - {fileID: 11400000, guid: c4de770d3928e704dbdd4fb2a7b70117, type: 2}
     DefAct_Arr:
@@ -30,4 +31,6 @@ MonoBehaviour:
   Armor:
     Material: 0
   Clip_Idle: {fileID: 7400000, guid: 8c40dd111c2b7dc4e94c1fc5425f83e3, type: 2}
-  Clip_Atk1: []
+  Clip_Atk1:
+  - {fileID: 7400000, guid: c11d8c619ba8d25438fb87605791e253, type: 2}
+  - {fileID: 7400000, guid: 1d513c9289b79fb4cb06e9d44e4ed054, type: 2}

@@ -4,9 +4,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using Coffee.UIExtensions;
 using static PlayerSystem;
+using UnityEngine.Experimental.AI;
 
 public class LevelUpPannel : MonoBehaviour
 {
+    [SerializeField]
+    private Button _btn_levelUpEnd; //·¹º§¾÷ ¿Ï·á ¹öÆ°
+
     [SerializeField]
     private Button _btn_STR;    //Èû ½ºÅÈ ¹öÆ°
     [SerializeField]
@@ -102,6 +106,8 @@ public class LevelUpPannel : MonoBehaviour
         var stat_con = PlayerSys.CON;
         var stat_wil = PlayerSys.WIL;
 
+        LevelUpEndButton_OnOff(false);
+
         ButtonActive_STR(true);
         ActiveUI_STR(true);
         for (int i = 0; i < stat_str.Length; i++)   //Èû
@@ -190,6 +196,25 @@ public class LevelUpPannel : MonoBehaviour
 
             _statUpCursor_WIL[i].SetActive(false);
             _statUpText_WIL[i].text = "";
+        }
+    }
+
+    public void LevelUpEndButton_OnOff(bool b)
+    {
+        _btn_levelUpEnd.interactable = b;
+
+        var btn_image = _btn_levelUpEnd.GetComponent<Image>();
+        var btn_text = _btn_levelUpEnd.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+
+        if (b)
+        {
+            btn_image.color = new Color(1, 1, 1, 1);
+            btn_text.color = new Color(1, 1, 1, 1);
+        }
+        else
+        {
+            btn_image.color = new Color(1, 1, 1, 0.2f);
+            btn_text.color = new Color(1, 1, 1, 0.2f);
         }
     }
 

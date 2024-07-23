@@ -244,7 +244,7 @@ public class ItemSystem : MonoBehaviour
         int cost = _cost;   //임시 코스트
 
         //2. 데이터의 공격행동 목록에서 행동 하나를 무작위로 선택해 추가. 코스트 소모.
-        btlAct1 = data.Action.AtkAct_Arr[Random.Range(0, data.Action.AtkAct_Arr.Length)];
+        btlAct1 = data.Action.NormalAtk_Arr[Random.Range(0, data.Action.NormalAtk_Arr.Length)];
         btlAct1_stat = btlAct1.Stats_Arr[Random.Range(0, btlAct1.Stats_Arr.Length)];
         cost -= _needCost_btlAct;
         //   그 행동의 보정스탯을 스탯1로 추가. 코스트 소모 

@@ -16,8 +16,9 @@ MonoBehaviour:
   _name: "\uCC3D"
   _type: 0
   Action:
-    AtkAct_Arr:
+    NormalAtk_Arr:
     - {fileID: 11400000, guid: 29b35bf4224c8364eb8e46000c35c056, type: 2}
+    AtkAct_Arr:
     - {fileID: 11400000, guid: a48f6b12b06810b42a896867d62bde9d, type: 2}
     DefAct_Arr:
     - {fileID: 11400000, guid: aea4259d0b821014e9cedccdf30d937e, type: 2}

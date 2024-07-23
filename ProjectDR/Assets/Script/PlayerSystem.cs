@@ -781,7 +781,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
     public void UnequipItem(ItemData item)  //아이템 해제
     {
         if (item.Type == ItemData.ItemType.Weapon)
-            Armed_OnOff(true);  //무기를 해제함
+            Armed_OnOff(false);  //무기를 해제함
 
         //무기, 방어구, 보조무기 타입의 장비의 경우 외형 변경
         if (item.Type <= ItemData.ItemType.SubWp)

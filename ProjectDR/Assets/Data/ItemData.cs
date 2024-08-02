@@ -35,6 +35,7 @@ public class ItemData : ScriptableObject
     [Header("# SpriteAnimation -----")]
     public AnimationClip Clip_Idle;
     public AnimationClip[] Clip_Atk1;
+    public AnimationClip[] Clip_Atk2;
 
     [Serializable]
     public class ActionClass

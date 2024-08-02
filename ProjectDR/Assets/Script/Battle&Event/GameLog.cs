@@ -2,17 +2,18 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class GameLog : MonoBehaviour
 {
     public enum LogSituation
     {
-        No, ActEffect, BtlFlow, RunEnd, BtlEnd
+        No, ActEffect, BtlFlow, RunEnd, EvntSuccess, EvntMinFail, EvntMaxFail, EvntResult
     }
 
     [SerializeField]
     private BattleSystem _btlSys;           //전투 시스템
+    [SerializeField]
+    private DungeonEventSystem _evntSys;    //이벤트 시스템
 
     [SerializeField]
     private TextMeshProUGUI _log;   //로그 텍스트
@@ -43,7 +44,39 @@ public class GameLog : MonoBehaviour
         CurSor_OnOff(false);
     }
 
-    public void SetLog_BattleStart(string e_name)   //로그 설정: 전투의 시작 
+    public void SetLog_EventStart(string log)   //로그 설정: 이벤트 시작
+    {
+        NewLog(log);
+        LogPrint_Start(LogSituation.No);
+    }
+
+    public void SetLog_DiceCheck_Success(string log)    //로그 설정: 이벤트 주사위 체크 성공
+    {
+        NewLog(log);
+        LogPrint_Start(LogSituation.EvntSuccess);
+    }
+
+    public void SetLog_DiceCheck_MinFail(string log)       //로그 설정: 이벤트 주사위 체크 실패 (성공값 미달)
+    {
+        NewLog(log);
+        LogPrint_Start(LogSituation.EvntMinFail);
+    }
+
+    public void SetLog_DiceCheck_MaxFail(string log)       //로그 설정: 이벤트 주사위 체크 실패 (성공값 초과)
+    {
+        NewLog(log);
+        LogPrint_Start(LogSituation.EvntMaxFail);
+    }
+
+    public void SetLog_EventResult(string log)          //로그 설정: 이벤트 결과
+    {
+        Debug.Log("이벤트 로그");
+        _evntSys.Set_ResultProcess(true);
+        NewLog(log);
+        LogPrint_Start(LogSituation.EvntResult);
+    }
+
+    public void SetLog_BattleStart(string e_name)   //로그 설정: 전투 시작 
     {
         NewLog(MakeSentence(e_name, "[이/가]","나타났다"));
         LogPrint_Start(LogSituation.No);
@@ -373,11 +406,17 @@ public class GameLog : MonoBehaviour
             case LogSituation.BtlFlow:          //전투 처리 로그 출력
                 _btlSys.Set_BattleProcess(false);
                 break;
-            case LogSituation.RunEnd:           //도망으로 전투 종료 로그
-                //_btlSys.StartCoroutine(_btlSys.BattleFlow_End());
+            case LogSituation.EvntSuccess:      //이벤트 성공 결과
+                _evntSys.StartCoroutine(_evntSys.EventResultFlow(true, false));
                 break;
-            case LogSituation.BtlEnd:
-
+            case LogSituation.EvntMinFail:      //이벤트 실패 결과 (값 미달 실패)
+                _evntSys.StartCoroutine(_evntSys.EventResultFlow(false, false));
+                break;
+            case LogSituation.EvntMaxFail:      //이벤트 실패 결과 (값 초과 실패)
+                _evntSys.StartCoroutine(_evntSys.EventResultFlow(false, true));
+                break;
+            case LogSituation.EvntResult:       //이벤트 결과 처리 종료
+                _evntSys.Set_ResultProcess(false);
                 break;
         }
     }

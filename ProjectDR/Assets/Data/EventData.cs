@@ -7,10 +7,26 @@ using UnityEngine;
 public class EventData : ScriptableObject
 {
     public enum EventType   //Battle 타입과 같은 전투 이벤트는 enum에서 항상 맨 뒤에 배치시켜야 함
-    { No, Battle }
+    { No, Event, Battle, Boss }
 
-    public enum CheckStat { STR, INT, DEX, AGI, CON, WIL, LUC } //힘, 지능, 손재주, 민첩, 건강, 의지, 행운(D6)
+    public enum CheckStat
+    {
+        STR, INT, DEX, AGI, CON, WIL, LUC   //힘, 지능, 손재주, 민첩, 건강, 의지, 행운(D6)
+    }
 
+    public enum CheckRule
+    {
+        No, Total_Up, Total_Between, Each_Up, Each_Between
+    }
+
+    public enum ResultType
+    {
+        No,
+        ActRemove, ActAdd,
+        Exp, Item, Buff, Debuff,
+        Btl,
+        EvntEnd
+    }
 
     public EventModule Event;
 
@@ -20,14 +36,16 @@ public class EventData : ScriptableObject
         public string Name;     //이벤트 이름
         public EventType Type;  //이벤트 타입
 
+        public RuntimeAnimatorController EventObj_Anima;    //이벤트 오브젝트의 애니메이션 컨트롤러
+
         [TextArea(3, 5)]
-        public string StairLog; //이벤트 시작 로그
+        public string StartLog; //이벤트 시작 로그
 
         public List<EventAction> ActList;   //이벤트 행동 목록
 
-        public RuntimeAnimatorController EventObj_Anima;    //이벤트 오브젝트의 애니메이션 컨트롤러
+        public EventResult[] Result;  //이벤트 결과 목록
 
-        public ItemData[] Item; //보상 아이템 목록
+        public ItemData[] Item;     //이벤트에서 등장하는 아이템 목록(해당 이벤트 결과에 아이템 목록이 배정되어 있지 않을 경우 사용)
     }
 
     [Serializable]
@@ -36,6 +54,45 @@ public class EventData : ScriptableObject
         [TextArea(3, 5)]
         public string Name; //이벤트 행동명
 
+        public bool IsDiceCheck;    //주사위 체크 행동 여부
+        public DiceCheck Check;     //(주사위 체크 행동이면) 주사위 체크 방식
+        public int UseAp;           //(주사위 체크 행동이 아니면) 소모하는 행동력
 
+        public int[] Result_Success;    //행동 성공 시 결과 인덱스 목록
+
+        public int[] Result_Fail;       //행동 실패 시 결과 인덱스 목록 (체크 최소값을 넘지못한 실패 인덱스 목록)
+        public int[] Result_FailMax;    //체크 최대값을 넘긴 실패 인덱스 목록
+    }
+
+    [Serializable]
+    public class DiceCheck
+    {
+        public ICreature.Stats Stat;    //행동 체크 스탯
+
+        public CheckRule Rule;          //행동 체크 규칙
+    }
+
+    [Serializable]
+    public class EventResult
+    {
+        [TextArea(3, 5)]
+        public string Log;    //결과 로그
+
+        public ResultType[] Type;   //이벤트 결과 종류 목록
+
+        [Header("# Type: ActAdd")]
+        public EventAction[] NewAct;    //추가 행동 목록
+
+        [Header("# Type: Exp")]
+        public int Exp;                 //이벤트에서 획득하는 최소 경험치
+
+        [Header("# Type: Item")]
+        public ItemData[] Item;         //등장 아이템 목록
+
+        //버프 목록
+        //디버프 목록
+
+        [Header("# Type: Btl")]
+        public EnemyData[] Enemy;       //등장 적 목록
     }
 }

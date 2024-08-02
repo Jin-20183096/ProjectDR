@@ -6,6 +6,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 using static PlayerSystem;
 using static BattleSystem;
+using static DungeonEventSystem;
 using static AudioSystem;
 
 public class DungeonSystem : MonoBehaviour
@@ -528,14 +529,19 @@ public class DungeonSystem : MonoBehaviour
             else
                 _dgnData.TileEvent[x][y] = evnt;
 
-            var enemy = _enemy_list[Random.Range(0, _enemy_list.Length)];
+            if ((int)evnt.Event.Type >= (int)EventData.EventType.Battle)
+            {
+                var enemy = _enemy_list[Random.Range(0, _enemy_list.Length)];
 
-            //던전 데이터의 이 좌표에 적 데이터 기록
-            if (_dgnData.TileEnemy.ContainsKey(x) == false)
-                _dgnData.TileEnemy.Add(x, new Dictionary<int, EnemyData>());
-            _dgnData.TileEnemy[x].Add(y, enemy);
+                //던전 데이터의 이 좌표에 적 데이터 기록
+                if (_dgnData.TileEnemy.ContainsKey(x) == false)
+                    _dgnData.TileEnemy.Add(x, new Dictionary<int, EnemyData>());
+                _dgnData.TileEnemy[x].Add(y, enemy);
 
-            anima = enemy.Anima_Ctrl;
+                anima = enemy.Anima_Ctrl;
+            }
+            else
+                anima = evnt.Event.EventObj_Anima;
 
             _tile_dic[x][y].SetEventAnimation(anima);
         }
@@ -887,12 +893,9 @@ public class DungeonSystem : MonoBehaviour
 
                     yield return new WaitForSeconds(0.5f);
 
-                    //이벤트 발생한 타일 근처의 타일 상태 정보를 넘겨주고 전투 배경에 적용
-                    BtlSys.gameObject.SetActive(false);
-                    BtlSys.gameObject.SetActive(true);
-
+                    //이벤트 발생한 타일 근처의 타일 상태 정보를 bool배열로 저장
                     bool[] wallBool = new bool[]
-                            { x + 1 < _dgnSizeX && y + 1 < _dgnSizeY && _dgn_grid[x + 1, y + 1] == -1 ? true : false,
+                                { x + 1 < _dgnSizeX && y + 1 < _dgnSizeY && _dgn_grid[x + 1, y + 1] == -1 ? true : false,
                             x + 2 < _dgnSizeX && y + 2 < _dgnSizeY && _dgn_grid[x + 2, y + 2] == -1 ? true : false,
                             x + 2 < _dgnSizeX && _dgn_grid[x + 2, y] == -1 ? true : false,
                             x + 3 < _dgnSizeX && y + 1 < _dgnSizeY && _dgn_grid[x + 3, y + 1] == -1 ? true : false,
@@ -904,10 +907,23 @@ public class DungeonSystem : MonoBehaviour
                             x >= 2 && y + 2 < _dgnSizeY && _dgn_grid[x - 2, y + 2] == -1 ? true : false,
                             y + 2 < _dgnSizeY && _dgn_grid[x, y + 2] == -1 ? true : false};
 
-                    BtlSys.Set_BattleField(wallBool, _spr_tile, _spr_wall);
-                    
-                    BtlSys.Record_DungeonScript(this, _camera_dgn); //이 스크립트와 던전 카메라를 할당해주기 위해 전달
-                    BtlSys.BattleStart(_dgnData.TileEnemy[x][y]);   //해당 위치의 적과 전투 시작
+                    if (nowEvent.Event.Type >= EventData.EventType.Battle)  //전투 이벤트의 경우
+                    {
+                        BtlSys.gameObject.SetActive(false);
+                        BtlSys.gameObject.SetActive(true);
+
+                        BtlSys.Set_BattleField(wallBool, _spr_tile, _spr_wall); //전투 배경 설정
+
+                        BtlSys.Record_DungeonScript(this, _camera_dgn); //이 스크립트와 던전 카메라를 할당해주기 위해 전달
+                        BtlSys.BattleStart(_dgnData.TileEnemy[x][y]);   //해당 위치의 적과 전투 시작
+                    }
+                    else    //전투가 아닌 이벤트 시작
+                    {
+                        EvntSys.Set_EventField(wallBool, _spr_tile, _spr_wall); //이벤트 배경 설정
+
+                        EvntSys.Record_DungeonScript(this, _camera_dgn);    //이 스크립트와 던전 카메라를 할당해주기 위해 전달
+                        EvntSys.EventStart(_dgnData.TileEvent[x][y].Event); //해당 위치의 이벤트 시작
+                    }
                 }
 
                 PathClear();

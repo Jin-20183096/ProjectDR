@@ -4,10 +4,14 @@ using static PlayerSystem;
 
 public class ActionController : MonoBehaviour
 {
+    private float _offAlpha = 0.2f;
+
     [SerializeField]
     private BattleSystem _btlSys;
+    [SerializeField]
+    private DungeonEventSystem _evntSys;
 
-    public enum Situation { Off, No, Battle }
+    public enum Situation { Off, No, Event, Battle }
 
     [SerializeField]
     private Situation _situation;   //행동 결정하는 상황
@@ -18,7 +22,9 @@ public class ActionController : MonoBehaviour
 
     [Header("# Select Action")]
     [SerializeField]
-    private BtlActData _nowBtlAct;   //선택한 전투 행동
+    private BtlActData _nowBtlAct;                  //선택한 전투 행동
+    [SerializeField]
+    private EventData.EventAction _nowEvntAct;   //선택한 행동 (이벤트)
 
     [Header("# Action Dice Info")]
     [SerializeField]
@@ -58,6 +64,8 @@ public class ActionController : MonoBehaviour
     private DiceSelectPannel _diceSelectPannel; //주사위 선택창
     [SerializeField]
     private RectTransform _btn_noDiceAct;       //주사위 없는 행동 결정 버튼
+    [SerializeField]
+    private Image[] _img_btn_noDiceAct;     //주사위 없는 행동 결정 버튼 이미지
 
     [Header("# Dice & Board")]
     [SerializeField]
@@ -102,7 +110,11 @@ public class ActionController : MonoBehaviour
                 break;
             case Situation.Battle:  //전투 행동 목록 표시
                 _actList.gameObject.SetActive(true);        //행동 목록 On
-                ActList_Synch_Battle(); //행동 리스트 목록을 전투 행동 요소를 넣어서 동기화
+                ActList_Synch_Battle(); //행동 리스트 목록에 전투 행동을 넣어서 동기화
+                break;
+            case Situation.Event:   //이벤트 행동 목록 표시
+                _actList.gameObject.SetActive(true);
+                ActList_Synch_Event();  //행동 리스트 목록에 이벤트 행동을 넣어서 동기화
                 break;
         }
 
@@ -126,7 +138,40 @@ public class ActionController : MonoBehaviour
                 _actSlot[i].gameObject.SetActive(true);
                 _actSlot[i].Change_SlotContent(_spr_actType[(int)list[i].Data.Type],
                                                 list[i].Data.Name,
-                                                _statName_arr[(int)list[i].Stat]);
+                                                false,
+                                                _statName_arr[(int)list[i].Stat],
+                                                0);
+            }
+            else
+                _actSlot[i].gameObject.SetActive(false);
+        }
+
+        //선택 중인 슬롯이 있을 경우, 선택 취소
+        if (_cursor_nowAct != -1)
+            ActionSelect_Cancle(_cursor_nowAct);
+
+        //각종 변수 상태 초기화
+        _nowDice = 0;
+        _nowResult = new int[5] { -1, -1, -1, -1, -1 };
+        _nowTotal = 0;
+    }
+
+    public void ActList_Synch_Event()   //행동 리스트 동기화 (이벤트)
+    {
+        var list = _evntSys.ActList;
+
+        for (int i = 0; i < _actSlot.Length; i++)
+        {
+            if (i < list.Count)
+            {
+                _actSlot[i].gameObject.SetActive(true);
+
+                if (list[i].Data.UseAp != 0)
+                    _actSlot[i].Change_SlotContent(_spr_actType[0], list[i].Data.Name, true,
+                                                    "", list[i].Data.UseAp);
+                else
+                    _actSlot[i].Change_SlotContent(_spr_actType[0], list[i].Data.Name, false,
+                                                        _statName_arr[(int)list[i].Data.Check.Stat], 0);
             }
             else
                 _actSlot[i].gameObject.SetActive(false);
@@ -190,12 +235,31 @@ public class ActionController : MonoBehaviour
         var selected = _actSlot_select.gameObject.transform;
         selected.gameObject.SetActive(true);    //선택 슬롯 On
 
-        if (_situation == Situation.Battle)
+        if (_situation >= Situation.Battle)
         {
             _nowBtlAct = PlayerSys.ActList[_cursor_nowAct].Data;
             _nowStat = PlayerSys.ActList[_cursor_nowAct].Stat;
             _actSlot_select.Change_SlotContent(_spr_actType[(int)_nowBtlAct.Type],
-                                                _nowBtlAct.Name, _statName_arr[(int)_nowStat]);
+                                                _nowBtlAct.Name,
+                                                false, _statName_arr[(int)_nowStat], 0);
+        }
+        else if (_situation == Situation.Event)
+        {
+            _nowEvntAct = _evntSys.ActList[_cursor_nowAct].Data;
+
+
+            if (_nowEvntAct.UseAp != 0)
+            {
+                _actSlot_select.Change_SlotContent(_spr_actType[0], _nowEvntAct.Name, true,
+                                                "", _nowEvntAct.UseAp);
+            }
+            else
+            {
+                _actSlot_select.Change_SlotContent(_spr_actType[0], _nowEvntAct.Name, false,
+                                                    _statName_arr[(int)_nowEvntAct.Check.Stat], 0);
+
+                _nowStat = _nowEvntAct.Check.Stat;
+            }
         }
 
         selected.SetParent(_actList.gameObject.transform);  //선택 슬롯의 패런츠 변경
@@ -203,15 +267,9 @@ public class ActionController : MonoBehaviour
         _actSlot_select.Set_SlotOrder(_cursor_nowAct);      //선택 슬롯의 order 변경
 
         if (_nowStat != ICreature.Stats.No)
-        {
-            NoDiceButton_OnOff(false);      //주사위 없는 행동 결정 버튼 Off
             DiceSelectPannel_OnOff(true);   //주사위 선택창 On
-        }
         else
-        {
             NoDiceButton_OnOff(true);       //주사위 없는 행동 결정 버튼 On
-            DiceSelectPannel_OnOff(false);  //주사위 선택창 Off
-        }
 
         ActionTooltip_Off();   //행동 툴팁 Off
 
@@ -296,6 +354,39 @@ public class ActionController : MonoBehaviour
             _btn_noDiceAct.transform.position = _actSlot[_cursor_nowAct].transform.position;    //버튼 위치 설정
             _btn_noDiceAct.anchoredPosition = new Vector2(_btn_noDiceAct.anchoredPosition.x + _actSlot_select.Get_AddX() + 8,
                                                             _btn_noDiceAct.anchoredPosition.y);
+
+            if (_situation == Situation.Event)
+            {
+                var useAp = _evntSys.ActList[_cursor_nowAct].Data.UseAp;
+
+                if (useAp > 0)
+                {
+                    if (PlayerSys.AP >= useAp)
+                    {
+                        _btn_noDiceAct.GetComponent<Button>().interactable = true;
+
+                        foreach (Image img in _img_btn_noDiceAct)
+                            img.color = new Color(1, 1, 1, 1);
+
+                        Debug.Log("사용 예정 ap 표시");
+                        PlayerSys.Change_Ap_UsePreview(useAp);
+                    }
+                    else
+                    {
+                        _btn_noDiceAct.GetComponent<Button>().interactable = false;
+
+                        foreach (Image img in _img_btn_noDiceAct)
+                            img.color = new Color(1, 1, 1, _offAlpha);
+                    }
+                }
+            }
+            else
+            {
+                _btn_noDiceAct.GetComponent<Button>().interactable = true;
+
+                foreach (Image img in _img_btn_noDiceAct)
+                    img.color = new Color(1, 1, 1, 1);
+            }
         }
     }
 
@@ -324,6 +415,20 @@ public class ActionController : MonoBehaviour
                     Set_DiceSide(_nowStat); //결정한 행동에 맞게 주사위 오브젝트 설정
                     DiceRoll(); //주사위 굴리기
                 }
+                break;
+            case Situation.Event:
+                if (_nowEvntAct.IsDiceCheck)   //주사위 체크 행동일 때
+                {
+                    //행동 타입 아이콘, 행동명 설정
+                    _resultPannel.Change_ActInfo(BtlActData.ActionType.No, _nowEvntAct.Name); //행동 타입 아이콘, 행동명 설정
+
+                    Set_DiceSide(_nowStat); //결정한 행동에 맞게 주사위 오브젝트 설정
+                    DiceRoll(); //주사위 굴리기
+
+                    //이벤트 조건 패널을 활성화하기
+                }
+                else
+                    _evntSys.DiceCheck_Success(); //주사위 굴리는 과정 없이 즉시 행동 성공
                 break;
         }
     }
@@ -372,8 +477,6 @@ public class ActionController : MonoBehaviour
     public void DiceRoll()  //주사위 굴림
     {
         _resultPannel.ActionInfoPannel_OnOff(true);     //행동 정보창 On
-        if (_situation == Situation.Battle)
-            _resultPannel.Change_ActInfo(_nowBtlAct.Type, _nowBtlAct.Name); //행동 타입 아이콘, 행동명 설정
 
         _resultPannel.DiceResultPannel_OnOff(true);     //주사위 결과창 On
         _resultPannel.Set_NewDiceTotal(_nowDice);       //주사위 결과창 초기화
@@ -384,7 +487,7 @@ public class ActionController : MonoBehaviour
         _resultPannel.SetAble_RerollButton(false);      //재굴림 버튼 상호작용 Off
 
         _resultPannel.ActStartButton_OnOff(true);       //행동 개시 버튼 On
-        _resultPannel.SetAble_ActStartButton(false);    //행동 개시 버튼 상호작용 Off
+        //_resultPannel.SetAble_ActStartButton(false);    //행동 개시 버튼 상호작용 Off
 
         Set_DiceObj();  //주사위 오브젝트 배치
     }
@@ -483,7 +586,7 @@ public class ActionController : MonoBehaviour
 
         _resultPannel.Change_DiceTotal(_nowTotal.ToString());
 
-        _resultPannel.SetAble_ActStartButton(true);    //행동 개시 버튼 상호작용 Off
+        _resultPannel.SetAble_ActStartButton(true);    //행동 개시 버튼 상호작용 On
     }
 
     public void Check_AllDiceStop()
@@ -512,6 +615,22 @@ public class ActionController : MonoBehaviour
         {
             //전투 시스템에 행동 정보 전달
             _btlSys.Set_BtlAct_Player(_nowBtlAct, _nowResult);
+        }
+        else if (_situation == Situation.Event) //주사위 체크 행동을 개시할 경우
+        {
+            //행동 조건을 만족하는지 체크하기
+            switch (_evntSys.Check_DiceCondition(_cursor_nowAct, _nowTotal, _nowResult))
+            {
+                case DungeonEventSystem.DiceCheckResult.Success:
+                    _evntSys.DiceCheck_Success(); //행동 성공 처리
+                    break;
+                case DungeonEventSystem.DiceCheckResult.MinFail:
+                    _evntSys.DiceCheck_MinFail(); //행동 실패 처리 (값 미달)
+                    break;
+                case DungeonEventSystem.DiceCheckResult.MaxFail:
+                    _evntSys.DiceCheck_MaxFail();   //행동 실패 처리 (값 초과)
+                    break;
+            }
         }
 
         //각종 상태 변수 초기화

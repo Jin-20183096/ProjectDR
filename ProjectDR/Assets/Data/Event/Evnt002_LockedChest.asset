@@ -1,0 +1,128 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2218ac29604da814bab60c1b767e81eb, type: 3}
+  m_Name: Evnt002_LockedChest
+  m_EditorClassIdentifier: 
+  Event:
+    Name: "\uC790\uBB3C\uC1E0\uAC00 \uAC78\uB9B0 \uB0A1\uC740 \uBCF4\uBB3C \uC0C1\uC790
+      \uBC1C\uACAC"
+    Type: 1
+    EventObj_Anima: {fileID: 9100000, guid: 66d17f0274bd88144a2a48b29e28404b, type: 2}
+    StartLog: "\uC624\uB798\uB418\uACE0 \uB0A1\uC740 \uBCF4\uBB3C \uC0C1\uC790\uB97C
+      \uBC1C\uACAC\uD588\uB2E4.\n\uC0C1\uC790\uC5D0\uB294 \uB179\uC2A8 \uC790\uBB3C\uC1E0\uAC00
+      \uAC78\uB824\uC788\uB2E4."
+    ActList:
+    - Name: "\uADFC\uCC98\uC5D0\uC11C \uC5F4\uC1E0\uB97C \uCC3E\uC544\uBCF8\uB2E4"
+      IsDiceCheck: 0
+      Check:
+        Stat: 0
+        Rule: 0
+      UseAp: 2
+      Result_Success: 00000000
+      Result_Fail: 01000000
+      Result_FailMax: 
+    - Name: "\uC790\uBB3C\uC1E0\uB97C \uB534\uB2E4"
+      IsDiceCheck: 1
+      Check:
+        Stat: 3
+        Rule: 1
+      UseAp: 0
+      Result_Success: 02000000
+      Result_Fail: 0300000004000000
+      Result_FailMax: 
+    - Name: "\uC790\uBB3C\uC1E0\uB97C \uAC15\uC81C\uB85C \uBD80\uC21C\uB2E4"
+      IsDiceCheck: 1
+      Check:
+        Stat: 1
+        Rule: 2
+      UseAp: 0
+      Result_Success: 05000000
+      Result_Fail: 06000000
+      Result_FailMax: 07000000
+    - Name: "\uC0C1\uC790\uB97C \uBB34\uC2DC\uD558\uACE0 \uB5A0\uB09C\uB2E4"
+      IsDiceCheck: 0
+      Check:
+        Stat: 0
+        Rule: 0
+      UseAp: 0
+      Result_Success: 08000000
+      Result_Fail: 
+      Result_FailMax: 
+    Result:
+    - Log: "\uC5F4\uC1E0\uB97C \uCC3E\uC544\uB0B4 \uC0C1\uC790\uB97C \uC5F4\uC5C8\uB2E4."
+      Type: 0400000008000000
+      NewAct: []
+      Exp: 30
+      Item: []
+      Enemy: []
+    - Log: "\uADFC\uCC98\uC5D0\uC11C \uC5F4\uC1E0\uB97C \uBC1C\uACAC\uD558\uC9C0
+        \uBABB\uD588\uB2E4."
+      Type: 01000000
+      NewAct: []
+      Exp: 0
+      Item: []
+      Enemy: []
+    - Log: "\uC790\uBB3C\uC1E0\uB97C \uB2A5\uC219\uD558\uAC8C \uD574\uC81C\uD55C
+        \uB4A4 \uC0C1\uC790\uB97C \uC5F4\uC5C8\uB2E4."
+      Type: 0400000008000000
+      NewAct: []
+      Exp: 0
+      Item: []
+      Enemy: []
+    - Log: "\uC0C1\uC790\uC758 \uC790\uBB3C\uC1E0\uB97C \uD574\uC81C\uD558\uC9C0
+        \uBABB\uD588\uB2E4."
+      Type: 01000000
+      NewAct: []
+      Exp: 0
+      Item: []
+      Enemy: []
+    - Log: "\uC790\uBB3C\uC1E0\uC5D0 \uC8FC\uC704\uB97C \uBE7C\uC557\uAE34 \uC0AC\uC774
+        \uC801\uC774 \uC811\uADFC\uD574\uC654\uB2E4."
+      Type: 07000000
+      NewAct: []
+      Exp: 0
+      Item: []
+      Enemy: []
+    - Log: "\uC790\uBB3C\uC1E0\uB97C \uBD80\uC21C \uB4A4, \uC0C1\uC790\uB97C \uC5F4\uC5C8\uB2E4"
+      Type: 0400000008000000
+      NewAct: []
+      Exp: 0
+      Item: []
+      Enemy: []
+    - Log: "\uC0C1\uC790\uB294 \uAFC8\uCA4D\uB3C4 \uD558\uC9C0 \uC54A\uC558\uB2E4."
+      Type: 01000000
+      NewAct: []
+      Exp: 0
+      Item: []
+      Enemy: []
+    - Log: "\uBB34\uB9AC\uD558\uAC8C \uC790\uBB3C\uC1E0\uB97C \uBD80\uC218\uB824\uB2E4
+        \uC0C1\uC790\uAC00 \uBD80\uC11C\uC838 \uB0B4\uC6A9\uBB3C\uC774 \uD30C\uC190\uB418\uC5C8\uB2E4."
+      Type: 08000000
+      NewAct: []
+      Exp: 0
+      Item: []
+      Enemy: []
+    - Log: "\uC0C1\uC790\uB97C \uBB34\uC2DC\uD558\uACE0 \uB2E4\uB978 \uC7A5\uC18C\uB85C
+        \uD5A5\uD558\uAE30\uB85C \uD588\uB2E4."
+      Type: 08000000
+      NewAct: []
+      Exp: 0
+      Item: []
+      Enemy: []
+    Item:
+    - {fileID: 11400000, guid: c220993099025834abff4ba78971ccc2, type: 2}
+    - {fileID: 11400000, guid: 327946c1231836c468a3883ce48bb398, type: 2}
+    - {fileID: 11400000, guid: d6fd4800cbe7e434dbe95a3c9b9cf66c, type: 2}
+    - {fileID: 11400000, guid: d2013e6a2ede28b4ba893c7f97672068, type: 2}
+    - {fileID: 11400000, guid: d70470c69ad518b44a03dd669b40dbf5, type: 2}
+    - {fileID: 11400000, guid: 54900e305e1766645be589cbf49c37e0, type: 2}
+    - {fileID: 11400000, guid: ac5edffaf80644645ba48f2a5a6c0a41, type: 2}

@@ -34,3 +34,6 @@ MonoBehaviour:
   Clip_Atk1:
   - {fileID: 7400000, guid: c11d8c619ba8d25438fb87605791e253, type: 2}
   - {fileID: 7400000, guid: 1d513c9289b79fb4cb06e9d44e4ed054, type: 2}
+  Clip_Atk2:
+  - {fileID: 7400000, guid: 3bf423a8aee2d5846978cb665543a36b, type: 2}
+  - {fileID: 7400000, guid: b21b7dc68c96c6642a2d01a9f8a18c62, type: 2}

@@ -678,8 +678,8 @@ public class BattleSystem : MonoBehaviour
         _playerSys.MenuButton_OnOff_ActList(true);
 
         _enemySys.Set_BattleEnemy(false, null); //적 데이터 Off
-                                                //전투 행동 리스트, 주사위 보드, 재굴림 버튼, 행동 개시 버튼 Off
-        _actController.Set_ActListSituation(ActionController.Situation.No);
+        //전투 행동 목록, 주사위 보드, 재굴림 버튼, 행동 개시 버튼 Off            
+        _actController.Set_ActListSituation(ActionController.Situation.No); 
         _actController.Dice_Off();  //주사위 오브젝트 Off
 
         _actController.DiceSelectPannel_OnOff(false);   //주사위 선택창 Off

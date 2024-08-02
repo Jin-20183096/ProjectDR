@@ -8,6 +8,8 @@ public class RewardPannel : MonoBehaviour
 {
     [SerializeField]
     private BattleSystem _btlSys;
+    [SerializeField]
+    private DungeonEventSystem _evntSys;
 
     [Header("# Reward Exp")]
     [SerializeField]
@@ -110,6 +112,7 @@ public class RewardPannel : MonoBehaviour
         }
 
         _btlSys.Set_RewardExpProcess(false);
+        _evntSys.Set_ResultProcess(false);
         StopCoroutine("ExpMeter_Up");
     }
 

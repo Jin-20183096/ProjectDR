@@ -20,6 +20,8 @@ public class ActionListSlot : MonoBehaviour, IActionListSlot, IPointerEnterHandl
     private TextMeshProUGUI _txt_actName;
     [SerializeField]
     private TextMeshProUGUI _txt_actStat;
+    [SerializeField]
+    private TextMeshProUGUI _txt_useAp;
 
     private RectTransform _rect;
     private Image _img;
@@ -39,11 +41,23 @@ public class ActionListSlot : MonoBehaviour, IActionListSlot, IPointerEnterHandl
         _actController.ActionClick(_order);
     }
 
-    public void Change_SlotContent(Sprite spr, string name, string stat)
+    public void Change_SlotContent(Sprite spr, string name, bool isNoDice, string stat, int useAp)
     {
         _icon_actType.sprite = spr;
         _txt_actName.text = name;
-        _txt_actStat.text = stat;
+
+        if (isNoDice)
+        {
+            _txt_actStat.gameObject.SetActive(false);
+            _txt_useAp.gameObject.SetActive(true);
+            _txt_useAp.text = useAp.ToString();
+        }
+        else
+        {
+            _txt_actStat.gameObject.SetActive(true);
+            _txt_useAp.gameObject.SetActive(false);
+            _txt_actStat.text = stat;
+        }
     }
 
     public void OnPointerEnter(PointerEventData eventData)

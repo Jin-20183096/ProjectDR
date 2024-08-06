@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using static PlayerSystem;
+using static EventData;
 
 public class DiceSelectPannel : MonoBehaviour
 {
@@ -25,6 +26,20 @@ public class DiceSelectPannel : MonoBehaviour
     private Button _btn_decision;       //행동 결정 버튼
     [SerializeField]
     private Image[] _img_btn_decision;  //행동 결정 버튼 이미지
+
+    [Header("# DiceRule Pannel")]
+    [SerializeField]
+    private HorizontalLayoutGroup _pannel_diceRule_preview;
+    [SerializeField]
+    private GameObject[] _layout_diceRule;
+    [SerializeField]
+    private TextMeshProUGUI _txt_totalUp_checkMin;
+    [SerializeField]
+    private TextMeshProUGUI[] _txt_totalBetween_checkMinMax;
+    [SerializeField]
+    private TextMeshProUGUI _txt_eachUp_checkMin;
+    [SerializeField]
+    private TextMeshProUGUI[] _txt_eachBetween_checkMinMax;
 
     [SerializeField]
     private int _nowDice = 0;
@@ -69,6 +84,44 @@ public class DiceSelectPannel : MonoBehaviour
     {
         for (int i = 0; i < _img_statDice.Length; i++)
             _img_statDice[i].sprite = _spr_dice[stat[i]];
+    }
+
+    public void DiceRulePannel_Preview_OnOff(bool isOn, CheckRule rule, int checkMin, int checkMax)
+    {
+        _pannel_diceRule_preview.gameObject.SetActive(isOn);
+
+        if (isOn)
+        {
+            for (int i = 0; i < _layout_diceRule.Length; i++)
+            {
+                if (i + 1 == (int)rule)
+                    _layout_diceRule[i].gameObject.SetActive(true);
+                else
+                    _layout_diceRule[i].gameObject.SetActive(false);
+            }
+
+            switch (rule)
+            {
+                case CheckRule.Total_Up:
+                    _txt_totalUp_checkMin.text = checkMin.ToString(); ;
+                    break;
+                case CheckRule.Total_Between:
+                    _txt_totalBetween_checkMinMax[0].text = checkMin.ToString();
+                    _txt_totalBetween_checkMinMax[1].text = checkMax.ToString();
+                    break;
+                case CheckRule.Each_Up:
+                    _txt_eachUp_checkMin.text = checkMin.ToString();
+                    break;
+                case CheckRule.Each_Between:
+                    _txt_eachBetween_checkMinMax[0].text = checkMin.ToString();
+                    _txt_eachBetween_checkMinMax[1].text = checkMax.ToString();
+                    break;
+            }
+        }
+
+        Canvas.ForceUpdateCanvases();
+        _pannel_diceRule_preview.enabled = false;
+        _pannel_diceRule_preview.enabled = true;
     }
 
     public void NowDice_MouseOver(int order)    //주사위 슬롯에 마우스 오버

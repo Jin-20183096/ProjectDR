@@ -43,6 +43,11 @@ public class EquipSprite : MonoBehaviour
                 _aoc["Atk2_Ready"] = data.Clip_Atk2[0];
                 _aoc["Atk2_Start"] = data.Clip_Atk2[1];
             }
+            if (data.Clip_Atk3.Length != 0)
+            {
+                _aoc["Atk3_Ready"] = data.Clip_Atk3[0];
+                _aoc["Atk3_Start"] = data.Clip_Atk3[1];
+            }
         }
         else    //아이템을 해제한 경우
         {
@@ -55,6 +60,9 @@ public class EquipSprite : MonoBehaviour
 
             _aoc["Atk2_Ready"] = null;
             _aoc["Atk2_Start"] = null;
+
+            _aoc["Atk3_Ready"] = null;
+            _aoc["Atk3_Start"] = null;
         }
     }
 

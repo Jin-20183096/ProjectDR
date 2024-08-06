@@ -8,7 +8,7 @@ public class SpriteSystem : MonoBehaviour
     [SerializeField]
     private BattleSystem _btlSys;
 
-    public enum AtkMoveSet { No, Atk1, Atk2 }
+    public enum AtkMoveSet { No, Atk1, Atk2, Atk3 }
     public enum DefMoveSet { No, Def }
     public enum DgeMoveSet { No, Dge }
     public enum TacMoveSet { No, Tac }

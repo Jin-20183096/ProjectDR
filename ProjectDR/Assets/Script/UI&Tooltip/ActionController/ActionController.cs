@@ -247,18 +247,22 @@ public class ActionController : MonoBehaviour
         {
             _nowEvntAct = _evntSys.ActList[_cursor_nowAct].Data;
 
-
-            if (_nowEvntAct.UseAp != 0)
-            {
-                _actSlot_select.Change_SlotContent(_spr_actType[0], _nowEvntAct.Name, true,
-                                                "", _nowEvntAct.UseAp);
-            }
-            else
+            if (_nowEvntAct.IsDiceCheck)    //주사위 체크 행동일 때
             {
                 _actSlot_select.Change_SlotContent(_spr_actType[0], _nowEvntAct.Name, false,
                                                     _statName_arr[(int)_nowEvntAct.Check.Stat], 0);
 
                 _nowStat = _nowEvntAct.Check.Stat;
+
+                //주사위 조건창 미리보기 on
+                _diceSelectPannel.DiceRulePannel_Preview_OnOff(true, _nowEvntAct.Check.Rule,
+                                                        _evntSys.ActList[_cursor_nowAct].CheckMin,
+                                                        _evntSys.ActList[_cursor_nowAct].CheckMax);   
+            }
+            else
+            {
+                _actSlot_select.Change_SlotContent(_spr_actType[0], _nowEvntAct.Name, true,
+                                                    "", _nowEvntAct.UseAp);
             }
         }
 
@@ -287,6 +291,8 @@ public class ActionController : MonoBehaviour
 
         _actSlot[order].gameObject.SetActive(true);
         _cursor_nowAct = -1;    //선택 취소
+
+        _evntSys.DiceRulePannel_OnOff(false, _cursor_nowAct);  //주사위 조건창 off
 
         _nowBtlAct = null;
         _nowStat = ICreature.Stats.No;
@@ -342,7 +348,10 @@ public class ActionController : MonoBehaviour
         else
             _diceSelectPannel.DiceZero();
 
-        PlayerSys.Change_Ap_UsePreview(_nowDice);   //행동력 소모 미리보기 Off
+        if (isOn)
+            PlayerSys.Change_Ap_UsePreview(_nowDice);   //행동력 소모 미리보기 Off
+        else
+            PlayerSys.Change_Ap_UsePreview(0);   //행동력 소모 미리보기 Off
     }
 
     public void NoDiceButton_OnOff(bool isOn)
@@ -425,10 +434,20 @@ public class ActionController : MonoBehaviour
                     Set_DiceSide(_nowStat); //결정한 행동에 맞게 주사위 오브젝트 설정
                     DiceRoll(); //주사위 굴리기
 
-                    //이벤트 조건 패널을 활성화하기
+                    //이벤트 조건 미리보기 패널 off
+                    _diceSelectPannel.DiceRulePannel_Preview_OnOff(false, EventData.CheckRule.No, 0, 0);
+                    //이벤트 조건 패널 on
+                    _evntSys.DiceRulePannel_OnOff(true, _cursor_nowAct);
                 }
                 else
-                    _evntSys.DiceCheck_Success(); //주사위 굴리는 과정 없이 즉시 행동 성공
+                {
+                    PlayerSys.Change_Ap(false, _nowEvntAct.UseAp);
+
+                    if (_nowEvntAct.Result_Fail.Length <= 0 || Random.value < 0.5f)
+                        _evntSys.DiceCheck_Success(); //주사위 굴리는 과정 없이 즉시 행동 성공
+                    else
+                        _evntSys.DiceCheck_MinFail();
+                }
                 break;
         }
     }

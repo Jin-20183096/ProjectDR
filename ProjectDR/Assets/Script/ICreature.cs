@@ -13,6 +13,7 @@ public interface ICreature
     public void Change_Hp(bool plus, int value);    //HP 변경
     public void Change_HpMax(bool plus, int value); //최대 HP 변경
     public void Change_AC(bool plus, int value);    //방어도 변경
+    public void Change_ACMax(bool plus, int value); //최대 방어도 변경
     public void Change_Ap(bool plus, int value);    //행동력 변경
     public void Change_ApMax(bool plus, int value); //최대 행동력 변경
     public void TakeDamage(int dmg, BtlActData.DamageType dmgType); //피해 받음

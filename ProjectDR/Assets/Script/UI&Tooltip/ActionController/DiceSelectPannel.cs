@@ -21,17 +21,25 @@ public class DiceSelectPannel : MonoBehaviour
     [SerializeField]
     private Image[] _img_statDice;  //행동 스탯 주사위 이미지 표기
     [SerializeField]
-    private Image[] _diceSlot;      //주사위 슬롯
-    [SerializeField]
     private Button _btn_decision;       //행동 결정 버튼
     [SerializeField]
     private Image[] _img_btn_decision;  //행동 결정 버튼 이미지
+
+    [Header("# DiceSlot")]
+    [SerializeField]
+    private GameObject _diceSlotSet_btl;    //주사위 슬롯 집단(전투)
+    [SerializeField]
+    private Image[] _diceSlot_btl;      //주사위 슬롯(전투)
+    [SerializeField]
+    private GameObject _diceSlotSet_evnt;   //주사위 슬롯 집단(이벤트)
+    [SerializeField]
+    private Image[] _diceSlot_evnt;     //주사위 슬롯(이벤트)
 
     [Header("# DiceRule Pannel")]
     [SerializeField]
     private HorizontalLayoutGroup _pannel_diceRule_preview;
     [SerializeField]
-    private GameObject[] _layout_diceRule;
+    private VerticalLayoutGroup[] _layout_diceRule;
     [SerializeField]
     private TextMeshProUGUI _txt_totalUp_checkMin;
     [SerializeField]
@@ -86,12 +94,20 @@ public class DiceSelectPannel : MonoBehaviour
             _img_statDice[i].sprite = _spr_dice[stat[i]];
     }
 
-    public void DiceRulePannel_Preview_OnOff(bool isOn, CheckRule rule, int checkMin, int checkMax)
+    public void Change_DiceSlotSet(bool isBtl)
+    {
+        _diceSlotSet_btl.SetActive(isBtl);
+        _diceSlotSet_evnt.SetActive(isBtl == false);
+    }
+
+    public void DiceRulePannel_Preview_OnOff(bool isOn, int index)
     {
         _pannel_diceRule_preview.gameObject.SetActive(isOn);
 
         if (isOn)
         {
+            var rule = _evntSys.ActList[index].Rule;
+
             for (int i = 0; i < _layout_diceRule.Length; i++)
             {
                 if (i + 1 == (int)rule)
@@ -100,28 +116,31 @@ public class DiceSelectPannel : MonoBehaviour
                     _layout_diceRule[i].gameObject.SetActive(false);
             }
 
+            var evntAct = _evntSys.ActList[index];
+
             switch (rule)
             {
                 case CheckRule.Total_Up:
-                    _txt_totalUp_checkMin.text = checkMin.ToString(); ;
+                    _txt_totalUp_checkMin.text = evntAct.CheckMin.ToString();
                     break;
                 case CheckRule.Total_Between:
-                    _txt_totalBetween_checkMinMax[0].text = checkMin.ToString();
-                    _txt_totalBetween_checkMinMax[1].text = checkMax.ToString();
+                    _txt_totalBetween_checkMinMax[0].text = evntAct.CheckMin.ToString();
+                    _txt_totalBetween_checkMinMax[1].text = evntAct.CheckMax.ToString();
                     break;
                 case CheckRule.Each_Up:
-                    _txt_eachUp_checkMin.text = checkMin.ToString();
+                    _txt_eachUp_checkMin.text = evntAct.CheckMin.ToString();
                     break;
                 case CheckRule.Each_Between:
-                    _txt_eachBetween_checkMinMax[0].text = checkMin.ToString();
-                    _txt_eachBetween_checkMinMax[1].text = checkMax.ToString();
+                    _txt_eachBetween_checkMinMax[0].text = evntAct.CheckMin.ToString();
+                    _txt_eachBetween_checkMinMax[1].text = evntAct.CheckMax.ToString();
                     break;
             }
         }
-
+        
         Canvas.ForceUpdateCanvases();
         _pannel_diceRule_preview.enabled = false;
         _pannel_diceRule_preview.enabled = true;
+        
     }
 
     public void NowDice_MouseOver(int order)    //주사위 슬롯에 마우스 오버
@@ -129,6 +148,7 @@ public class DiceSelectPannel : MonoBehaviour
         BtlActData btlAct = null;   //null이면 전투 행동이 아니라는 의미
         DungeonEventSystem.EvntAct evntAct = null;   //null이면 이벤트 행동이 아니라는 의미
         var realOrder = order + 1;
+        Image[] diceSlot;
 
         if (_actController.SITUATION == ActionController.Situation.Battle)  //전투 행동인 경우, 행동 데이터 지정
         {
@@ -137,63 +157,59 @@ public class DiceSelectPannel : MonoBehaviour
             if (realOrder < btlAct.DiceMin)
                 realOrder = btlAct.DiceMin;
 
-            //플레이어의 행동력이 마우스 오버한 슬롯만큼 있으면
-
-            if (PlayerSys.AP >= realOrder)
-            {
-                for (int i = 0; i < _diceSlot.Length; i++)
-                {
-                    if (i < realOrder)
-                    {
-                        if (i < _nowDice && _nowDice <= realOrder)
-                            _diceSlot[i].sprite = _spr_diceSlot[2]; //현재 선택한 주사위의 경우 선택한 스프라이트
-                        else
-                            _diceSlot[i].sprite = _spr_diceSlot[1]; //이외에는 마우스 오버 스프라이트
-                    }
-                    else
-                        _diceSlot[i].sprite = _spr_diceSlot[0]; //이외에는 미선택 스프라이트
-                }
-
-                if (btlAct != null) //행동력을 소모하는 행동의 경우
-                {
-                    //소모 예정 행동력 표기
-                    PlayerSys.Change_Ap_UsePreview(realOrder);
-                }
-            }
+            diceSlot = _diceSlot_btl;
         }
-        else if (_actController.SITUATION == ActionController.Situation.Event)
+        else    //이벤트 행동인 경우, 
         {
             evntAct = _evntSys.ActList[_actController.NOW_CURSOR];
 
-            if (realOrder < evntAct.Dice)
-                realOrder = evntAct.Dice;
+            diceSlot = _diceSlot_evnt;
+        }
 
-            for (int i = 0; i < _diceSlot.Length; i++)
+        //플레이어의 행동력이 마우스 오버한 슬롯만큼 있으면
+        if (PlayerSys.AP >= realOrder)
+        {
+            for (int i = 0; i < diceSlot.Length; i++)
             {
                 if (i < realOrder)
                 {
                     if (i < _nowDice && _nowDice <= realOrder)
-                        _diceSlot[i].sprite = _spr_diceSlot[2]; //현재 선택한 주사위의 경우 선택한 스프라이트
+                        diceSlot[i].sprite = _spr_diceSlot[2]; //현재 선택한 주사위의 경우 선택한 스프라이트
                     else
-                        _diceSlot[i].sprite = _spr_diceSlot[1]; //이외에는 마우스 오버 스프라이트
+                        diceSlot[i].sprite = _spr_diceSlot[1]; //이외에는 마우스 오버 스프라이트
                 }
                 else
-                    _diceSlot[i].sprite = _spr_diceSlot[0]; //이외에는 미선택 스프라이트
+                    diceSlot[i].sprite = _spr_diceSlot[0]; //이외에는 미선택 스프라이트
             }
+
+            /*
+            if (btlAct != null) //행동력을 소모하는 행동의 경우
+            {
+            */
+                //소모 예정 행동력 표기
+                PlayerSys.Change_Ap_UsePreview(realOrder);
+            //}
         }
     }
 
     public void NowDice_MouseOver_End() //주사위 슬롯에서 마우스가 나간 경우
     {
-        for (int i = 0; i < _diceSlot.Length; i++)
+        Image[] diceSlot;
+
+        if (_actController.SITUATION == ActionController.Situation.Battle)
+            diceSlot = _diceSlot_btl;
+        else
+            diceSlot = _diceSlot_evnt;
+
+        for (int i = 0; i < diceSlot.Length; i++)
         {
             if (i < _nowDice)
-                _diceSlot[i].sprite = _spr_diceSlot[2];
+                diceSlot[i].sprite = _spr_diceSlot[2];
             else
-                _diceSlot[i].sprite = _spr_diceSlot[0];
+                diceSlot[i].sprite = _spr_diceSlot[0];
         }
 
-        if (_actController.SITUATION == ActionController.Situation.Battle)  //현재 선택된 주사위 수만큼 소모 예정 행동력 표시
+        //if (_actController.SITUATION == ActionController.Situation.Battle)  //현재 선택된 주사위 수만큼 소모 예정 행동력 표시
             PlayerSys.Change_Ap_UsePreview(_nowUseAp);
     }
 
@@ -202,6 +218,7 @@ public class DiceSelectPannel : MonoBehaviour
         BtlActData btlAct = null;   //null이면 전투 행동이 아니라는 의미
         DungeonEventSystem.EvntAct evntAct = null;   //null이면 이벤트 행동이 아니라는 의미
         var realOrder = order + 1;
+        Image[] diceSlot;
 
         if (_actController.SITUATION == ActionController.Situation.Battle)  //전투 행동인 경우, 행동 데이터 지정
         {
@@ -212,21 +229,20 @@ public class DiceSelectPannel : MonoBehaviour
 
             if (btlAct.NoDice == false && PlayerSys.AP < realOrder) //선택한 주사위 개수를 위한 행동력이 없을 경우, return
                 return;
+
+            diceSlot = _diceSlot_btl;
         }
-        else if (_actController.SITUATION == ActionController.Situation.Event)  //이벤트 행동인 경우, 행동 데이터 지정
+        else    //이벤트 행동인 경우, 행동 데이터 지정
         {
             evntAct = _evntSys.ActList[_actController.NOW_CURSOR];
 
-            if (realOrder < evntAct.Dice)
-                realOrder = evntAct.Dice;
+            diceSlot = _diceSlot_evnt;
         }
 
         //return 되지 않았을 경우 함수 계속 진행
 
         if (_nowDice == realOrder)  //동일한 주사위 개수를 한번 더 선택한 경우
-        {
             NowDice_Reset();    //주사위 개수 초기화
-        }
         else
         {
             _nowDice = realOrder;   //주사위 개수 새로 지정
@@ -237,18 +253,18 @@ public class DiceSelectPannel : MonoBehaviour
                 _nowUseAp = _nowDice;
 
             //주사위 개수에 따른 슬롯 설정
-            for (int i = 0; i < _diceSlot.Length; i++)
+            for (int i = 0; i < diceSlot.Length; i++)
             {
                 if (i < _nowDice)
-                    _diceSlot[i].sprite = _spr_diceSlot[2];
+                    diceSlot[i].sprite = _spr_diceSlot[2];
                 else
-                    _diceSlot[i].sprite = _spr_diceSlot[0];
+                    diceSlot[i].sprite = _spr_diceSlot[0];
             }
 
             if (_actController.SITUATION == ActionController.Situation.Battle)
                 DecisionBtn_OnOff(PlayerSys.AP >= _nowUseAp);   //현재 행동력이 충분한지에 따라, 행동 결정 버튼 OnOff
             else if (_actController.SITUATION == ActionController.Situation.Event)
-                DecisionBtn_OnOff(_nowDice != 0);
+                DecisionBtn_OnOff(true);
         }
 
         if (_actController.SITUATION == ActionController.Situation.Battle)
@@ -259,36 +275,28 @@ public class DiceSelectPannel : MonoBehaviour
     {
         //현재 선택한 주사위 개수, 소모 예정 행동력을 0으로
         DiceZero();
+        Image[] diceSlot;
+
+        if (_actController.SITUATION == ActionController.Situation.Battle)
+            diceSlot = _diceSlot_btl;
+        else
+            diceSlot = _diceSlot_evnt;
 
         //현재 선택한 행동의 최대 주사위 개수만큼 슬롯을 활성화
-        for (int i = 0; i < _diceSlot.Length; i++)
+        for (int i = 0; i < diceSlot.Length; i++)
         {
-            if (_actController.SITUATION == ActionController.Situation.Battle)
+            if (i < PlayerSys.ActList[_actController.NOW_CURSOR].Data.DiceMax)
             {
-                if (i < PlayerSys.ActList[_actController.NOW_CURSOR].Data.DiceMax)
-                {
-                    _diceSlot[i].gameObject.SetActive(true);
-                    _diceSlot[i].enabled = true;
-                    _diceSlot[i].sprite = _spr_diceSlot[0];
-                }
-                else
-                    _diceSlot[i].gameObject.SetActive(false);
+                diceSlot[i].gameObject.SetActive(true);
+                diceSlot[i].enabled = true;
+                diceSlot[i].sprite = _spr_diceSlot[0];
             }
-            else if (_actController.SITUATION == ActionController.Situation.Event)
-            {
-                if (i < _evntSys.ActList[_actController.NOW_CURSOR].Dice)
-                {
-                    _diceSlot[i].gameObject.SetActive(true);
-                    _diceSlot[i].enabled = true;
-                    _diceSlot[i].sprite = _spr_diceSlot[0];
-                }
-                else
-                    _diceSlot[i].gameObject.SetActive(false);
-            }
+            else
+                diceSlot[i].gameObject.SetActive(false);
         }
 
         //행동 결정 버튼 비활성화
-        DecisionBtn_OnOff(false);
+        DecisionBtn_OnOff(_actController.SITUATION == ActionController.Situation.Event);
 
         //소모 예정 행동력 표기 초기화
         PlayerSys.Change_Ap_UsePreview(_nowUseAp);

@@ -242,6 +242,8 @@ public class ActionController : MonoBehaviour
             _actSlot_select.Change_SlotContent(_spr_actType[(int)_nowBtlAct.Type],
                                                 _nowBtlAct.Name,
                                                 false, _statName_arr[(int)_nowStat], 0);
+            //주사위 조건창 미리보기 off
+            _diceSelectPannel.DiceRulePannel_Preview_OnOff(false, _cursor_nowAct);
         }
         else if (_situation == Situation.Event)
         {
@@ -255,9 +257,7 @@ public class ActionController : MonoBehaviour
                 _nowStat = _nowEvntAct.Check.Stat;
 
                 //주사위 조건창 미리보기 on
-                _diceSelectPannel.DiceRulePannel_Preview_OnOff(true, _nowEvntAct.Check.Rule,
-                                                        _evntSys.ActList[_cursor_nowAct].CheckMin,
-                                                        _evntSys.ActList[_cursor_nowAct].CheckMax);   
+                _diceSelectPannel.DiceRulePannel_Preview_OnOff(true, _cursor_nowAct);   
             }
             else
             {
@@ -344,14 +344,14 @@ public class ActionController : MonoBehaviour
             _diceSelectPannel.Change_RerollText(_nowReroll.ToString());
             _diceSelectPannel.Change_StatDiceImage(statArr);
             _diceSelectPannel.NowDice_Reset();
+
+            //주사위 슬롯 집단 설정 (전투 or 이벤트)
+            _diceSelectPannel.Change_DiceSlotSet(_situation == Situation.Battle);
         }
         else
             _diceSelectPannel.DiceZero();
 
-        if (isOn)
-            PlayerSys.Change_Ap_UsePreview(_nowDice);   //행동력 소모 미리보기 Off
-        else
-            PlayerSys.Change_Ap_UsePreview(0);   //행동력 소모 미리보기 Off
+        PlayerSys.Change_Ap_UsePreview(_nowDice);   //행동력 소모 미리보기 Off
     }
 
     public void NoDiceButton_OnOff(bool isOn)
@@ -377,7 +377,6 @@ public class ActionController : MonoBehaviour
                         foreach (Image img in _img_btn_noDiceAct)
                             img.color = new Color(1, 1, 1, 1);
 
-                        Debug.Log("사용 예정 ap 표시");
                         PlayerSys.Change_Ap_UsePreview(useAp);
                     }
                     else
@@ -386,7 +385,16 @@ public class ActionController : MonoBehaviour
 
                         foreach (Image img in _img_btn_noDiceAct)
                             img.color = new Color(1, 1, 1, _offAlpha);
+
+                        PlayerSys.Change_Ap_UsePreview(0);
                     }
+                }
+                else
+                {
+                    _btn_noDiceAct.GetComponent<Button>().interactable = true;
+
+                    foreach (Image img in _img_btn_noDiceAct)
+                        img.color = new Color(1, 1, 1, 1);
                 }
             }
             else
@@ -408,12 +416,11 @@ public class ActionController : MonoBehaviour
         switch (_situation)
         {
             case Situation.Battle: //전투 상황
+                _resultPannel.Change_ActInfo(_nowBtlAct.Type, _nowBtlAct.Name); //행동 타입 아이콘, 행동명 설정
+
                 if (_nowBtlAct.NoDice)  //주사위가 없는 행동일 때
                 {
                     _resultPannel.ActionInfoPannel_OnOff(true);     //행동 정보창 On
-                    if (_situation == Situation.Battle)
-                        _resultPannel.Change_ActInfo(_nowBtlAct.Type, _nowBtlAct.Name); //행동 타입 아이콘, 행동명 설정
-
                     _resultPannel.DiceResultPannel_OnOff(true);     //주사위 결과창 On
                     _resultPannel.Set_NewDiceTotal(_nowDice);       //주사위 결과창 초기화
                     
@@ -428,6 +435,8 @@ public class ActionController : MonoBehaviour
             case Situation.Event:
                 if (_nowEvntAct.IsDiceCheck)   //주사위 체크 행동일 때
                 {
+                    _nowDice += 1;  //주사위 개수 1개 증가 (기본적으로 굴리는 주사위 1개)
+
                     //행동 타입 아이콘, 행동명 설정
                     _resultPannel.Change_ActInfo(BtlActData.ActionType.No, _nowEvntAct.Name); //행동 타입 아이콘, 행동명 설정
 
@@ -435,7 +444,7 @@ public class ActionController : MonoBehaviour
                     DiceRoll(); //주사위 굴리기
 
                     //이벤트 조건 미리보기 패널 off
-                    _diceSelectPannel.DiceRulePannel_Preview_OnOff(false, EventData.CheckRule.No, 0, 0);
+                    _diceSelectPannel.DiceRulePannel_Preview_OnOff(false, _cursor_nowAct);
                     //이벤트 조건 패널 on
                     _evntSys.DiceRulePannel_OnOff(true, _cursor_nowAct);
                 }

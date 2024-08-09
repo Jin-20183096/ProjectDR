@@ -15,9 +15,9 @@ public class DungeonEventSystem : MonoBehaviour
     public enum DiceCheckResult { Success, MinFail, MaxFail }
 
     // 수준에 따른 평균적인 주사위 1개의 값:  1~4 / 3~7 / 5~10
-    private int[] AvgDice_first = new int[] { 1, 4 };
-    private int[] AvgDice_Mid = new int[] { 3, 7 };
-    private int[] AvgDice_Last = new int[] { 5, 10 };
+    private int[] AvgDice_first = new int[] { 1, 3 };
+    private int[] AvgDice_Mid = new int[] { 4, 6 };
+    private int[] AvgDice_Last = new int[] { 7, 10 };
 
     [SerializeField]
     private PlayerSystem _playerSys;
@@ -77,7 +77,6 @@ public class DungeonEventSystem : MonoBehaviour
         public EventAction Data;
 
         public CheckRule Rule;  //주사위 체크 규칙
-        public int Dice;        //굴리는 주사위 개수
 
         public int CheckMin; //주사위 체크 행동 시 성공 최소값
         public int CheckMax; //주사위 체크 행동 시 성공 최대값
@@ -179,7 +178,6 @@ public class DungeonEventSystem : MonoBehaviour
     void Add_NewEventAction(int index, EventAction act) //행동을 추가하고, 주사위 체크가 있는 행동은 체크 조건과 값도 생성
     {
         var rule = act.Check.Rule;
-        var dice = 0;
         var checkMin = 0;
         var checkMax = 0;
 
@@ -188,21 +186,18 @@ public class DungeonEventSystem : MonoBehaviour
 
         if (act.IsDiceCheck)    //주사위 체크 행동인 경우
         {
-            //주사위 개수 무작위 선정
-            dice = Random.Range(1, 6);
-
             //현재 층과 주사위 개수에 따라 최소값과 최대값 선정
             switch (rule)
             {
                 case CheckRule.Total_Up:
-                    for (int i = 0; i < dice; i++)
+                    //for (int i = 0; i < dice; i++)
                         checkMin += Random.Range(avgDice[0], avgDice[1] + 1);
                     break;
                 case CheckRule.Total_Between:
-                    for (int i = 0; i < dice; i++)
+                    //for (int i = 0; i < dice; i++)
                         checkMin += Random.Range(avgDice[0], avgDice[1] + 1);
 
-                    for (int i = 0; i < dice; i++)
+                    //for (int i = 0; i < dice; i++)
                         checkMax += Random.Range(avgDice[0], avgDice[1] + 1);
 
                     if (checkMin > checkMax)
@@ -234,7 +229,6 @@ public class DungeonEventSystem : MonoBehaviour
         {
             Data = act,
             Rule = rule,
-            Dice = dice,
             CheckMin = checkMin,
             CheckMax = checkMax
         };

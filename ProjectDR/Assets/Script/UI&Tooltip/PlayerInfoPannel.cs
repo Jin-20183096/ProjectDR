@@ -20,6 +20,8 @@ public class PlayerInfoPannel : MonoBehaviour
     private GameObject _icon_ac;        //방어도 아이콘
     [SerializeField]
     private TextMeshProUGUI _txt_ac;    //방어도 텍스트
+    [SerializeField]
+    private TextMeshProUGUI _txt_acMax; //최대 방어도 텍스트
 
     [Header("# AP")]
     [SerializeField]
@@ -90,10 +92,15 @@ public class PlayerInfoPannel : MonoBehaviour
 
     public void Change_Ac(int newAc)
     {
-        _icon_ac.SetActive(newAc != 0);
+        _txt_ac.text = newAc.ToString();
+    }
 
-        if (newAc != 0)
-            _txt_ac.text = newAc.ToString();
+    public void Change_AcMax(int newAcMax)
+    {
+        _icon_ac.SetActive(newAcMax != 0);
+
+        if (newAcMax != 0)
+            _txt_acMax.text = "/ " + newAcMax.ToString();
     }
 
     public void Change_ApMeter(int newAp)

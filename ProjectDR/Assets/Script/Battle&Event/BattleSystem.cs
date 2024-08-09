@@ -1049,8 +1049,6 @@ public class BattleSystem : MonoBehaviour
 
         Vector3 dest;
 
-        AudioSys.Play_Sfx(Sfx.Atk);
-
         //공격 상태 돌입 (이 상태에서 행동 히트박스가 충돌했을 때, 공격 체크 코루틴을 호출하는 방식)
         if (isPlayer)
         {
@@ -1096,6 +1094,8 @@ public class BattleSystem : MonoBehaviour
             _e_spr.Set_SpriteMove(dest);                            //적의 공격을 위한 이동
             _e_spr.Set_ActionMoveSet_Atk(_e_act.AtkMS, true);       //공격 무브셋
         }
+
+        AudioSys.Play_Sfx(Sfx.Atk);
     }
 
     public IEnumerator Wait(bool isPlayer)  //대기
@@ -1174,9 +1174,7 @@ public class BattleSystem : MonoBehaviour
         }
         else    //적이 플레이어에게 공격
         {
-            finalDmg = (_e_total - _playerSys.AC) > 0 ? _e_total - _playerSys.AC : 0;
-
-            _playerSys.TakeDamage(finalDmg, _e_act.DmgType); //플레이어의 방어도를 반영한 피해를 줌
+            _playerSys.TakeDamage(_e_total, _e_act.DmgType); //플레이어의 방어도를 반영한 피해를 줌
             _p_spr.Set_CommonMoveSet(SpriteSystem.CommonTrigger.Dmg);   //피격 애니메이션
             AudioSys.Play_Sfx(Sfx.Dmg);
 
@@ -1208,9 +1206,7 @@ public class BattleSystem : MonoBehaviour
 
         if (fromEnemy)  //적의 공격을 플레이어가 방어
         {
-            finalDmg = (_e_total - _p_total) > 0 ? _e_total - _p_total : 0;
-
-            _playerSys.TakeDamage(finalDmg, BtlActData.DamageType.Defense); //플레이어의 방어 총합과 방어도를 반영한 피해를 줌
+            _playerSys.TakeDamage(_e_total, BtlActData.DamageType.Defense); //플레이어의 방어 총합과 방어도를 반영한 피해를 줌
             AudioSys.Play_Sfx(Sfx.Def);
 
             //플레이어 살짝 밀림
@@ -1272,9 +1268,7 @@ public class BattleSystem : MonoBehaviour
             }
             else    //회피에 실패한 경우
             {
-                var finalDmg = (_e_total - _playerSys.AC) > 0 ? _e_total - _playerSys.AC : 0;
-
-                _playerSys.TakeDamage(finalDmg, _e_act.DmgType); //플레이어의 방어도를 반영한 피해를 줌
+                _playerSys.TakeDamage(_e_total, _e_act.DmgType); //플레이어의 방어도를 반영한 피해를 줌
                 _p_spr.Set_CommonMoveSet(SpriteSystem.CommonTrigger.Dmg);
                 AudioSys.Play_Sfx(Sfx.Dmg);
 
@@ -1285,10 +1279,9 @@ public class BattleSystem : MonoBehaviour
                 var dest = new Vector3(pos.x - 1f, pos.y, pos.z);
                 _p_spr.Set_SpriteMove(dest);
 
-                if (finalDmg > 0)   //적이 공격으로 피해를 주었는지 처리
-                    _e_makeDmg = true;
+                _e_makeDmg = true;  //적이 공격으로 피해를 주었는지 처리
 
-                log = _btlLog.Log_Dge(fromEnemy, false, finalDmg); //플레이어 회피 실패 로그 추가
+                log = _btlLog.Log_Dge(fromEnemy, false, _e_total); //플레이어 회피 실패 로그 추가
                 Refresh_Log();
                 _btlLog.SetLog_BattleFlow(log); //로그 출력
             }

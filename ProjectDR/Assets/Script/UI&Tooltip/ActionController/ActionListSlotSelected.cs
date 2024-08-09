@@ -36,8 +36,10 @@ public class ActionListSlotSelected : MonoBehaviour, IActionListSlot
         if (isNoDice)
         {
             _txt_actStat.gameObject.SetActive(false);
-            _txt_useAp.gameObject.SetActive(true);
-            _txt_useAp.text = useAp.ToString();
+            _txt_useAp.gameObject.SetActive(useAp > 0);
+
+            if (useAp > 0)
+                _txt_useAp.text = useAp.ToString();
         }
         else
         {

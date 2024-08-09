@@ -209,6 +209,7 @@ public class ItemSystem : MonoBehaviour
     //create 무기
     public void Create_Weapon(ItemData data, ItemSlotType slot, int index)
     {
+        /*
         //스탯1
         var stat1 = ICreature.Stats.No; //무기 스탯1
         var stat1_value = 0;            //  일반 스탯: 정수 변수
@@ -217,6 +218,7 @@ public class ItemSystem : MonoBehaviour
         var stat2 = ICreature.Stats.No; //무기 스탯2
         var stat2_value = 0;            //  일반 스탯: 정수 변수
         int[] stat2_arr = { };          //  행동 스탯: 정수 배열
+        */
         //행동1
         BtlActData btlAct1 = null;
         ICreature.Stats btlAct1_stat = ICreature.Stats.No;  //행동1 스탯
@@ -247,11 +249,13 @@ public class ItemSystem : MonoBehaviour
         btlAct1 = data.Action.NormalAtk_Arr[Random.Range(0, data.Action.NormalAtk_Arr.Length)];
         btlAct1_stat = btlAct1.Stats_Arr[Random.Range(0, btlAct1.Stats_Arr.Length)];
         cost -= _needCost_btlAct;
+        /*
         //   그 행동의 보정스탯을 스탯1로 추가. 코스트 소모 
         stat1 = btlAct1_stat;
         stat1_arr = new int[] { 0, 0, 0, 0, 0, 0 };
         cost_stat1 = _needCost_stat;
         cost -= cost_stat1;
+        */
 
         //3. 보유한 코스트를 소모해서, 현재 무기에 생성될 스탯, 행동, 능력에 코스트를 부여함.
         List<ItemOptionType> option_list = new List<ItemOptionType>()
@@ -271,6 +275,7 @@ public class ItemSystem : MonoBehaviour
 
             switch (option)
             {
+                /*
                 case ItemOptionType.Stat:   //스탯
                     if (stat2 == ICreature.Stats.No)    //스탯2가 없는 경우
                     {
@@ -303,6 +308,7 @@ public class ItemSystem : MonoBehaviour
                             cost_stat2 += use_cost;
                     }
                     break;
+                */
                 case ItemOptionType.Action:
                     if (btlAct2 == null)    //행동2가 없는 경우
                     {
@@ -323,6 +329,7 @@ public class ItemSystem : MonoBehaviour
         }
 
         //4) 모든 코스트를 소모한 뒤, 각 옵션의 세부정보를 부여받은 코스트에 따라 설정
+        /*
         if (stat1 != ICreature.Stats.No)
         {
             if (cost_stat1 > 0) //스탯 1 코스트가 1 이상이면
@@ -351,7 +358,7 @@ public class ItemSystem : MonoBehaviour
                 stat1_arr = new int[] { };
             }
         }
-
+        
         if (stat2 != ICreature.Stats.No)
         {
             if (cost_stat2 > 0) //스탯 2 코스트가 1 이상이면
@@ -383,7 +390,7 @@ public class ItemSystem : MonoBehaviour
                 stat2_arr = new int[] { };
             }
         }
-
+        */
         if (cost_btlAct2 >= _needCost_btlAct)   //행동2 생성에 필요한 만큼 코스트가 있으면
         {
             //이 무기가 보유 중인 행동 타입 리스트 생성
@@ -496,6 +503,7 @@ public class ItemSystem : MonoBehaviour
         {
             //아이템 데이터
             Data = data,
+            /*
             //스탯1 & 스탯1 수치
             Stat1 = stat1,
             Stat1_Value = stat1_value,
@@ -504,6 +512,7 @@ public class ItemSystem : MonoBehaviour
             Stat2 = stat2,
             Stat2_Value = stat2_value,
             Stat2_Arr = stat2_arr.ToArray(),
+            */
             //행동1
             BtlAct1 = new ICreature.BtlActClass()
             {
@@ -1416,7 +1425,7 @@ public class ItemSystem : MonoBehaviour
                     PlayerSys.Change_HpMax(plus, stat_value);
                     break;
                 case ICreature.Stats.AC:
-                    PlayerSys.Change_AC(plus, stat_value);
+                    PlayerSys.Change_ACMax(plus, stat_value);
                     break;
                 default:
                     PlayerSys.Change_Reroll(plus, stat, stat_value);

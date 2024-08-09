@@ -26,6 +26,8 @@ public class StatusScreen : MonoBehaviour, IPointerClickHandler
     private TextMeshProUGUI _txt_apMax; //최대 행동력
     [SerializeField]
     private TextMeshProUGUI _txt_ac;    //방어도
+    [SerializeField]
+    private TextMeshProUGUI _txt_acMax; //최대 방어도
 
     [Header("# Stat")]
     [SerializeField]
@@ -91,6 +93,8 @@ public class StatusScreen : MonoBehaviour, IPointerClickHandler
     public void Change_AC(int ac)
         => _txt_ac.text = ac.ToString();
 
+    public void Change_ACMax(int acMax)
+        => _txt_acMax.text = acMax.ToString();
     public void Change_Reroll(ICreature.Stats stat, int value)
     {
         switch (stat)

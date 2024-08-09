@@ -35,6 +35,8 @@ public class EnemySystem : MonoBehaviour, ICreature
     [SerializeField]
     private TextMeshProUGUI _txt_ac;        //적 방어도 UI 텍스트
     [SerializeField]
+    private TextMeshProUGUI _txt_acMax;     //적 최대 방어도 UI 텍스트
+    [SerializeField]
     private Transform[] _meter_ap;          //행동력 미터(아이콘들)
 
     [Header("# Data Info")]
@@ -65,6 +67,12 @@ public class EnemySystem : MonoBehaviour, ICreature
     public int AC
     {
         get { return _ac; }
+    }
+    [SerializeField]
+    private int _acMax;     //최대 방어도
+    public int AC_MAX
+    {
+        get { return _acMax; }
     }
     [SerializeField]
     private int _ap;        //행동력
@@ -191,6 +199,7 @@ public class EnemySystem : MonoBehaviour, ICreature
             _hp = 0;
             _hpMax = 0;
             _ac = 0;
+            _acMax = 0;
             _ap = 0;
             _apMax = 0;
 
@@ -208,7 +217,8 @@ public class EnemySystem : MonoBehaviour, ICreature
         _hpMax = hpMax;
         _hp = _hpMax;
         //방어도
-        _ac = _data.AC;
+        _acMax = _data.AC;
+        _ac = _acMax;
         //행동력
         _apMax = _data.ApMax;
         _ap = Random.Range(1, _apMax + 1);
@@ -239,6 +249,7 @@ public class EnemySystem : MonoBehaviour, ICreature
         _hpMask.fillAmount = _hp / (float)_hpMax;
         _hpMeter.fillAmount = _hp / (float)_hpMax;
         Change_AC(true, 0);
+        Change_ACMax(true, 0);
         Change_ApMax(true, 0);
         Change_Ap(true, 0);
 
@@ -355,10 +366,27 @@ public class EnemySystem : MonoBehaviour, ICreature
         else
             _ac -= value;
 
-        _icon_ac.SetActive(_ac != 0);
+        //_icon_ac.SetActive(_ac != 0);
 
-        if (_ac != 0)
+        //if (_ac != 0)
             _txt_ac.text = _ac.ToString();
+    }
+
+    public void Change_ACMax(bool plus, int value)
+    {
+        //값만큼 증가
+        if (plus)
+            _acMax += value;
+        else
+            _acMax -= value;
+
+        if (_ac >= _acMax)      //최대 HP가 현재 HP보다 낮아졌을 경우
+            _ac = _acMax;       //낮아진 최대 HP만큼 현재 HP를 설정
+
+        //변경된 값만큼 수치 변경
+        _icon_ac.SetActive(_acMax != 0);
+        if (_acMax != 0)
+            _txt_acMax.text = "/ " + _acMax.ToString();
     }
 
     public void Change_Ap(bool plus, int value)
@@ -383,19 +411,7 @@ public class EnemySystem : MonoBehaviour, ICreature
             }
         }
 
-        /*
-        if (old_ap == 0)    //행동력이 0이었다가
-        {
-            if (_ap > 0)    //0이 아니게 되면, 방어도 회복
-                Change_AC(true, 5);
-        }
-        else if (_ap == 0)  //행동력이 0이 아니었다가 0이 되면, 방어도 감소
-        {
-            Change_AC(false, 5);
-        }
-        */
-
-        //AP바 갱신
+        //행동력 미터 갱신
         for (int i = 0; i < _meter_ap.Length; i++)
         {
             if (_meter_ap[i].gameObject.activeSelf)
@@ -422,14 +438,32 @@ public class EnemySystem : MonoBehaviour, ICreature
 
     public void TakeDamage(int dmg, BtlActData.DamageType dmgType)
     {
-        Change_Hp(false, dmg);
+        if (_ac >= 1)    //방어도가 1 이상 존재할 때
+        {
+            int realDmg;    //실제 피해량
+
+            if (dmg > _ac)  //피해량이 방어도보다 높을 때
+            {
+                realDmg = dmg - _ac;    //실제 피해량은 방어도를 제외한 나머지 수치
+
+                Change_AC(false, _ac);  //방어도를 모두 없앰
+
+                Change_Hp(false, realDmg);  //실제 피해량만큼 hp 줄어듬
+            }
+            else            //피해량이 방어도 이하일 때
+            {
+                //실제 피해량은 0 (방어도로 모든 피해를 경감)
+
+                Change_AC(false, dmg);  //피해량만큼 방어도를 차감
+            }
+        }
+        else    //방어도가 없을 때
+            Change_Hp(false, dmg);
 
         ParticleSystem eff;
 
         if (dmgType == BtlActData.DamageType.Defense)
-        {
-            eff = Instantiate(_eff_block, _eff_group);
-        }
+            eff = Instantiate(_eff_block, _eff_group);  //방어 이펙트 파티클
         else
         {
             eff = Instantiate(_eff_blood, _eff_group);

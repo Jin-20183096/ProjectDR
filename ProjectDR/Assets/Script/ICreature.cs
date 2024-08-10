@@ -23,5 +23,6 @@ public interface ICreature
     {
         public BtlActData Data; //행동 데이터
         public Stats Stat;      //행동의 스탯
+        public int Upgrade;     //행동 강화 수치
     }
 }

@@ -227,7 +227,11 @@ public class ItemTooltip : MonoBehaviour
         {
             _act1.SetActive(true);
             _act1_typeIcon.sprite = _spr_typeIcon[(int)data.Type];
-            _act1_name.text = data.Name;
+
+            string upgradeStr = "";
+            if (btlAct.Upgrade > 0) upgradeStr = " +" + btlAct.Upgrade;
+
+            _act1_name.text = data.Name + upgradeStr;
             _act1_stat.text = _statName_arr[(int)btlAct.Stat];
         }
     }
@@ -235,7 +239,7 @@ public class ItemTooltip : MonoBehaviour
     public void Change_Action2(ICreature.BtlActClass btlAct)
     {
         var data = btlAct.Data;
-
+        
         if (data == null)
         {
             if (_act2 != null)
@@ -245,7 +249,11 @@ public class ItemTooltip : MonoBehaviour
         {
             _act2.SetActive(true);
             _act2_typeIcon.sprite = _spr_typeIcon[(int)data.Type];
-            _act2_name.text = data.Name;
+
+            string upgradeStr = "";
+            if (btlAct.Upgrade > 0) upgradeStr = " +" + btlAct.Upgrade;
+
+            _act2_name.text = data.Name + upgradeStr;
             _act2_stat.text = _statName_arr[(int)btlAct.Stat];
         }
     }

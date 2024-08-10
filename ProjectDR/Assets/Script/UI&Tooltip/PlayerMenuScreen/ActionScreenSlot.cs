@@ -31,10 +31,14 @@ public class ActionScreenSlot : MonoBehaviour, IPointerEnterHandler, IPointerExi
         _img = GetComponent<Image>();
     }
 
-    public void Set_ActionSlotContent(Sprite spr, string actName, string actStat)
+    public void Set_ActionSlotContent(Sprite spr, string actName, int upgrade, string actStat)
     {
         _icon_actType.sprite = spr;
-        _txt_actName.text = actName;
+
+        string upgradeStr = "";
+        if (upgrade > 0) upgradeStr = " +" + upgrade;
+
+        _txt_actName.text = actName + upgradeStr;
         _txt_actStat.text = actStat;
     }
 

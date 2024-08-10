@@ -33,6 +33,7 @@ public class ActionScreen : MonoBehaviour, IPointerClickHandler
 
                 _btlActSlot[i].Set_ActionSlotContent(_spr_actType[(int)list[i].Data.Type],
                                                     list[i].Data.Name,
+                                                    list[i].Upgrade,
                                                     _statName_arr[(int)list[i].Stat]);
             }
             else

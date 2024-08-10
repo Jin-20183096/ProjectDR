@@ -100,7 +100,7 @@ public class PlayerInfoPannel : MonoBehaviour
         _icon_ac.SetActive(newAcMax != 0);
 
         if (newAcMax != 0)
-            _txt_acMax.text = "/ " + newAcMax.ToString();
+            _txt_acMax.text = newAcMax.ToString();
     }
 
     public void Change_ApMeter(int newAp)

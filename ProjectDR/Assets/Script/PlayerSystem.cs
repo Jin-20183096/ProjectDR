@@ -432,8 +432,11 @@ public class PlayerSystem : MonoBehaviour, ICreature
         else
             _acMax -= value;
 
+        /*
         if (_ac >= _acMax)      //최대 HP가 현재 HP보다 낮아졌을 경우
             _ac = _acMax;       //낮아진 최대 HP만큼 현재 HP를 설정
+        */
+        _ac = _acMax;
 
         //변경된 값만큼 수치 변경
         _infoPannel.Change_Ac(_ac);

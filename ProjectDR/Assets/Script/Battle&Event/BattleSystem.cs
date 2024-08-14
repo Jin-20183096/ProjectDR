@@ -601,6 +601,8 @@ public class BattleSystem : MonoBehaviour
                 _btlLog.SetLog_BattleEnd(true);     //적 사망 로그
 
                 StartCoroutine(Enemy_Reward(enemy));
+
+                _playerSys.Change_ACMax(true, 0);   //방어도 완전 복구
             }
             else    //플레이어 사망 시
             {
@@ -611,12 +613,6 @@ public class BattleSystem : MonoBehaviour
         }
         else    //전투가 끝나지 않은 경우
         {
-            //추가 턴 관련 처리
-            if (_p_extraTurn)   //플레이어 추가 턴이 있을 때
-            {
-                
-            }
-
             //적 다음 행동 요청
             _enemySys.Request_NextAction();
             //플레이어 행동목록 재출력

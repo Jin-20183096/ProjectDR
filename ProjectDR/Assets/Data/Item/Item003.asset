@@ -31,3 +31,7 @@ MonoBehaviour:
     Material: 0
   Clip_Idle: {fileID: 7400000, guid: ae300c940b5fd8845b677c4b1c09cc99, type: 2}
   Clip_Atk1: []
+  Clip_Atk2:
+  - {fileID: 7400000, guid: 9f7926fae7f31134b930c502449e48a1, type: 2}
+  - {fileID: 7400000, guid: 3e4884b35dc575340964819cc04be8bd, type: 2}
+  Clip_Atk3: []

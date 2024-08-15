@@ -15,7 +15,7 @@ public class EnemySystem : MonoBehaviour, ICreature
 
     [Header("# Enemy Sprite")]
     [SerializeField]
-    private SpriteRenderer _e_spr;
+    private SpriteSystem _e_spr;
     [SerializeField]
     private Animator _e_anima;
 
@@ -472,8 +472,8 @@ public class EnemySystem : MonoBehaviour, ICreature
             var burst1 = eff.emission.GetBurst(0);
             var burst2 = eff.emission.GetBurst(1);
 
-            burst1.count = dmg;
-            burst2.count = dmg;
+            burst1.count = 20 * dmg / _hpMax;
+            burst2.count = 20 * dmg / _hpMax;
             eff.emission.SetBurst(0, burst1);
             eff.emission.SetBurst(1, burst2);
         }
@@ -485,6 +485,9 @@ public class EnemySystem : MonoBehaviour, ICreature
         eff.Play();
 
         //데미지 타입에 따른 피격음
+
+        //피격 효과
+        _e_spr.StartCoroutine(_e_spr.HitFlash());
     }
 
     public void Request_NextAction()    //전투 시스템에서 다음 턴 행동을 요청

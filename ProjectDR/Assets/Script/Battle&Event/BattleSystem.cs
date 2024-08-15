@@ -1062,9 +1062,9 @@ public class BattleSystem : MonoBehaviour
             }
 
             var pos = _e_spr.transform.position;
-            dest = new Vector3(pos.x - _e_sprRend.bounds.size.x, pos.y, pos.z);
+            dest = new Vector3(pos.x - _e_sprRend.bounds.size.x * 3/2, pos.y, pos.z);
 
-            _p_spr.ActHitBoxOn();   //<<<<<<<<<<<<<<추후에 모든 공격 행동의 모션이 완성되면 주석처리해야할 코드>>>>>>>>>>>>>>
+            _p_spr.ActHitBoxOn();   //<<<<<<<<<<<<<<추후 모든 공격 행동의 모션이 완성되면 주석처리해야할 코드>>>>>>>>>>>>>>
             _p_spr.Set_ActHitBox(HitBoxCollider.HitBoxType.Atk);    //플레이어 행동 히트박스: 공격
             _p_spr.Set_SpriteMove(dest);                            //플레이어의 공격을 위한 이동
             _p_spr.Set_ActionMoveSet_Atk(_p_act.AtkMS, true);       //공격 무브셋
@@ -1083,7 +1083,7 @@ public class BattleSystem : MonoBehaviour
                 _enemySys.Change_Ap(false, _e_nowDice);
 
             var pos = _p_spr.transform.position;
-            dest = new Vector3(pos.x + _p_sprRend.bounds.size.x, pos.y, pos.z);
+            dest = new Vector3(pos.x + _p_sprRend.bounds.size.x * 3/2, pos.y, pos.z);
 
             _e_spr.ActHitBoxOn();
             _e_spr.Set_ActHitBox(HitBoxCollider.HitBoxType.Atk);    //적 행동 히트박스: 공격
@@ -1152,9 +1152,9 @@ public class BattleSystem : MonoBehaviour
 
         if (toEnemy)    //플레이어가 적에게 공격
         {
-            finalDmg = (_p_total - _enemySys.AC) > 0 ? _p_total - _enemySys.AC : 0;
+            finalDmg = _p_total;
 
-            _enemySys.TakeDamage(finalDmg, _p_act.DmgType); //적의 방어도를 반영한 피해를 줌
+            _enemySys.TakeDamage(finalDmg, _p_act.DmgType); //공격 피해를 줌
             _e_spr.Set_CommonMoveSet(SpriteSystem.CommonTrigger.Dmg);   //피격 애니메이션
             AudioSys.Play_Sfx(Sfx.Dmg);
 
@@ -1165,12 +1165,14 @@ public class BattleSystem : MonoBehaviour
 
             _p_hitAtk = true;   //플레이어의 공격 명중 처리
 
-            if (finalDmg > 0)   //플레이어가 공격으로 피해를 주었는지 처리
+            if (_p_total > 0)   //플레이어가 공격으로 피해를 주었는지 처리
                 _p_makeDmg = true;
         }
         else    //적이 플레이어에게 공격
         {
-            _playerSys.TakeDamage(_e_total, _e_act.DmgType); //플레이어의 방어도를 반영한 피해를 줌
+            finalDmg = _e_total;
+
+            _playerSys.TakeDamage(finalDmg, _e_act.DmgType); //공격 피해를 줌
             _p_spr.Set_CommonMoveSet(SpriteSystem.CommonTrigger.Dmg);   //피격 애니메이션
             AudioSys.Play_Sfx(Sfx.Dmg);
 
@@ -1181,11 +1183,12 @@ public class BattleSystem : MonoBehaviour
 
             _e_hitAtk = true;   //적의 공격 명중 처리
 
-            if (finalDmg > 0)   //적이 공격으로 피해를 주었는지 처리
+            if (_e_total > 0)   //적이 공격으로 피해를 주었는지 처리
                 _e_makeDmg = true;
         }
 
         log += _btlLog.Log_AtkDmg(toEnemy, finalDmg);   //공격 로그 추가
+
         Refresh_Log();
         _btlLog.SetLog_BattleFlow(log); //로그 출력
 
@@ -1202,7 +1205,9 @@ public class BattleSystem : MonoBehaviour
 
         if (fromEnemy)  //적의 공격을 플레이어가 방어
         {
-            _playerSys.TakeDamage(_e_total, BtlActData.DamageType.Defense); //플레이어의 방어 총합과 방어도를 반영한 피해를 줌
+            finalDmg = (_e_total - _p_total) > 0 ? _e_total - _p_total : 0;
+
+            _playerSys.TakeDamage(finalDmg, BtlActData.DamageType.Defense); //플레이어의 방어 총합과 방어도를 반영한 피해를 줌
             AudioSys.Play_Sfx(Sfx.Def);
 
             //플레이어 살짝 밀림
@@ -1235,7 +1240,8 @@ public class BattleSystem : MonoBehaviour
                 _p_makeDmg = true;
         }
 
-        log = _btlLog.Log_Def(fromEnemy, finalDmg);   //방어 로그 추가
+        log = _btlLog.Log_Def(fromEnemy, finalDmg);   //방어 로그 추가 
+
         Refresh_Log();
         _btlLog.SetLog_BattleFlow(log); //로그 출력
         yield return new WaitUntil(() => _battleProcess == false);  //로그 출력이 끝날때까지 대기

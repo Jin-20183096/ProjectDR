@@ -7358,7 +7358,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &118923303
 Transform:
   m_ObjectHideFlags: 0
@@ -7368,7 +7368,7 @@ Transform:
   m_GameObject: {fileID: 118923302}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.75, y: 0.5, z: 0}
+  m_LocalPosition: {x: -1, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7434,7 +7434,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 0.2}
+  m_Size: {x: 2, y: 1, z: 0.2}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &122701384
 GameObject:
@@ -38496,6 +38496,8 @@ MonoBehaviour:
   - {fileID: 1589722326}
   - {fileID: 1826928380}
   - {fileID: 1789833074}
+  _defaultMat: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  _hitMat: {fileID: 2100000, guid: 4d597700f6e78cb43a59144e29b9724e, type: 2}
 --- !u!4 &603999842
 Transform:
   m_ObjectHideFlags: 0
@@ -38558,7 +38560,7 @@ SpriteRenderer:
   m_SortingLayerID: 1853274467
   m_SortingLayer: 5
   m_SortingOrder: 0
-  m_Sprite: {fileID: -565597640, guid: 9481f7268691e824c8c7acbbcae8b5d5, type: 3}
+  m_Sprite: {fileID: 1961880178, guid: 98ddb91770248194ea73d367ce995326, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -39721,6 +39723,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _aoc: {fileID: 22100000, guid: 1ee5d214bd2807845b6ce5dc8d3d0d1d, type: 2}
+  _defaultMat: {fileID: 0}
+  _hitMat: {fileID: 0}
 --- !u!1 &625376452
 GameObject:
   m_ObjectHideFlags: 0
@@ -48553,7 +48557,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _btlSys: {fileID: 885702282}
-  _e_spr: {fileID: 1996183754}
+  _e_spr: {fileID: 1996183752}
   _e_anima: {fileID: 1996183753}
   _pannel_info: {fileID: 699263133}
   _txt_name: {fileID: 1777259926}
@@ -64724,6 +64728,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _aoc: {fileID: 22100000, guid: a77e670ee1e79404184c8852cbc8b751, type: 2}
+  _defaultMat: {fileID: 0}
+  _hitMat: {fileID: 0}
 --- !u!1 &1015823840
 GameObject:
   m_ObjectHideFlags: 0
@@ -98780,7 +98786,7 @@ Transform:
   m_GameObject: {fileID: 1589722322}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.09375, y: 0.28125, z: 0}
+  m_LocalPosition: {x: 0.015625, y: 0.4375, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -98848,15 +98854,15 @@ SpriteRenderer:
   m_SortingLayerID: 1853274467
   m_SortingLayer: 5
   m_SortingOrder: 13
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 1979950763, guid: 74d5f010d45498f4eb33439a03b7425f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.125, y: 0.53125}
+  m_Size: {x: 0.59375, y: 0.46875}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &1589722326
@@ -98872,6 +98878,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _aoc: {fileID: 22100000, guid: 5cd982901b252a84fa82b33de8d927a5, type: 2}
+  _defaultMat: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  _hitMat: {fileID: 2100000, guid: 4d597700f6e78cb43a59144e29b9724e, type: 2}
 --- !u!1 &1592313301
 GameObject:
   m_ObjectHideFlags: 0
@@ -102809,7 +102817,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 0.2}
+  m_Size: {x: 2, y: 1, z: 0.2}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!4 &1649184783
 Transform:
@@ -102820,7 +102828,7 @@ Transform:
   m_GameObject: {fileID: 1649184779}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.75, y: 0.5, z: 0}
+  m_LocalPosition: {x: 1, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -103777,7 +103785,7 @@ MonoBehaviour:
   - {fileID: -2132877528, guid: 02e2a29f7269ce54a9aecb2a5d1aa909, type: 3}
   - {fileID: -2132877528, guid: 02e2a29f7269ce54a9aecb2a5d1aa909, type: 3}
   _test_item:
-  - {fileID: 11400000, guid: d2013e6a2ede28b4ba893c7f97672068, type: 2}
+  - {fileID: 11400000, guid: d6fd4800cbe7e434dbe95a3c9b9cf66c, type: 2}
   - {fileID: 11400000, guid: ac5edffaf80644645ba48f2a5a6c0a41, type: 2}
   - {fileID: 11400000, guid: 54900e305e1766645be589cbf49c37e0, type: 2}
   - {fileID: 11400000, guid: d70470c69ad518b44a03dd669b40dbf5, type: 2}
@@ -107169,6 +107177,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _aoc: {fileID: 22100000, guid: 9360a1a1b4caf4e4697dae367144957c, type: 2}
+  _defaultMat: {fileID: 0}
+  _hitMat: {fileID: 0}
 --- !u!1 &1726153625
 GameObject:
   m_ObjectHideFlags: 0
@@ -111072,6 +111082,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _aoc: {fileID: 22100000, guid: 4ffb8cd9af909d043876c8e55fb39552, type: 2}
+  _defaultMat: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  _hitMat: {fileID: 2100000, guid: 4d597700f6e78cb43a59144e29b9724e, type: 2}
 --- !u!1 &1791060323
 GameObject:
   m_ObjectHideFlags: 0
@@ -114032,6 +114044,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _aoc: {fileID: 22100000, guid: a77e670ee1e79404184c8852cbc8b751, type: 2}
+  _defaultMat: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  _hitMat: {fileID: 2100000, guid: 4d597700f6e78cb43a59144e29b9724e, type: 2}
 --- !u!1 &1827272012
 GameObject:
   m_ObjectHideFlags: 0
@@ -114285,7 +114299,7 @@ Transform:
   m_GameObject: {fileID: 1830446669}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.6875, y: 0.28125, z: 0}
+  m_LocalPosition: {x: 0.9375, y: -0.125, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -114353,12 +114367,12 @@ SpriteRenderer:
   m_SortingLayerID: 1853274467
   m_SortingLayer: 5
   m_SortingOrder: 14
-  m_Sprite: {fileID: 21300000, guid: 2b7816e0b9e8e5c488ca612e587300e3, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 634522912e67b78448c2ec65dbe20a06, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.46875, y: 0.5625}
+  m_Size: {x: 0.40625, y: 0.40625}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -114377,6 +114391,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _aoc: {fileID: 22100000, guid: 9360a1a1b4caf4e4697dae367144957c, type: 2}
+  _defaultMat: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  _hitMat: {fileID: 2100000, guid: 4d597700f6e78cb43a59144e29b9724e, type: 2}
 --- !u!1 &1836488243
 GameObject:
   m_ObjectHideFlags: 0
@@ -119551,6 +119567,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _aoc: {fileID: 22100000, guid: 1ee5d214bd2807845b6ce5dc8d3d0d1d, type: 2}
+  _defaultMat: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  _hitMat: {fileID: 2100000, guid: 4d597700f6e78cb43a59144e29b9724e, type: 2}
 --- !u!1 &1920949819
 GameObject:
   m_ObjectHideFlags: 0
@@ -122146,6 +122164,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _aoc: {fileID: 22100000, guid: 4ffb8cd9af909d043876c8e55fb39552, type: 2}
+  _defaultMat: {fileID: 0}
+  _hitMat: {fileID: 0}
 --- !u!1 &1961426216
 GameObject:
   m_ObjectHideFlags: 0
@@ -124610,7 +124630,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1996183749
 Transform:
   m_ObjectHideFlags: 0
@@ -124692,6 +124712,8 @@ MonoBehaviour:
   _def_or_dge: 0
   _actHitBox: {fileID: 118923305}
   _equipSpr: []
+  _defaultMat: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  _hitMat: {fileID: 2100000, guid: 4d597700f6e78cb43a59144e29b9724e, type: 2}
 --- !u!95 &1996183753
 Animator:
   serializedVersion: 5
@@ -127156,6 +127178,8 @@ MonoBehaviour:
   - {fileID: 2083027790}
   - {fileID: 1010406671}
   - {fileID: 1961285625}
+  _defaultMat: {fileID: 0}
+  _hitMat: {fileID: 0}
 --- !u!95 &2044910160
 Animator:
   serializedVersion: 5
@@ -129427,6 +129451,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _aoc: {fileID: 22100000, guid: 5cd982901b252a84fa82b33de8d927a5, type: 2}
+  _defaultMat: {fileID: 0}
+  _hitMat: {fileID: 0}
 --- !u!1 &2084937211
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class EquipSprite : MonoBehaviour
@@ -9,6 +10,11 @@ public class EquipSprite : MonoBehaviour
 
     [SerializeField]
     private AnimatorOverrideController _aoc;
+
+    [SerializeField]
+    private Material _defaultMat;
+    [SerializeField]
+    private Material _hitMat;
 
     void Awake()
     {
@@ -74,4 +80,11 @@ public class EquipSprite : MonoBehaviour
 
     public void Set_AnimaBool(string trigger, bool isTrue)
         => _anima.SetBool(trigger, isTrue);
+
+    public IEnumerator HitFlash()
+    {
+        _spr.material = _hitMat;
+        yield return new WaitForSecondsRealtime(0.125f);
+        _spr.material = _defaultMat;
+    }
 }

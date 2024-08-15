@@ -198,10 +198,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
     private SpriteSystem _p_spr;
     [SerializeField]
     private SpriteSystem _p_spr_btl;
-    public SpriteSystem P_SPRITE
-    {
-        get { return _p_spr; }
-    }
+
     private SortingGroup _sorting;
 
     [Header("# Effect")]
@@ -581,8 +578,8 @@ public class PlayerSystem : MonoBehaviour, ICreature
             var burst1 = eff.emission.GetBurst(0);
             var burst2 = eff.emission.GetBurst(1);
 
-            burst1.count = dmg;
-            burst2.count = dmg;
+            burst1.count = 20 * dmg / _hpMax;
+            burst2.count = 20 * dmg / _hpMax;
             eff.emission.SetBurst(0, burst1);
             eff.emission.SetBurst(1, burst2);
         }
@@ -594,6 +591,9 @@ public class PlayerSystem : MonoBehaviour, ICreature
         eff.Play();
 
         //데미지 타입에 따른 피격음
+
+        //피격 효과
+        _p_spr_btl.StartCoroutine(_p_spr_btl.HitFlash());
     }
 
     public void Change_Reroll(bool plus, Stats stat, int value)

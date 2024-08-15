@@ -35,6 +35,12 @@ public class SpriteSystem : MonoBehaviour
     private EquipSprite[] _equipSpr;
     private bool[] _isSomeEquip = new bool[5];
 
+    [Header("# Material")]
+    [SerializeField]
+    private Material _defaultMat;
+    [SerializeField]
+    private Material _hitMat;
+
     private string _actTrigger;
 
     void Awake()
@@ -61,7 +67,7 @@ public class SpriteSystem : MonoBehaviour
     public void Set_CommonMoveSet(CommonTrigger trigger)
     {
         _anima.SetTrigger(trigger.ToString());
-
+        
         for (int i = 0; i < _equipSpr.Length; i++)
         {
             _equipSpr[i].Renderer_OnOff(_isSomeEquip[i]);
@@ -216,7 +222,9 @@ public class SpriteSystem : MonoBehaviour
                 _btlSys.StartCoroutine(_btlSys.AtkDge(_hitBoxHost == HitBoxHost.Player));  //공격을 회피하는 코루틴
         }
         else
-            _btlSys.StartCoroutine(_btlSys.AtkHit(_hitBoxHost == HitBoxHost.Enemy));       //공격을 받는 코루틴  
+        {
+            _btlSys.StartCoroutine(_btlSys.AtkHit(_hitBoxHost == HitBoxHost.Enemy));       //공격을 받는 코루틴
+        }
 
         hitBox.HitBoxOff();
     }
@@ -229,5 +237,16 @@ public class SpriteSystem : MonoBehaviour
         _isSomeEquip[(int)type] = (data != null);
 
         _equipSpr[(int)type].Renderer_OnOff(data != null);
+    }
+
+    public IEnumerator HitFlash()
+    {
+        _spr.material = _hitMat;
+
+        for (int i = 0; i < _equipSpr.Length; i++)
+            _equipSpr[i].StartCoroutine(_equipSpr[i].HitFlash());
+
+        yield return new WaitForSecondsRealtime(0.125f);
+        _spr.material = _defaultMat;
     }
 }

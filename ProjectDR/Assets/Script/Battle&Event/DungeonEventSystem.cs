@@ -12,12 +12,14 @@ public class DungeonEventSystem : MonoBehaviour
 {
     public static DungeonEventSystem EvntSys = null;
 
-    public enum DiceCheckResult { Success, MinFail, MaxFail }
+    public enum DiceCheckResult { Success, Fail }
 
-    // 수준에 따른 평균적인 주사위 1개의 값:  1~4 / 3~7 / 5~10
-    private int[] AvgDice_first = new int[] { 1, 3 };
-    private int[] AvgDice_Mid = new int[] { 4, 6 };
-    private int[] AvgDice_Last = new int[] { 7, 10 };
+    // 스탯(행운 제외) 수준에 따른 평균적인 성공 조건:  3~5 / 5~8 / 8~12 / 12~20
+    private int[] AvgDice_1 = new int[] { 2, 3 };
+    private int[] AvgDice_2 = new int[] { 3, 5 };
+    private int[] AvgDice_3 = new int[] { 5, 8 };
+    private int[] AvgDice_4 = new int[] { 8, 12 };
+    private int[] AvgDice_5 = new int[] { 12, 20 };
 
     [SerializeField]
     private PlayerSystem _playerSys;
@@ -53,19 +55,19 @@ public class DungeonEventSystem : MonoBehaviour
     private GameObject _btn_eventEnd;      //이벤트 종료 버튼
 
     //주사위 조건 창
+    [SerializeField]
+    private VerticalLayoutGroup _pannel_diceRule;
     //주사위 조건 텍스트
+    //_pannel_diceRule의 0번째 차일드는 "주사위 총합" (total_~)
+    //_pannel_diceRule의 1번째 차일드는 "모든 주사위" (each_~)
     [SerializeField]
-    private HorizontalLayoutGroup _pannel_diceRule;
+    private TextMeshProUGUI _txt_checkValue1;
     [SerializeField]
-    private GameObject[] _layout_diceRule;
+    private TextMeshProUGUI _txt_checkValue2;
     [SerializeField]
-    private TextMeshProUGUI _txt_totalUp_checkMin;
+    private TextMeshProUGUI _txt_ruleText_A;
     [SerializeField]
-    private TextMeshProUGUI[] _txt_totalBetween_checkMinMax;
-    [SerializeField]
-    private TextMeshProUGUI _txt_eachUp_checkMin;
-    [SerializeField]
-    private TextMeshProUGUI[] _txt_eachBetween_checkMinMax;
+    private TextMeshProUGUI _txt_ruleText_B;
 
     [Header("# NowEvent")]
     [SerializeField]
@@ -78,8 +80,8 @@ public class DungeonEventSystem : MonoBehaviour
 
         public CheckRule Rule;  //주사위 체크 규칙
 
-        public int CheckMin; //주사위 체크 행동 시 성공 최소값
-        public int CheckMax; //주사위 체크 행동 시 성공 최대값
+        public int CheckValue1; //주사위 체크 행동 시 조건값1
+        public int CheckValue2; //주사위 체크 행동 시 조건값
     }
 
     [SerializeField]
@@ -171,34 +173,52 @@ public class DungeonEventSystem : MonoBehaviour
         Refresh_Log();  //로그 새로고침
         _evntLog.SetLog_EventStart(_nowEvnt.StartLog);  //시작 로그 출력
 
+        /*
         //이벤트 행동 목록 출력
         _actController.Set_ActListSituation(ActionController.Situation.Event);
+        */
+    }
+
+    public void EvntActList_OnOff(bool b)
+    {
+        if (b)
+            _actController.Set_ActListSituation(ActionController.Situation.Event);
+        else
+            _actController.Set_ActListSituation(ActionController.Situation.No);
     }
 
     void Add_NewEventAction(int index, EventAction act) //행동을 추가하고, 주사위 체크가 있는 행동은 체크 조건과 값도 생성
     {
-        var rule = act.Check.Rule;
-        var checkMin = 0;
-        var checkMax = 0;
+        var rule = CheckRule.No;
+        var checkValue1 = 0;
+        var checkValue2 = 0;
 
         //현재 층에 따라 주사위 평균값을 선정함
-        var avgDice = AvgDice_first;
+        var avgDice = AvgDice_1;
 
         if (act.IsDiceCheck)    //주사위 체크 행동인 경우
         {
+            //행운 체크 행동이면, 
+            if (act.CheckStat == ICreature.Stats.LUC)
+            {
+                //체크 룰과 주사위 개수, 최소 최대값 선정
+            }
+            else if (act.CheckStat != ICreature.Stats.No)   //다른 스탯 체크일 경우
+            {
+                rule = CheckRule.Total_Up;  //체크 룰: 일정 값 이상일 때 성공
+                checkValue1 = Random.Range(avgDice[0], avgDice[1] + 1);
+            }
+
+            /*
             //현재 층과 주사위 개수에 따라 최소값과 최대값 선정
             switch (rule)
             {
                 case CheckRule.Total_Up:
-                    //for (int i = 0; i < dice; i++)
-                        checkMin += Random.Range(avgDice[0], avgDice[1] + 1);
+                    checkMin += Random.Range(avgDice[0], avgDice[1] + 1);
                     break;
                 case CheckRule.Total_Between:
-                    //for (int i = 0; i < dice; i++)
-                        checkMin += Random.Range(avgDice[0], avgDice[1] + 1);
-
-                    //for (int i = 0; i < dice; i++)
-                        checkMax += Random.Range(avgDice[0], avgDice[1] + 1);
+                    checkMin += Random.Range(avgDice[0], avgDice[1] + 1);
+                    checkMax += Random.Range(avgDice[0], avgDice[1] + 1);
 
                     if (checkMin > checkMax)
                     {
@@ -222,6 +242,7 @@ public class DungeonEventSystem : MonoBehaviour
                     }
                     break;
             }
+            */
         }
 
         //이벤트 행동 클래스 생성
@@ -229,8 +250,8 @@ public class DungeonEventSystem : MonoBehaviour
         {
             Data = act,
             Rule = rule,
-            CheckMin = checkMin,
-            CheckMax = checkMax
+            CheckValue1 = checkValue1,
+            CheckValue2 = checkValue2
         };
 
         //생성한 이벤트 행동을 리스트에 추가
@@ -240,8 +261,6 @@ public class DungeonEventSystem : MonoBehaviour
             _nowEvnt_actList.Add(newAct);
     }
 
-    //주사위 조건 텍스트 생성 함수
-
     public DiceCheckResult Check_DiceCondition(int index, int total, int[] result)    //주사위 조건 체크 결과 반환 함수  
     {
         var act = _nowEvnt_actList[index];
@@ -249,42 +268,87 @@ public class DungeonEventSystem : MonoBehaviour
         switch (act.Rule)
         {
             case CheckRule.Total_Up:
-                if (total >= act.CheckMin)
+                if (total >= act.CheckValue1)
                     return DiceCheckResult.Success;
                 else
-                    return DiceCheckResult.MinFail;
+                    return DiceCheckResult.Fail;
+            case CheckRule.Total_Down:
+                if (total <= act.CheckValue1)
+                    return DiceCheckResult.Success;
+                else
+                    return DiceCheckResult.Fail;
             case CheckRule.Total_Between:
-                if (total < act.CheckMin)
-                    return DiceCheckResult.MinFail;
-                else if (total > act.CheckMax)
-                    return DiceCheckResult.MaxFail;
+                if (total < act.CheckValue1 || total > act.CheckValue2)
+                    return DiceCheckResult.Fail;
                 else
                     return DiceCheckResult.Success;
+            case CheckRule.Total_Odd:
+                if (total % 2 == 1)
+                    return DiceCheckResult.Success;
+                else
+                    return DiceCheckResult.Fail;
+            case CheckRule.Total_Even:
+                if (total % 2 == 0)
+                    return DiceCheckResult.Success;
+                else
+                    return DiceCheckResult.Fail;
             case CheckRule.Each_Up:
                 for (int i = 0; i < result.Length; i++)
                 {
                     if (result[i] == -1)
                         break;
-                    else if (result[i] >= act.CheckMin)
+                    else if (result[i] >= act.CheckValue1)
                         continue;
                     else
-                        return DiceCheckResult.MinFail;
+                        return DiceCheckResult.Fail;
                 }
-
+                return DiceCheckResult.Success;
+            case CheckRule.Each_Down:
+                for (int i = 0; i < result.Length; i++)
+                {
+                    if (result[i] == -1)
+                        break;
+                    else if (result[i] >= act.CheckValue1)
+                        continue;
+                    else
+                        return DiceCheckResult.Fail;
+                }
                 return DiceCheckResult.Success;
             case CheckRule.Each_Between:
                 for (int i = 0; i < result.Length; i++)
                 {
                     if (result[i] == -1)
                         break;
-                    else if (result[i] >= act.CheckMin && result[i] <= act.CheckMax)
+                    else if (result[i] >= act.CheckValue1 && result[i] <= act.CheckValue2)
                         continue;
                     else
-                        return DiceCheckResult.MinFail;
+                        return DiceCheckResult.Fail;
+                }
+                return DiceCheckResult.Success;
+            case CheckRule.Each_Odd:
+                for (int i = 0; i < result.Length; i++)
+                {
+                    if (result[i] == -1)
+                        break;
+                    else if (result[i] % 2 == 1)
+                        continue;
+                    else
+                        return DiceCheckResult.Fail;
+                }
+                return DiceCheckResult.Success;
+            case CheckRule.Each_Even:
+                for (int i = 0; i < result.Length; i++)
+                {
+                    if (result[i] == -1)
+                        break;
+                    else if (result[i] % 2 == 0)
+                        continue;
+                    else
+                        return DiceCheckResult.Fail;
                 }
                 return DiceCheckResult.Success;
         }
-        return DiceCheckResult.MinFail;
+        return DiceCheckResult.Fail;
     }
 
     public void DiceCheck_Success()    //주사위 체크 성공
@@ -293,20 +357,14 @@ public class DungeonEventSystem : MonoBehaviour
         _evntLog.SetLog_DiceCheck_Success("");
     }
 
-    public void DiceCheck_MinFail()    //주사위 체크 실패 (값 미달)
+    public void DiceCheck_Fail()    //주사위 체크 실패 (값 미달)
     {
         Refresh_Log();
-        _evntLog.SetLog_DiceCheck_MinFail("");
-    }
-
-    public void DiceCheck_MaxFail()    //주사위 체크 실패 (값 초과)
-    {
-        Refresh_Log();
-        _evntLog.SetLog_DiceCheck_MaxFail("");
+        _evntLog.SetLog_DiceCheck_Fail("");
     }
 
     //이벤트 결과 실행 함수
-    public IEnumerator EventResultFlow(bool isSuccess, bool failMax)
+    public IEnumerator EventResultFlow(bool isSuccess)
     {
         var act = _nowEvnt_actList[_actController.NOW_CURSOR];  //행동의 결과나 주사위 체크 결과에 의해 이벤트 결과 실행
         EventResult result = null;
@@ -315,12 +373,7 @@ public class DungeonEventSystem : MonoBehaviour
         if (isSuccess)  //행동 성공 시
             index = act.Data.Result_Success[Random.Range(0, act.Data.Result_Success.Length)];
         else
-        {
-            if (failMax)
-                index = act.Data.Result_FailMax[Random.Range(0, act.Data.Result_FailMax.Length)];
-            else
-                index = act.Data.Result_Fail[Random.Range(0, act.Data.Result_Fail.Length)];
-        }
+            index = act.Data.Result_Fail[Random.Range(0, act.Data.Result_Fail.Length)];
 
         result = _nowEvnt.Result[index];
 
@@ -382,7 +435,9 @@ public class DungeonEventSystem : MonoBehaviour
                     _playerSys.MenuButton_OnOff_Inventory(true);
                     _playerSys.MenuButton_OnOff_ActList(true);
 
-                    _actController.Set_ActListSituation(ActionController.Situation.No); //이벤트 행동 목록, 주사위 보드 off
+                    //_actController.Set_ActListSituation(ActionController.Situation.No); //이벤트 행동 목록, 주사위 보드 off
+                    EvntActList_OnOff(false);
+
                     _actController.Dice_Off();  //주사위 off
                     
                     DiceRulePannel_OnOff(false, 0);    //주사위 조건 창 off
@@ -400,7 +455,9 @@ public class DungeonEventSystem : MonoBehaviour
             DiceRulePannel_OnOff(false, 0);    //주사위 조건 창 off
             _actController.DiceResultPannel_Off();  //주사위 결과창 off
 
-            _actController.Set_ActListSituation(ActionController.Situation.Event);  //행동 리스트 재출력
+            //_actController.Set_ActListSituation(ActionController.Situation.Event);  //행동 리스트 재출력
+
+            EvntActList_OnOff(true);
         }
     }
 
@@ -416,7 +473,8 @@ public class DungeonEventSystem : MonoBehaviour
         _camera_dgn.SetActive(true);    //던전 카메라 활성화
         _camera_evnt.SetActive(false);  //이벤트 카메라 비활성화
 
-        _actController.Set_ActListSituation(ActionController.Situation.No); //이벤트 행동 목록, 주사위 보드 off
+        //_actController.Set_ActListSituation(ActionController.Situation.No); //이벤트 행동 목록, 주사위 보드 off
+        EvntActList_OnOff(false);
 
         _actController.DiceSelectPannel_OnOff(false);   //주사위 선택창 off
         _actController.DiceResultPannel_Off();          //주사위 결과창 off
@@ -442,33 +500,64 @@ public class DungeonEventSystem : MonoBehaviour
         if (isOn)
         {
             var rule = _nowEvnt_actList[index].Rule;
-
-            for (int i = 0; i < _layout_diceRule.Length; i++)
-            {
-                if (i + 1 == (int)rule)
-                    _layout_diceRule[i].gameObject.SetActive(true);
-                else
-                    _layout_diceRule[i].gameObject.SetActive(false);
-            }
-
             var evntAct = _nowEvnt_actList[index];
 
-            switch (rule)
+            if (rule != CheckRule.No)
             {
-                case CheckRule.Total_Up:
-                    _txt_totalUp_checkMin.text = evntAct.CheckMin.ToString(); ;
-                    break;
-                case CheckRule.Total_Between:
-                    _txt_totalBetween_checkMinMax[0].text = evntAct.CheckMin.ToString();
-                    _txt_totalBetween_checkMinMax[1].text = evntAct.CheckMax.ToString();
-                    break;
-                case CheckRule.Each_Up:
-                    _txt_eachUp_checkMin.text = evntAct.CheckMin.ToString();
-                    break;
-                case CheckRule.Each_Between:
-                    _txt_eachBetween_checkMinMax[0].text = evntAct.CheckMin.ToString();
-                    _txt_eachBetween_checkMinMax[1].text = evntAct.CheckMax.ToString();
-                    break;
+                //주사위 총합 ~ 조건일 때 활성화
+                _pannel_diceRule.transform.GetChild(0).gameObject.SetActive(rule < CheckRule.Each_Up);
+                //모든 주사위 ~ 조건일 때 활성화
+                _pannel_diceRule.transform.GetChild(1).gameObject.SetActive(rule >= CheckRule.Each_Up);
+
+                if (rule == CheckRule.Total_Odd || rule == CheckRule.Total_Even ||
+                    rule == CheckRule.Each_Odd || rule == CheckRule.Each_Even)
+                {
+                    _txt_checkValue1.gameObject.SetActive(false);
+
+                    _txt_ruleText_A.gameObject.SetActive(false);
+
+                    if (rule == CheckRule.Total_Odd || rule == CheckRule.Each_Odd)
+                        _txt_ruleText_B.text = "홀수일 때 성공";
+                    else
+                        _txt_ruleText_B.text = "짝수일 때 성공";
+                }
+                else
+                {
+                    _txt_checkValue1.gameObject.SetActive(true);
+                    _txt_checkValue1.text = evntAct.CheckValue1.ToString();
+
+                    if (rule == CheckRule.Total_Between ||
+                    rule == CheckRule.Each_Between)
+                    {
+                        if (evntAct.CheckValue1 == evntAct.CheckValue2)
+                        {
+                            _txt_ruleText_A.gameObject.SetActive(false);
+
+                            _txt_ruleText_B.text = "일 때 성공";
+                        }
+                        else
+                        {
+                            _txt_ruleText_A.gameObject.SetActive(true);
+                            _txt_ruleText_A.text = "이상";
+
+                            _txt_checkValue2.gameObject.SetActive(true);
+                            _txt_checkValue2.text = evntAct.CheckValue2.ToString();
+
+                            _txt_ruleText_B.text = "이하일 때 성공";
+                        }
+                    }
+                    else
+                    {
+                        _txt_ruleText_A.gameObject.SetActive(false);
+                        _txt_checkValue2.gameObject.SetActive(false);
+
+                        if (rule == CheckRule.Total_Up || rule == CheckRule.Each_Up)
+                            _txt_ruleText_B.text = "이상일 때 성공";
+                        else if (rule == CheckRule.Total_Down || rule == CheckRule.Each_Down)
+                            _txt_ruleText_B.text = "이하일 때 성공";
+                    }
+                }
+
             }
         }
 

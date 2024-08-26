@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6500328b725676d4fa5b9dd95d180b00, type: 3}
+  m_Name: Item085
+  m_EditorClassIdentifier: 
+  _icon: {fileID: -491670247, guid: 832b35751793d10448ae1bd27b2f4046, type: 3}
+  _name: "\uAC00\uC8FD \uC154\uCE20"
+  _type: 2
+  Action:
+    NormalAtk_Arr: []
+    AtkAct_Arr: []
+    DefAct_Arr: []
+    DgeAct_Arr: []
+    TacAct_Arr: []
+  Ability_Arr:
+  - {fileID: 11400000, guid: d5ad3e474c14cd643a474634f0cb5f00, type: 2}
+  Armor:
+    Material: 2
+  Clip_Idle: {fileID: 7400000, guid: 971ab05bdfbaa194fa5983b97eab8544, type: 2}
+  Clip_Atk1:
+  - {fileID: 7400000, guid: b2670f47ef910b74d91876be25d85e49, type: 2}
+  - {fileID: 7400000, guid: 4f82a9958925e074099b1257fc7dfad5, type: 2}
+  Clip_Atk2:
+  - {fileID: 7400000, guid: 2944d19de85b5684daa829da9087987a, type: 2}
+  - {fileID: 7400000, guid: 16f1ccbb65fe0ec4aa9319494592e99f, type: 2}
+  Clip_Atk3:
+  - {fileID: 7400000, guid: 292e701d6b59c4c47bcbc9824ff22a54, type: 2}
+  - {fileID: 7400000, guid: 14660d89df8205b48bca06d4265a1303, type: 2}

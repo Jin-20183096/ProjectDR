@@ -96,8 +96,7 @@ public class ItemSystem : MonoBehaviour
     private int _cost = 5;     //아이템 생성에 사용하는 코스트
 
     private int _needCost_stat = 1;     //스탯 추가 시 필요 코스트
-    //private int _needCost_hp = 2;       //HP 스탯 1 상승의 필요 코스트
-    private int _seedCost_hp = 2;       //HP 스탯 추가를 위한 시작 코스트
+    private int _needCost_hp = 2;       //HP 스탯 1 상승의 필요 코스트
     private int _needCost_ac = 3;       //방어도 스탯 1 상승의 필요 코스트
     
     private int _needCost_btlAct = 2;   //행동 추가 시 필요 코스트
@@ -243,7 +242,7 @@ public class ItemSystem : MonoBehaviour
         //6. 모든 옵션 설정이 끝나면, 아이템 생성
 
         //1. 옵션 생성에 필요한 코스트 설정
-        int cost = _cost;   //임시 코스트
+        int cost = Random.Range(_cost, _cost+6);   //임시 코스트
 
         //2. 무기의 공격행동 목록에서 행동 하나를 무작위로 선택해 추가 후 코스트 소모.
         btlAct1 = data.Action.NormalAtk_Arr[Random.Range(0, data.Action.NormalAtk_Arr.Length)];
@@ -315,7 +314,8 @@ public class ItemSystem : MonoBehaviour
         //스탯2가 결정되지 않았고 코스트가 존재할 경우 스탯 결정
         if (stat2 == ICreature.Stats.No && cost_stat2 > 0)
         {
-            stat2 = (ICreature.Stats)Random.Range(1, Enum.GetValues(typeof(ICreature.Stats)).Length);   //무작위 스탯
+            //stat2 = (ICreature.Stats)Random.Range(1, Enum.GetValues(typeof(ICreature.Stats)).Length);   //무작위 스탯
+            stat2 = (ICreature.Stats)Random.Range(1, (int)ICreature.Stats.LUC); //행운 관련 스탯을 제외한 무작위 스탯
 
             if (stat1 == stat2)
             {
@@ -590,7 +590,7 @@ public class ItemSystem : MonoBehaviour
         //          스탯1이 재굴림 스탯이면 스탯2 =  그 재굴림의 행동 스탯>
 
         //1) 옵션 생성에 필요한 코스트 설정
-        int cost = _cost;
+        int cost = Random.Range(_cost, _cost + 6);   //임시 코스트
 
         //2) 스탯1을 결정짓는 방어구 부위 및 재질이면, 스탯 1을 설정 후 코스트 소모
         var material = data.Armor.Material;
@@ -610,8 +610,8 @@ public class ItemSystem : MonoBehaviour
             stat1 = ICreature.Stats.HP; //HP 스탯 보유
 
             //스탯 생성을 위한 코스트 소모
-            cost -= _seedCost_hp;
-            cost_stat1 += _seedCost_hp;
+            cost -= _needCost_hp;
+            cost_stat1 += _needCost_hp;
         }
         else if (material == ItemData.ArmorMaterial.Cloth)      //천 방어구일 때
         {
@@ -688,7 +688,8 @@ public class ItemSystem : MonoBehaviour
         //스탯1이 결정되지 않았고 코스트가 존재할 경우 스탯 결정
         if (stat1 == ICreature.Stats.No && cost_stat1 > 0)
         {
-            stat1 = (ICreature.Stats)Random.Range(1, Enum.GetValues(typeof(ICreature.Stats)).Length);   //무작위 스탯
+            //stat1 = (ICreature.Stats)Random.Range(1, Enum.GetValues(typeof(ICreature.Stats)).Length);   //무작위 스탯
+            stat1 = (ICreature.Stats)Random.Range(1, (int)ICreature.Stats.LUC);     //행운 관련 스탯을 제외한 무작위 스탯
 
             if (stat1 < ICreature.Stats.HP) //행동 스탯일 때
                 stat1_arr = new int[] { 0, 0, 0, 0, 0, 0 };
@@ -724,10 +725,12 @@ public class ItemSystem : MonoBehaviour
                     }
                 }
                 else
-                    stat2 = (ICreature.Stats)Random.Range(1, Enum.GetValues(typeof(ICreature.Stats)).Length);   //무작위 스탯
+                    //stat2 = (ICreature.Stats)Random.Range(1, Enum.GetValues(typeof(ICreature.Stats)).Length);   //무작위 스탯
+                    stat2 = (ICreature.Stats)Random.Range(1, (int)ICreature.Stats.LUC);     //행운 관련 스탯을 제외한 무작위 스탯
             }
             else
-                stat2 = (ICreature.Stats)Random.Range(1, Enum.GetValues(typeof(ICreature.Stats)).Length);   //무작위 스탯
+                //stat2 = (ICreature.Stats)Random.Range(1, Enum.GetValues(typeof(ICreature.Stats)).Length);   //무작위 스탯
+                stat2 = (ICreature.Stats)Random.Range(1, (int)ICreature.Stats.LUC);     //행운 관련 스탯을 제외한 무작위 스탯
 
             if (stat1 == stat2)
             {
@@ -928,7 +931,8 @@ public class ItemSystem : MonoBehaviour
         switch (stat)
         {
             case ICreature.Stats.HP:    //HP
-                return cost;
+                //return cost / _needCost_hp + cost / (_needCost_hp + 1);
+                return cost / _needCost_hp;
             case ICreature.Stats.AC:    //방어도
                 return cost / _needCost_ac;
             default:    //재굴림

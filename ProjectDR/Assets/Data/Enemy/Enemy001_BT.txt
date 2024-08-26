@@ -17,20 +17,24 @@ tree("Ap2Under")
 tree("DgeSuccess")
 	sequence
 		Is_DgeSuccess
+		Set_ActClueLog0
 		Push_RandomAtk
 ///////////////////
 tree("P_DefDgeFail")
 	sequence
 		Is_P_FailDefDge
+		Set_ActClueLog1
 		Push_RandomAtk
 ///////////////////
 tree("P_WaitAndAp4Over")
 	sequence
 		Is_P_LastWait
 		Is_P_Ap_4Over
+		Set_ActClueLog2
 		Push_RandomDge
 ///////////////////
 tree("Ap0Check")
 	sequence
 		Is_P_Ap_0Under
+		Set_ActClueLog3
 		Push_RandomAtk

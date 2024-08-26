@@ -15,8 +15,6 @@ public class ActionListSlotSelected : MonoBehaviour, IActionListSlot
     private TextMeshProUGUI _txt_actName;
     [SerializeField]
     private TextMeshProUGUI _txt_actStat;
-    [SerializeField]
-    private TextMeshProUGUI _txt_useAp;
 
     [SerializeField]
     private RectTransform _rect_cursor;
@@ -28,23 +26,16 @@ public class ActionListSlotSelected : MonoBehaviour, IActionListSlot
         _actController.ActionClick(_order);
     }
 
-    public void Change_SlotContent(Sprite spr, string name, bool isNoDice, string stat, int useAp)
+    public void Change_SlotContent(Sprite spr, string name, bool isNoDice, string stat)
     {
         _icon_actType.sprite = spr;
         _txt_actName.text = name;
 
         if (isNoDice)
-        {
             _txt_actStat.gameObject.SetActive(false);
-            _txt_useAp.gameObject.SetActive(useAp > 0);
-
-            if (useAp > 0)
-                _txt_useAp.text = useAp.ToString();
-        }
         else
         {
             _txt_actStat.gameObject.SetActive(true);
-            _txt_useAp.gameObject.SetActive(false);
             _txt_actStat.text = stat;
         }
     }

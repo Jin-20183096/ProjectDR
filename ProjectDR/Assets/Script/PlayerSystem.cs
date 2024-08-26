@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 using static ICreature;
@@ -133,13 +135,22 @@ public class PlayerSystem : MonoBehaviour, ICreature
     {
         get { return _stat_WIL; }
     }
+    [SerializeField]
+    private int[] _stat_LUC = { 1, 2, 3, 4, 5, 6 };     //행운 스탯
+    public int[] LUC
+    {
+        get { return _stat_LUC; }
+    }
 
     [SerializeField]
-    private int[] _reroll = new int[7];     //No, 힘, 지능, 손재주, 민첩, 건강, 의지
+    private int[] _reroll = new int[8];     //No, 힘, 지능, 손재주, 민첩, 건강, 의지, 행운
 
     public int GetReroll(Stats stat)  //재굴림 반환
     {
-        return _reroll[(int)stat];
+        if (stat == Stats.LUC)
+            return _reroll[_reroll.Length - 1];
+        else
+            return _reroll[(int)stat];
     }
 
     [SerializeField]
@@ -205,9 +216,12 @@ public class PlayerSystem : MonoBehaviour, ICreature
     [SerializeField]
     private Transform _eff_group;
     [SerializeField]
-    private ParticleSystem _eff_blood;
+    private ParticleSystem _eff_hit;
     [SerializeField]
     private ParticleSystem _eff_block;
+    [SerializeField]
+    private GameObject _dmgText_prefab;
+
 
     void Awake()
     {
@@ -240,7 +254,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
         Change_ACMax(true, 0);
 
         _apMax = 6;
-        _ap = Random.Range(1, _apMax + 1);
+        _ap = Random.Range(6, _apMax + 1);
         Change_ApMax(true, 0);
         Change_Ap(true, 0);
 
@@ -544,6 +558,8 @@ public class PlayerSystem : MonoBehaviour, ICreature
 
     public void TakeDamage(int dmg, BtlActData.DamageType dmgType)
     {
+        
+
         if (_ac >= 1)    //방어도가 1 이상 존재할 때
         {
             int realDmg;    //실제 피해량
@@ -555,16 +571,55 @@ public class PlayerSystem : MonoBehaviour, ICreature
                 Change_AC(false, _ac);  //방어도를 모두 없앰
 
                 Change_Hp(false, realDmg);  //실제 피해량만큼 hp 줄어듬
+
+                //방어도 텍스트
+                var acText = Instantiate(_dmgText_prefab.transform, _eff_group);
+
+                //acText.position = _p_spr_btl.transform.position;
+                acText.position = new Vector3(_p_spr_btl.transform.position.x,
+                                            _p_spr_btl.transform.position.y + 2f, _p_spr_btl.transform.position.z);
+                acText.GetChild(0).GetComponent<TextMeshPro>().text = "<sprite=0> " + (dmg - realDmg).ToString();
+                acText.GetChild(1).GetComponent<TextMeshPro>().text = "<sprite=0> " + (dmg - realDmg).ToString();
+
+                //데미지 텍스트
+                var dmgText = Instantiate(_dmgText_prefab.transform, _eff_group);
+
+                //데미지텍스트 좌표 설정
+                dmgText.position = _p_spr_btl.transform.position;
+
+                //데미지텍스트 값 설정
+                dmgText.GetChild(0).GetComponent<TextMeshPro>().text = realDmg.ToString();
+                dmgText.GetChild(1).GetComponent<TextMeshPro>().text = realDmg.ToString();
             }
             else            //피해량이 방어도 이하일 때
             {
+                //데미지 텍스트
+                var dmgText = Instantiate(_dmgText_prefab.transform, _eff_group);
+
+                //데미지텍스트 좌표 설정
+                dmgText.position = _p_spr_btl.transform.position;
+
                 //실제 피해량은 0 (방어도로 모든 피해를 경감)
-                
+                dmgText.GetChild(0).GetComponent<TextMeshPro>().text = "<sprite=0> " + dmg.ToString();
+                dmgText.GetChild(1).GetComponent<TextMeshPro>().text = "<sprite=0> " + dmg.ToString();
+
                 Change_AC(false, dmg);  //피해량만큼 방어도를 차감
             }
         }
         else    //방어도가 없을 때
+        {
             Change_Hp(false, dmg);
+
+            //데미지 텍스트
+            var dmgText = Instantiate(_dmgText_prefab.transform, _eff_group);
+
+            //데미지텍스트 좌표 설정
+            dmgText.position = _p_spr_btl.transform.position;
+
+            //데미지텍스트 값 설정
+            dmgText.GetChild(0).GetComponent<TextMeshPro>().text = dmg.ToString();
+            dmgText.GetChild(1).GetComponent<TextMeshPro>().text = dmg.ToString();
+        }
 
         ParticleSystem eff;
 
@@ -572,16 +627,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
             eff = Instantiate(_eff_block, _eff_group);  //방어 이펙트 파티클 
         else
         {
-            eff = Instantiate(_eff_blood, _eff_group);
-
-            //데미지량에 따른 유혈 파티클 개수 조정
-            var burst1 = eff.emission.GetBurst(0);
-            var burst2 = eff.emission.GetBurst(1);
-
-            burst1.count = 20 * dmg / _hpMax;
-            burst2.count = 20 * dmg / _hpMax;
-            eff.emission.SetBurst(0, burst1);
-            eff.emission.SetBurst(1, burst2);
+            eff = Instantiate(_eff_hit, _eff_group);
         }
 
         var pos = _p_spr_btl.transform.position;

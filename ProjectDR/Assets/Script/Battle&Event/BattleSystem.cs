@@ -310,8 +310,18 @@ public class BattleSystem : MonoBehaviour
         //적 행동 요청
         _enemySys.Request_NextAction();
 
+        /*
         //플레이어 전투 행동목록 활성화
         _actController.Set_ActListSituation(ActionController.Situation.Battle);
+        */
+    }
+
+    public void BtlActList_OnOff(bool b)
+    {
+        if (b)
+            _actController.Set_ActListSituation(ActionController.Situation.Battle);
+        else
+            _actController.Set_ActListSituation(ActionController.Situation.No);
     }
 
     public void Set_BtlAct_Player(BtlActData act, int[] result)    //플레이어 전투 행동 결정 완료
@@ -510,6 +520,7 @@ public class BattleSystem : MonoBehaviour
         DiceResult_Off(true);   //플레이어 주사위 결과창 Off
         DiceResult_Off(false);  //적 주사위 결과창 Off
 
+        /*
         //양측의 행동모션 원상복구
         switch (_p_act.Type)
         {
@@ -526,8 +537,10 @@ public class BattleSystem : MonoBehaviour
                 _p_spr.Set_ActionMoveSet_Tac(_p_act.TacMS, false);
                 break;
         }
+        */
         _p_spr.StartCoroutine(_p_spr.Return_Coroutine());
-
+        
+        /*
         switch (_e_act.Type)
         {
             case BtlActData.ActionType.Atk:
@@ -543,6 +556,7 @@ public class BattleSystem : MonoBehaviour
                 _e_spr.Set_ActionMoveSet_Tac(_e_act.TacMS, false);
                 break;
         }
+        */
         _e_spr.StartCoroutine(_e_spr.Return_Coroutine());
 
         //양측의 행동정보 초기화
@@ -586,8 +600,13 @@ public class BattleSystem : MonoBehaviour
             var enemy = _enemySys.Data;
 
             _enemySys.Set_BattleEnemy(false, null); //적 데이터 Off
+            
+            /*
             //전투 행동 리스트, 주사위 보드, 재굴림 버튼, 행동 개시 버튼 Off
             _actController.Set_ActListSituation(ActionController.Situation.No);
+            */
+            BtlActList_OnOff(false);
+
             _actController.Dice_Off();  //주사위 오브젝트 Off
 
             _actController.DiceSelectPannel_OnOff(false);   //주사위 선택창 Off
@@ -615,8 +634,14 @@ public class BattleSystem : MonoBehaviour
         {
             //적 다음 행동 요청
             _enemySys.Request_NextAction();
+
+            //적의 행동에 대한 전조 로그 또는 무엇을 할까 로그
+            _btlLog.SetLog_TurnStart(_enemySys.ActClueLog);
+
+            /*
             //플레이어 행동목록 재출력
             _actController.Set_ActListSituation(ActionController.Situation.Battle);
+            */
         }
     }
 
@@ -628,24 +653,28 @@ public class BattleSystem : MonoBehaviour
 
         //경험치 획득
         var exp = Random.Range(data.Exp[0], data.Exp[1]);
-        var amount = Random.Range(1, 4);
+        
         _rewardPannel.RewardPannel_Exp_OnOff(true);     //경험치 획득 패널 On
 
         _rewardPannel.Set_RewardExpInfo();  //경험치 획득 패널의 수치 설정
         _rewardPannel.Set_GetExpText(exp);//획득 경험치 표시
 
-        //모든 경험치 획득이 끝날 때까지 대기
-        yield return new WaitUntil(() => _rewardExpProcess == false);
+        if (data.Item.Length > 0)   //아이템을 드랍하는 몬스터인 경우
+        {
+            //모든 경험치 획득이 끝날 때까지 대기
+            yield return new WaitUntil(() => _rewardExpProcess == false);
 
-        _rewardPannel.RewardPannel_Item_OnOff(true);    //아이템 획득 패널 On
-        _itemSys.Reward_Clear();    //이전 전리품 모두 제거
-        _itemSys.ON_REWARD = true;  //전리품창 ON 상태
+            _rewardPannel.RewardPannel_Item_OnOff(true);    //아이템 획득 패널 On
+            _itemSys.Reward_Clear();    //이전 전리품 모두 제거
+            _itemSys.ON_REWARD = true;  //전리품창 ON 상태
 
-        for (int i = 0; i < amount; i++)    //드랍할 아이템 개수만큼 아이템 드랍
-            _itemSys.Create_Item(data.Item[Random.Range(0, data.Item.Length)], ItemSystem.ItemSlotType.Reward, i);
+            var amount = Random.Range(1, 4);
 
-        _itemSys.Set_RewardIcon();  //드랍한 아이템 표시
+            for (int i = 0; i < amount; i++)    //드랍할 아이템 개수만큼 아이템 드랍
+                _itemSys.Create_Item(data.Item[Random.Range(0, data.Item.Length)], ItemSystem.ItemSlotType.Reward, i);
 
+            _itemSys.Set_RewardIcon();  //드랍한 아이템 표시
+        }
         //---------------
 
         //양측의 행동 상태 변수 초기화
@@ -674,8 +703,12 @@ public class BattleSystem : MonoBehaviour
         _playerSys.MenuButton_OnOff_ActList(true);
 
         _enemySys.Set_BattleEnemy(false, null); //적 데이터 Off
+        /*
         //전투 행동 목록, 주사위 보드, 재굴림 버튼, 행동 개시 버튼 Off            
-        _actController.Set_ActListSituation(ActionController.Situation.No); 
+        _actController.Set_ActListSituation(ActionController.Situation.No);
+        */
+        BtlActList_OnOff(false);
+
         _actController.Dice_Off();  //주사위 오브젝트 Off
 
         _actController.DiceSelectPannel_OnOff(false);   //주사위 선택창 Off
@@ -1024,7 +1057,7 @@ public class BattleSystem : MonoBehaviour
 
                 var dgePos = new Vector3(_e_spr.transform.position.x + 3f, _e_spr.transform.position.y, _e_spr.transform.position.z);
                 _e_spr.Set_SpriteMove(dgePos);
-                _e_spr.Set_ActionMoveSet_Dge(_e_act.DgeMS, true);
+                //_e_spr.Set_ActionMoveSet_Dge(_e_act.DgeMS, true); //회피 애니메이션
                 AudioSys.Play_Sfx(Sfx.Dge);
 
                 var log = _btlLog.Log_DgeFail(false);   //적 회피 실패 로그
@@ -1067,7 +1100,7 @@ public class BattleSystem : MonoBehaviour
             _p_spr.ActHitBoxOn();   //<<<<<<<<<<<<<<추후 모든 공격 행동의 모션이 완성되면 주석처리해야할 코드>>>>>>>>>>>>>>
             _p_spr.Set_ActHitBox(HitBoxCollider.HitBoxType.Atk);    //플레이어 행동 히트박스: 공격
             _p_spr.Set_SpriteMove(dest);                            //플레이어의 공격을 위한 이동
-            _p_spr.Set_ActionMoveSet_Atk(_p_act.AtkMS, true);       //공격 무브셋
+            //_p_spr.Set_ActionMoveSet_Atk(_p_act.AtkMS, true);       //공격 애니메이션
 
         }
         else
@@ -1088,7 +1121,7 @@ public class BattleSystem : MonoBehaviour
             _e_spr.ActHitBoxOn();
             _e_spr.Set_ActHitBox(HitBoxCollider.HitBoxType.Atk);    //적 행동 히트박스: 공격
             _e_spr.Set_SpriteMove(dest);                            //적의 공격을 위한 이동
-            _e_spr.Set_ActionMoveSet_Atk(_e_act.AtkMS, true);       //공격 무브셋
+            //_e_spr.Set_ActionMoveSet_Atk(_e_act.AtkMS, true);       //공격 애니메이션
         }
 
         AudioSys.Play_Sfx(Sfx.Atk);
@@ -1155,7 +1188,7 @@ public class BattleSystem : MonoBehaviour
             finalDmg = _p_total;
 
             _enemySys.TakeDamage(finalDmg, _p_act.DmgType); //공격 피해를 줌
-            _e_spr.Set_CommonMoveSet(SpriteSystem.CommonTrigger.Dmg);   //피격 애니메이션
+            //_e_spr.Set_CommonMoveSet(SpriteSystem.CommonTrigger.Dmg);   //피격 애니메이션
             AudioSys.Play_Sfx(Sfx.Dmg);
 
             //적 넉백
@@ -1173,7 +1206,7 @@ public class BattleSystem : MonoBehaviour
             finalDmg = _e_total;
 
             _playerSys.TakeDamage(finalDmg, _e_act.DmgType); //공격 피해를 줌
-            _p_spr.Set_CommonMoveSet(SpriteSystem.CommonTrigger.Dmg);   //피격 애니메이션
+            //_p_spr.Set_CommonMoveSet(SpriteSystem.CommonTrigger.Dmg);   //피격 애니메이션
             AudioSys.Play_Sfx(Sfx.Dmg);
 
             //플레이어 넉백
@@ -1271,7 +1304,7 @@ public class BattleSystem : MonoBehaviour
             else    //회피에 실패한 경우
             {
                 _playerSys.TakeDamage(_e_total, _e_act.DmgType); //플레이어의 방어도를 반영한 피해를 줌
-                _p_spr.Set_CommonMoveSet(SpriteSystem.CommonTrigger.Dmg);
+                //_p_spr.Set_CommonMoveSet(SpriteSystem.CommonTrigger.Dmg); //피격 애니메이션
                 AudioSys.Play_Sfx(Sfx.Dmg);
 
                 _e_hitAtk = true;   //적의 공격 명중 처리
@@ -1294,7 +1327,7 @@ public class BattleSystem : MonoBehaviour
             {
                 var dgePos = new Vector3(_e_spr.transform.position.x + 3f, _e_spr.transform.position.y, _e_spr.transform.position.z);
                 _e_spr.Set_SpriteMove(dgePos);
-                _e_spr.Set_ActionMoveSet_Dge(_e_act.DgeMS, true);
+                //_e_spr.Set_ActionMoveSet_Dge(_e_act.DgeMS, true); //회피 애니메이션
                 AudioSys.Play_Sfx(Sfx.Dge);
 
                 _e_hitDge = true;   //적 공격 회피 처리
@@ -1308,7 +1341,7 @@ public class BattleSystem : MonoBehaviour
                 var finalDmg = (_p_total - _enemySys.AC) > 0 ? _p_total - _enemySys.AC : 0;
 
                 _enemySys.TakeDamage(finalDmg, _p_act.DmgType); //적의 방어도를 반영한 피해를 줌
-                _e_spr.Set_CommonMoveSet(SpriteSystem.CommonTrigger.Dmg);
+                //_e_spr.Set_CommonMoveSet(SpriteSystem.CommonTrigger.Dmg); //피격 애니메이션
                 AudioSys.Play_Sfx(Sfx.Dmg);
 
                 _p_hitAtk = true;   //플레이어의 공격 명중 처리

@@ -7,7 +7,7 @@ public class GameLog : MonoBehaviour
 {
     public enum LogSituation
     {
-        No, ActEffect, BtlFlow, RunEnd, EvntSuccess, EvntMinFail, EvntMaxFail, EvntResult
+        No, EvntStart, BtlTurnStart, ActEffect, BtlFlow, RunEnd, EvntSuccess, EvntFail, EvntResult
     }
 
     [SerializeField]
@@ -19,7 +19,7 @@ public class GameLog : MonoBehaviour
     private TextMeshProUGUI _log;   //로그 텍스트
     [SerializeField]
     private GameObject _cursor_log; //로그 커서
-    private Button _btn_cursor;     //커서 출력 중 로그의 버튼 인식
+    private Button _btn_log;     //로그의 버튼 인식
 
     private string _p_name = "당신";
     [SerializeField]
@@ -35,7 +35,7 @@ public class GameLog : MonoBehaviour
 
     private void Awake()
     {
-        _btn_cursor = GetComponent<Button>();
+        _btn_log = GetComponent<Button>();
     }
 
     public void LogErase()
@@ -47,7 +47,7 @@ public class GameLog : MonoBehaviour
     public void SetLog_EventStart(string log)   //로그 설정: 이벤트 시작
     {
         NewLog(log);
-        LogPrint_Start(LogSituation.No);
+        LogPrint_Start(LogSituation.EvntStart);
     }
 
     public void SetLog_DiceCheck_Success(string log)    //로그 설정: 이벤트 주사위 체크 성공
@@ -56,16 +56,10 @@ public class GameLog : MonoBehaviour
         LogPrint_Start(LogSituation.EvntSuccess);
     }
 
-    public void SetLog_DiceCheck_MinFail(string log)       //로그 설정: 이벤트 주사위 체크 실패 (성공값 미달)
+    public void SetLog_DiceCheck_Fail(string log)       //로그 설정: 이벤트 주사위 체크 실패
     {
         NewLog(log);
-        LogPrint_Start(LogSituation.EvntMinFail);
-    }
-
-    public void SetLog_DiceCheck_MaxFail(string log)       //로그 설정: 이벤트 주사위 체크 실패 (성공값 초과)
-    {
-        NewLog(log);
-        LogPrint_Start(LogSituation.EvntMaxFail);
+        LogPrint_Start(LogSituation.EvntFail);
     }
 
     public void SetLog_EventResult(string log)          //로그 설정: 이벤트 결과
@@ -79,8 +73,19 @@ public class GameLog : MonoBehaviour
     public void SetLog_BattleStart(string e_name)   //로그 설정: 전투 시작 
     {
         NewLog(MakeSentence(e_name, "[이/가]","나타났다"));
-        LogPrint_Start(LogSituation.No);
+        LogPrint_Start(LogSituation.BtlTurnStart);
         _e_name = e_name;
+    }
+
+    public void SetLog_TurnStart(string log) //로그 설정: 턴 시작
+    {
+        var finalLog = log;
+
+        if (finalLog == "")
+            finalLog = "당신은 무엇을 할까?";
+
+        NewLog(finalLog);
+        LogPrint_Start(LogSituation.BtlTurnStart);
     }
 
     public void SetLog_AtkHit(bool isP, string targetPost, string effText) //로그 설정: 공격 명중 효과 출력
@@ -345,6 +350,7 @@ public class GameLog : MonoBehaviour
     {
         _targetText = newLog;
         CurSor_OnOff(false);
+        _btn_log.interactable = true;
     }
 
     void LogPrint_Start(LogSituation situ)
@@ -375,7 +381,11 @@ public class GameLog : MonoBehaviour
             StartCoroutine(LogPrinting());
         else
         {
-            if (_targetText == "" || _logSituation == LogSituation.No)  //출력할 로그가 없으면, 로그 출력 종료까지 자동 실행
+            //출력할 로그가 없으면, 로그 출력 종료까지 자동 실행
+            if (_targetText == "" ||
+                _logSituation == LogSituation.No ||
+                _logSituation == LogSituation.EvntStart ||
+                _logSituation == LogSituation.BtlTurnStart)
                 LogPrint_End();
             else
                 CurSor_OnOff(true);
@@ -391,15 +401,24 @@ public class GameLog : MonoBehaviour
     }
 
     void CurSor_OnOff(bool b)
-        => _cursor_log.SetActive(b);
+    {
+        _cursor_log.SetActive(b);
+    }
 
     void LogPrint_End()
     {
         CurSor_OnOff(false);
+        _btn_log.interactable = false;
 
         //로그의 출력 상황에 따라 출력 후 처리 분류
         switch (_logSituation)
         {
+            case LogSituation.EvntStart:
+                _evntSys.EvntActList_OnOff(true);   //이벤트 시작(로그 출력이 완료된 시점에, 이벤트 행동 목록 출력)
+                break;
+            case LogSituation.BtlTurnStart:
+                _btlSys.BtlActList_OnOff(true); //전투 턴 시작(로그 출력이 완료된 시점에, 전투 행동 목록 출력)
+                break;
             case LogSituation.ActEffect:        //행동 효과 처리 로그 출력
                 _btlSys.Set_EffectProcess(false);
                 break;
@@ -407,13 +426,10 @@ public class GameLog : MonoBehaviour
                 _btlSys.Set_BattleProcess(false);
                 break;
             case LogSituation.EvntSuccess:      //이벤트 성공 결과
-                _evntSys.StartCoroutine(_evntSys.EventResultFlow(true, false));
+                _evntSys.StartCoroutine(_evntSys.EventResultFlow(true));
                 break;
-            case LogSituation.EvntMinFail:      //이벤트 실패 결과 (값 미달 실패)
-                _evntSys.StartCoroutine(_evntSys.EventResultFlow(false, false));
-                break;
-            case LogSituation.EvntMaxFail:      //이벤트 실패 결과 (값 초과 실패)
-                _evntSys.StartCoroutine(_evntSys.EventResultFlow(false, true));
+            case LogSituation.EvntFail:      //이벤트 실패 결과 (값 미달 실패)
+                _evntSys.StartCoroutine(_evntSys.EventResultFlow(false));
                 break;
             case LogSituation.EvntResult:       //이벤트 결과 처리 종료
                 _evntSys.Set_ResultProcess(false);

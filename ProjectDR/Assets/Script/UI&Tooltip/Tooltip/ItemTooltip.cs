@@ -82,8 +82,10 @@ public class ItemTooltip : MonoBehaviour
     [SerializeField]
     private Sprite[] _spr_typeIcon;
 
-    private string[] _statName_arr = { "", "힘", "지능", "손재주", "민첩", "건강", "의지", "HP", "방어도",
-                                        "힘 재굴림", "지능 재굴림", "손재주 재굴림", "민첩 재굴림", "건강 재굴림", "의지 재굴림" };
+    private string[] _statName_arr = { "", 
+                                    "힘", "지능", "손재주", "민첩", "건강", "의지", "HP", "방어도",
+                                    "힘 재굴림", "지능 재굴림", "손재주 재굴림", "민첩 재굴림", "건강 재굴림", "의지 재굴림",
+                                    "행운", "행운 재굴림"};
 
     private void Start()
     {

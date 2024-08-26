@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using static PlayerSystem;
 using static EventData;
+using Panda;
 
 public class DiceSelectPannel : MonoBehaviour
 {
@@ -34,25 +35,27 @@ public class DiceSelectPannel : MonoBehaviour
     private GameObject _diceSlotSet_evnt;   //주사위 슬롯 집단(이벤트)
     [SerializeField]
     private Image[] _diceSlot_evnt;     //주사위 슬롯(이벤트)
+    [SerializeField]
+    private GameObject _plusIcon_evnt;      //주사위 슬롯 집단(이벤트)의 플러스 아이콘
 
     [Header("# DiceRule Pannel")]
+    //주사위 조건 창
     [SerializeField]
-    private HorizontalLayoutGroup _pannel_diceRule_preview;
+    private VerticalLayoutGroup _pannel_diceRule_preview;
+    //주사위 조건 텍스트
+    //_pannel_diceRule의 0번째 차일드는 "주사위 총합" (total_~)
+    //_pannel_diceRule의 1번째 차일드는 "모든 주사위" (each_~)
     [SerializeField]
-    private VerticalLayoutGroup[] _layout_diceRule;
+    private TextMeshProUGUI _txt_checkValue1;
     [SerializeField]
-    private TextMeshProUGUI _txt_totalUp_checkMin;
+    private TextMeshProUGUI _txt_checkValue2;
     [SerializeField]
-    private TextMeshProUGUI[] _txt_totalBetween_checkMinMax;
+    private TextMeshProUGUI _txt_ruleText_A;
     [SerializeField]
-    private TextMeshProUGUI _txt_eachUp_checkMin;
-    [SerializeField]
-    private TextMeshProUGUI[] _txt_eachBetween_checkMinMax;
+    private TextMeshProUGUI _txt_ruleText_B;
 
     [SerializeField]
     private int _nowDice = 0;
-    [SerializeField]
-    private int _nowUseAp = 0;
 
     [SerializeField]
     private Sprite[] _spr_dice;
@@ -107,40 +110,69 @@ public class DiceSelectPannel : MonoBehaviour
         if (isOn)
         {
             var rule = _evntSys.ActList[index].Rule;
-
-            for (int i = 0; i < _layout_diceRule.Length; i++)
-            {
-                if (i + 1 == (int)rule)
-                    _layout_diceRule[i].gameObject.SetActive(true);
-                else
-                    _layout_diceRule[i].gameObject.SetActive(false);
-            }
-
             var evntAct = _evntSys.ActList[index];
 
-            switch (rule)
+            if (rule != CheckRule.No)
             {
-                case CheckRule.Total_Up:
-                    _txt_totalUp_checkMin.text = evntAct.CheckMin.ToString();
-                    break;
-                case CheckRule.Total_Between:
-                    _txt_totalBetween_checkMinMax[0].text = evntAct.CheckMin.ToString();
-                    _txt_totalBetween_checkMinMax[1].text = evntAct.CheckMax.ToString();
-                    break;
-                case CheckRule.Each_Up:
-                    _txt_eachUp_checkMin.text = evntAct.CheckMin.ToString();
-                    break;
-                case CheckRule.Each_Between:
-                    _txt_eachBetween_checkMinMax[0].text = evntAct.CheckMin.ToString();
-                    _txt_eachBetween_checkMinMax[1].text = evntAct.CheckMax.ToString();
-                    break;
+                //주사위 총합 ~ 조건일 때 활성화
+                _pannel_diceRule_preview.transform.GetChild(0).gameObject.SetActive(rule < CheckRule.Each_Up);
+                //모든 주사위 ~ 조건일 때 활성화
+                _pannel_diceRule_preview.transform.GetChild(1).gameObject.SetActive(rule >= CheckRule.Each_Up);
+
+                if (rule == CheckRule.Total_Odd || rule == CheckRule.Total_Even ||
+                    rule == CheckRule.Each_Odd || rule == CheckRule.Each_Even)
+                {
+                    _txt_checkValue1.gameObject.SetActive(false);
+
+                    _txt_ruleText_A.gameObject.SetActive(false);
+
+                    if (rule == CheckRule.Total_Odd || rule == CheckRule.Each_Odd)
+                        _txt_ruleText_B.text = "홀수일 때 성공";
+                    else
+                        _txt_ruleText_B.text = "짝수일 때 성공";
+                }
+                else
+                {
+                    _txt_checkValue1.gameObject.SetActive(true);
+                    _txt_checkValue1.text = evntAct.CheckValue1.ToString();
+
+                    if (rule == CheckRule.Total_Between ||
+                    rule == CheckRule.Each_Between)
+                    {
+                        if (evntAct.CheckValue1 == evntAct.CheckValue2)
+                        {
+                            _txt_ruleText_A.gameObject.SetActive(false);
+
+                            _txt_ruleText_B.text = "일 때 성공";
+                        }
+                        else
+                        {
+                            _txt_ruleText_A.gameObject.SetActive(true);
+                            _txt_ruleText_A.text = "이상";
+
+                            _txt_checkValue2.gameObject.SetActive(true);
+                            _txt_checkValue2.text = evntAct.CheckValue2.ToString();
+
+                            _txt_ruleText_B.text = "이하일 때 성공";
+                        }
+                    }
+                    else
+                    {
+                        _txt_ruleText_A.gameObject.SetActive(false);
+                        _txt_checkValue2.gameObject.SetActive(false);
+
+                        if (rule == CheckRule.Total_Up || rule == CheckRule.Each_Up)
+                            _txt_ruleText_B.text = "이상일 때 성공";
+                        else if (rule == CheckRule.Total_Down || rule == CheckRule.Each_Down)
+                            _txt_ruleText_B.text = "이하일 때 성공";
+                    }
+                }
             }
         }
-        
+
         Canvas.ForceUpdateCanvases();
         _pannel_diceRule_preview.enabled = false;
         _pannel_diceRule_preview.enabled = true;
-        
     }
 
     public void NowDice_MouseOver(int order)    //주사위 슬롯에 마우스 오버
@@ -182,13 +214,7 @@ public class DiceSelectPannel : MonoBehaviour
                     diceSlot[i].sprite = _spr_diceSlot[0]; //이외에는 미선택 스프라이트
             }
 
-            /*
-            if (btlAct != null) //행동력을 소모하는 행동의 경우
-            {
-            */
-                //소모 예정 행동력 표기
-                PlayerSys.Change_Ap_UsePreview(realOrder);
-            //}
+            PlayerSys.Change_Ap_UsePreview(realOrder);
         }
     }
 
@@ -209,15 +235,14 @@ public class DiceSelectPannel : MonoBehaviour
                 diceSlot[i].sprite = _spr_diceSlot[0];
         }
 
-        //if (_actController.SITUATION == ActionController.Situation.Battle)  //현재 선택된 주사위 수만큼 소모 예정 행동력 표시
-            PlayerSys.Change_Ap_UsePreview(_nowUseAp);
+        PlayerSys.Change_Ap_UsePreview(_nowDice);
     }
 
     public void NowDice_Change(int order)   //주사위 슬롯을 조작해 주사위 개수가 변했을 경우
     {
         BtlActData btlAct = null;   //null이면 전투 행동이 아니라는 의미
         DungeonEventSystem.EvntAct evntAct = null;   //null이면 이벤트 행동이 아니라는 의미
-        var realOrder = order + 1;
+        var realOrder = order + 1;  //0부터 시작하는 인덱스를 자연수로 인지하기 위해 +1함
         Image[] diceSlot;
 
         if (_actController.SITUATION == ActionController.Situation.Battle)  //전투 행동인 경우, 행동 데이터 지정
@@ -236,6 +261,9 @@ public class DiceSelectPannel : MonoBehaviour
         {
             evntAct = _evntSys.ActList[_actController.NOW_CURSOR];
 
+            if (PlayerSys.AP < realOrder)   //선택한 주사위 개수를 위한 행동력이 없을 경우, return
+                return;
+
             diceSlot = _diceSlot_evnt;
         }
 
@@ -247,11 +275,6 @@ public class DiceSelectPannel : MonoBehaviour
         {
             _nowDice = realOrder;   //주사위 개수 새로 지정
 
-            if (btlAct != null && btlAct.NoDice)
-                _nowUseAp = 0;
-            else
-                _nowUseAp = _nowDice;
-
             //주사위 개수에 따른 슬롯 설정
             for (int i = 0; i < diceSlot.Length; i++)
             {
@@ -262,13 +285,13 @@ public class DiceSelectPannel : MonoBehaviour
             }
 
             if (_actController.SITUATION == ActionController.Situation.Battle)
-                DecisionBtn_OnOff(PlayerSys.AP >= _nowUseAp);   //현재 행동력이 충분한지에 따라, 행동 결정 버튼 OnOff
+                DecisionBtn_OnOff(PlayerSys.AP >= _nowDice);   //현재 행동력이 충분한지에 따라, 행동 결정 버튼 OnOff
             else if (_actController.SITUATION == ActionController.Situation.Event)
                 DecisionBtn_OnOff(true);
         }
 
         if (_actController.SITUATION == ActionController.Situation.Battle)
-            PlayerSys.Change_Ap_UsePreview(_nowUseAp);  //현재 선택한 주사위 개수만큼 소모 예정 행동력 표시
+            PlayerSys.Change_Ap_UsePreview(_nowDice);  //현재 선택한 주사위 개수만큼 소모 예정 행동력 표시
     }
 
     public void NowDice_Reset()
@@ -277,29 +300,55 @@ public class DiceSelectPannel : MonoBehaviour
         DiceZero();
         Image[] diceSlot;
 
+        BtlActData btlAct = null;
+        EventAction evntAct = null;
+
         if (_actController.SITUATION == ActionController.Situation.Battle)
+        {
             diceSlot = _diceSlot_btl;
+            btlAct = PlayerSys.ActList[_actController.NOW_CURSOR].Data;
+        }
         else
+        {
             diceSlot = _diceSlot_evnt;
+            evntAct = _evntSys.ActList[_actController.NOW_CURSOR].Data;
+
+            //행운 주사위 이벤트는 주사위 추가를 할 수 없으므로, + 아이콘 OFF
+            _plusIcon_evnt.SetActive(evntAct.CheckStat != ICreature.Stats.LUC);
+        }
 
         //현재 선택한 행동의 최대 주사위 개수만큼 슬롯을 활성화
         for (int i = 0; i < diceSlot.Length; i++)
         {
-            if (i < PlayerSys.ActList[_actController.NOW_CURSOR].Data.DiceMax)
+            if (_actController.SITUATION == ActionController.Situation.Battle)
             {
-                diceSlot[i].gameObject.SetActive(true);
-                diceSlot[i].enabled = true;
-                diceSlot[i].sprite = _spr_diceSlot[0];
+                if (i < btlAct.DiceMax)
+                {
+                    diceSlot[i].gameObject.SetActive(true);
+                    diceSlot[i].enabled = true;
+                    diceSlot[i].sprite = _spr_diceSlot[0];
+                }
+                else
+                    diceSlot[i].gameObject.SetActive(false);
             }
-            else
-                diceSlot[i].gameObject.SetActive(false);
+            else if (_actController.SITUATION == ActionController.Situation.Event)
+            {
+                if (evntAct.CheckStat == ICreature.Stats.LUC)  //행운 주사위 이벤트 시 모든 주사위 슬롯과 '+'아이콘을 off
+                    diceSlot[i].gameObject.SetActive(false);
+                else if (evntAct.CheckStat != ICreature.Stats.No)  //스탯이 없는 이벤트가 아니라면
+                {
+                    diceSlot[i].gameObject.SetActive(true);
+                    diceSlot[i].enabled = true;
+                    diceSlot[i].sprite = _spr_diceSlot[0];
+                }
+            }
         }
 
         //행동 결정 버튼 비활성화
         DecisionBtn_OnOff(_actController.SITUATION == ActionController.Situation.Event);
 
         //소모 예정 행동력 표기 초기화
-        PlayerSys.Change_Ap_UsePreview(_nowUseAp);
+        PlayerSys.Change_Ap_UsePreview(_nowDice);
     }
 
     public void DecisionBtn_OnOff(bool b)
@@ -319,6 +368,5 @@ public class DiceSelectPannel : MonoBehaviour
     public void DiceZero()
     {
         _nowDice = 0;
-        _nowUseAp = 0;
     }
 }

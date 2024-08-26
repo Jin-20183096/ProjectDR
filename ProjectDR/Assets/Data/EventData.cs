@@ -9,14 +9,10 @@ public class EventData : ScriptableObject
     public enum EventType   //Battle 타입과 같은 전투 이벤트는 enum에서 항상 맨 뒤에 배치시켜야 함
     { No, Event, Battle, Boss }
 
-    public enum CheckStat
-    {
-        STR, INT, DEX, AGI, CON, WIL, LUC   //힘, 지능, 손재주, 민첩, 건강, 의지, 행운(D6)
-    }
-
     public enum CheckRule
     {
-        No, Total_Up, Total_Between, Each_Up, Each_Between
+        No, Total_Up, Total_Down, Total_Between, Total_Odd, Total_Even, 
+        Each_Up, Each_Down, Each_Between, Each_Odd, Each_Even
     }
 
     public enum ResultType
@@ -55,21 +51,10 @@ public class EventData : ScriptableObject
         public string Name; //이벤트 행동명
 
         public bool IsDiceCheck;    //주사위 체크 행동 여부
-        public DiceCheck Check;     //(주사위 체크 행동이면) 주사위 체크 방식
-        public int UseAp;           //(주사위 체크 행동이 아니면) 소모하는 행동력
+        public ICreature.Stats CheckStat;     //(주사위 체크 행동이면) 주사위 체크 방식
 
         public int[] Result_Success;    //행동 성공 시 결과 인덱스 목록
-
-        public int[] Result_Fail;       //행동 실패 시 결과 인덱스 목록 (체크 최소값을 넘지못한 실패 인덱스 목록)
-        public int[] Result_FailMax;    //체크 최대값을 넘긴 실패 인덱스 목록
-    }
-
-    [Serializable]
-    public class DiceCheck
-    {
-        public ICreature.Stats Stat;    //행동 체크 스탯
-
-        public CheckRule Rule;          //행동 체크 규칙
+        public int[] Result_Fail;       //행동 실패 시 결과 인덱스 목록
     }
 
     [Serializable]

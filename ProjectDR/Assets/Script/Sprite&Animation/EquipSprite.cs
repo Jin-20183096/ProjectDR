@@ -14,7 +14,9 @@ public class EquipSprite : MonoBehaviour
     [SerializeField]
     private Material _defaultMat;
     [SerializeField]
-    private Material _hitMat;
+    private Material _hitMat_w;
+    [SerializeField]
+    private Material _hitMat_b;
 
     void Awake()
     {
@@ -83,8 +85,14 @@ public class EquipSprite : MonoBehaviour
 
     public IEnumerator HitFlash()
     {
-        _spr.material = _hitMat;
+        _spr.material = _hitMat_b;
+
         yield return new WaitForSecondsRealtime(0.125f);
+
+        _spr.material = _hitMat_w;
+
+        yield return new WaitForSecondsRealtime(0.125f);
+
         _spr.material = _defaultMat;
     }
 }

@@ -162,15 +162,23 @@ public class EnemySystem : MonoBehaviour, ICreature
         get { return _banActType[4]; }
     }
 
-    Stack<BtlActClass> _act_stack; //행동 스택
+    Stack<BtlActClass> _act_stack;  //행동 스택
+    [SerializeField]
+    private string _actClueLog;     //행동 단서 로그
+    public string ActClueLog
+    {
+        get { return _actClueLog; }
+    }
 
     [Header("# Effect")]
     [SerializeField]
     private Transform _eff_group;
     [SerializeField]
-    private ParticleSystem _eff_blood;
+    private ParticleSystem _eff_hit;
     [SerializeField]
     private ParticleSystem _eff_block;
+    [SerializeField]
+    private GameObject _dmgText_prefab;
 
     void Awake()
     {
@@ -206,6 +214,8 @@ public class EnemySystem : MonoBehaviour, ICreature
             //행동 트리 할당 off
             Destroy(_bt);
             _bt = null;
+
+            _actTypeList.Clear();
 
             _e_spr.gameObject.SetActive(false);  //적 스프라이트 off
         }
@@ -366,10 +376,7 @@ public class EnemySystem : MonoBehaviour, ICreature
         else
             _ac -= value;
 
-        //_icon_ac.SetActive(_ac != 0);
-
-        //if (_ac != 0)
-            _txt_ac.text = _ac.ToString();
+        _txt_ac.text = _ac.ToString();
     }
 
     public void Change_ACMax(bool plus, int value)
@@ -460,23 +467,13 @@ public class EnemySystem : MonoBehaviour, ICreature
         else    //방어도가 없을 때
             Change_Hp(false, dmg);
 
-        ParticleSystem eff;
+        ParticleSystem eff = null;
+        ParticleSystem eff_sub = null;
 
         if (dmgType == BtlActData.DamageType.Defense)
             eff = Instantiate(_eff_block, _eff_group);  //방어 이펙트 파티클
         else
-        {
-            eff = Instantiate(_eff_blood, _eff_group);
-
-            //데미지량에 따른 유혈 파티클 개수 조정
-            var burst1 = eff.emission.GetBurst(0);
-            var burst2 = eff.emission.GetBurst(1);
-
-            burst1.count = 20 * dmg / _hpMax;
-            burst2.count = 20 * dmg / _hpMax;
-            eff.emission.SetBurst(0, burst1);
-            eff.emission.SetBurst(1, burst2);
-        }
+            eff = Instantiate(_eff_hit, _eff_group);
 
         var pos = _e_spr.transform.position;
         var sizeY = _e_spr.GetComponent<SpriteRenderer>().bounds.size.y;
@@ -488,6 +485,15 @@ public class EnemySystem : MonoBehaviour, ICreature
 
         //피격 효과
         _e_spr.StartCoroutine(_e_spr.HitFlash());
+
+        //데미지 폰트
+        var dmgText = Instantiate(_dmgText_prefab.transform, _eff_group);
+
+        //데미지텍스트 좌표 설정
+        dmgText.position = _e_spr.transform.position;
+        //데미지텍스트 값 설정
+        dmgText.GetChild(0).GetComponent<TextMeshPro>().text = dmg.ToString();
+        dmgText.GetChild(1).GetComponent<TextMeshPro>().text = dmg.ToString();
     }
 
     public void Request_NextAction()    //전투 시스템에서 다음 턴 행동을 요청
@@ -646,6 +652,7 @@ public class EnemySystem : MonoBehaviour, ICreature
         if (_actTypeList.Count > 0)
             type = _actTypeList[Random.Range(0, _actTypeList.Count)];
 
+        _actClueLog = "";
         switch (type)
         {
             case BtlActData.ActionType.No:
@@ -685,7 +692,7 @@ public class EnemySystem : MonoBehaviour, ICreature
         if (actData.NoDice == false && _ap < actData.DiceMin)    //행동력을 소모하면서, 현재 행동력이 최소 행동력보다 낮으면
         {
             Debug.Log("행동력 부족으로 대기");
-            _act_stack.Push(_waitAct);    //대기 행동 PUSH
+            Push_Wait();
         }
 
         return true;
@@ -706,7 +713,7 @@ public class EnemySystem : MonoBehaviour, ICreature
         if (actData.NoDice == false && _ap < actData.DiceMin)    //행동력을 소모하면서, 현재 행동력이 최소 행동력보다 낮으면
         {
             Debug.Log("행동력 부족으로 대기");
-            _act_stack.Push(_waitAct);    //대기 행동 PUSH
+            Push_Wait();
         }
         else
         {
@@ -731,7 +738,7 @@ public class EnemySystem : MonoBehaviour, ICreature
         if (actData.NoDice == false && _ap < actData.DiceMin)    //행동력을 소모하면서, 현재 행동력이 최소 행동력보다 낮으면
         {
             Debug.Log("행동력 부족으로 대기");
-            _act_stack.Push(_waitAct);    //대기 행동 PUSH
+            Push_Wait();
         }
         else
         {
@@ -758,7 +765,7 @@ public class EnemySystem : MonoBehaviour, ICreature
         if (actData.NoDice == false && _ap < actData.DiceMin)    //행동력을 소모하면서, 현재 행동력이 최소 행동력보다 낮으면
         {
             Debug.Log("행동력 부족으로 대기");
-            _act_stack.Push(_waitAct);    //대기 행동 PUSH
+            Push_Wait();
         }
 
         return true;
@@ -767,7 +774,56 @@ public class EnemySystem : MonoBehaviour, ICreature
     [Task]
     public bool Push_Wait() //대기 행동 push
     {
+        _actClueLog = "";
         _act_stack.Push(_waitAct);
+
+        return true;
+    }
+
+    [Task]
+    public bool Set_ActClueLog0()
+    {
+        if (_data.ActClueLog.Length > 0) _actClueLog = _data.ActClueLog[0];
+
+        return true;
+    }
+
+    [Task]
+    public bool Set_ActClueLog1()
+    {
+        if (_data.ActClueLog.Length > 1) _actClueLog = _data.ActClueLog[1];
+
+        return true;
+    }
+
+    [Task]
+    public bool Set_ActClueLog2()
+    {
+        if (_data.ActClueLog.Length > 2) _actClueLog = _data.ActClueLog[2];
+
+        return true;
+    }
+
+    [Task]
+    public bool Set_ActClueLog3()
+    {
+        if (_data.ActClueLog.Length > 3) _actClueLog = _data.ActClueLog[3];
+
+        return true;
+    }
+
+    [Task]
+    public bool Set_ActClueLog4()
+    {
+        if (_data.ActClueLog.Length > 4) _actClueLog = _data.ActClueLog[4];
+
+        return true;
+    }
+
+    [Task]
+    public bool Set_ActClueLog5()
+    {
+        if (_data.ActClueLog.Length > 5) _actClueLog = _data.ActClueLog[5];
 
         return true;
     }

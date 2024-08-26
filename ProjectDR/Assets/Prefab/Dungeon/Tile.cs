@@ -8,7 +8,7 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
 {
     Color ColorUnknown = new Color32(0, 0, 0, 255);  //안 가본 색
     Color ColorDark = new Color32(80, 80, 80, 255);  //시야 밖의 가본 색
-    Color ColorSightAround = new Color32(150, 150, 150, 255);   //가장자리 시야의 색
+    Color ColorSightAround = new Color32(170, 170, 170, 255);   //가장자리 시야의 색
     Color ColorSight = new Color32(255, 255, 255, 255); //시야 내의 색
 
     [SerializeField]

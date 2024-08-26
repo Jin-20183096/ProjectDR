@@ -22,41 +22,25 @@ MonoBehaviour:
       \uAC78\uB824\uC788\uB2E4."
     ActList:
     - Name: "\uADFC\uCC98\uC5D0\uC11C \uC5F4\uC1E0\uB97C \uCC3E\uC544\uBCF8\uB2E4"
-      IsDiceCheck: 0
-      Check:
-        Stat: 0
-        Rule: 0
-      UseAp: 2
+      IsDiceCheck: 1
+      CheckStat: 15
       Result_Success: 00000000
       Result_Fail: 01000000
-      Result_FailMax: 
     - Name: "\uC790\uBB3C\uC1E0\uB97C \uB534\uB2E4"
       IsDiceCheck: 1
-      Check:
-        Stat: 3
-        Rule: 1
-      UseAp: 0
+      CheckStat: 3
       Result_Success: 02000000
       Result_Fail: 03000000
-      Result_FailMax: 04000000
     - Name: "\uC790\uBB3C\uC1E0\uB97C \uAC15\uC81C\uB85C \uBD80\uC21C\uB2E4"
       IsDiceCheck: 1
-      Check:
-        Stat: 1
-        Rule: 2
-      UseAp: 0
+      CheckStat: 1
       Result_Success: 05000000
       Result_Fail: 06000000
-      Result_FailMax: 07000000
     - Name: "\uC0C1\uC790\uB97C \uBB34\uC2DC\uD558\uACE0 \uB5A0\uB09C\uB2E4"
       IsDiceCheck: 0
-      Check:
-        Stat: 0
-        Rule: 0
-      UseAp: 0
+      CheckStat: 0
       Result_Success: 08000000
       Result_Fail: 
-      Result_FailMax: 
     Result:
     - Log: "\uC5F4\uC1E0\uB97C \uCC3E\uC544\uB0B4 \uC0C1\uC790\uB97C \uC5F4\uC5C8\uB2E4."
       Type: 0400000008000000

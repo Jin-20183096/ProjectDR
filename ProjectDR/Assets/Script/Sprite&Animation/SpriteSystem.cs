@@ -39,7 +39,9 @@ public class SpriteSystem : MonoBehaviour
     [SerializeField]
     private Material _defaultMat;
     [SerializeField]
-    private Material _hitMat;
+    private Material _hitMat_b;
+    [SerializeField]
+    private Material _hitMat_w;
 
     private string _actTrigger;
 
@@ -64,6 +66,7 @@ public class SpriteSystem : MonoBehaviour
             _equipSpr[i].Flip_X(isLeft);
     }
 
+    /*
     public void Set_CommonMoveSet(CommonTrigger trigger)
     {
         _anima.SetTrigger(trigger.ToString());
@@ -75,6 +78,7 @@ public class SpriteSystem : MonoBehaviour
         }
     }
 
+    
     public void Set_ActionMoveSet_Atk(AtkMoveSet atk, bool isTrue)
     {
         _anima.SetBool(atk.ToString(), isTrue);
@@ -139,7 +143,7 @@ public class SpriteSystem : MonoBehaviour
             _equipSpr[i].Set_AnimaTrigger(trigger);
         }
     }
-
+    */
     public void Set_ActHitBox(HitBoxType type)
     {
         if (type == HitBoxType.Atk || type == HitBoxType.Def)
@@ -175,7 +179,7 @@ public class SpriteSystem : MonoBehaviour
 
         if (Vector3.Distance(transform.position, _moveDest) <= 0.5f)
         {
-            Set_ActionTrigger();
+            //Set_ActionTrigger();
             StopCoroutine(Move_Coroutine());
         }
         else
@@ -241,12 +245,17 @@ public class SpriteSystem : MonoBehaviour
 
     public IEnumerator HitFlash()
     {
-        _spr.material = _hitMat;
+        _spr.material = _hitMat_b;
 
         for (int i = 0; i < _equipSpr.Length; i++)
             _equipSpr[i].StartCoroutine(_equipSpr[i].HitFlash());
 
         yield return new WaitForSecondsRealtime(0.125f);
+
+        _spr.material = _hitMat_w;
+
+        yield return new WaitForSecondsRealtime(0.125f);
+
         _spr.material = _defaultMat;
     }
 }

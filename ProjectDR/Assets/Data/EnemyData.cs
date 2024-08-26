@@ -30,6 +30,7 @@ public class EnemyData : ScriptableObject
 
     [Header("# BT")]
     public TextAsset BT;
+    public string[] ActClueLog;
 
     [Header("# Sprite Animation")]
     public Sprite DefaultSprite;    //적 기본 스프라이트

@@ -19,7 +19,7 @@ public class EnemySystem : MonoBehaviour, ICreature
     [SerializeField]
     private Animator _e_anima;
 
-    private PandaBehaviour _bt;
+    private PandaBehaviour _bt;     //행동 트리
 
     [Header("# Enemy UI")]
     [SerializeField]
@@ -125,18 +125,18 @@ public class EnemySystem : MonoBehaviour, ICreature
 
     [Header("# Action Related")]
     [SerializeField]
-    private List<BtlActData.ActionType> _actTypeList;    //행동타입 목록
+    private List<BtlActData.ActType> _btlActTypeList;    //전투행동 타입 목록
 
     [SerializeField]
-    private List<BtlActClass> _atkAct; //공격 행동 목록
+    private List<BtlAct> _atkList; //공격 행동 목록
     [SerializeField]
-    private List<BtlActClass> _defAct; //방어 행동 목록
+    private List<BtlAct> _defList; //방어 행동 목록
     [SerializeField]
-    private List<BtlActClass> _dgeAct; //회피 행동 목록
+    private List<BtlAct> _dgeList; //회피 행동 목록
     [SerializeField]
-    private List<BtlActClass> _tacAct; //전술 행동 목록
+    private List<BtlAct> _tacList; //전술 행동 목록
     [SerializeField]
-    private BtlActClass _waitAct;     //대기 행동
+    private BtlAct _wait;     //대기 행동
 
     [SerializeField]
     private int _nowDice;               //적이 굴릴 주사위
@@ -162,12 +162,12 @@ public class EnemySystem : MonoBehaviour, ICreature
         get { return _banActType[4]; }
     }
 
-    Stack<BtlActClass> _act_stack;  //행동 스택
+    Stack<BtlAct> _btlActStack;    //전투행동 스택
     [SerializeField]
-    private string _actClueLog;     //행동 단서 로그
-    public string ActClueLog
+    private string _btlActClueLog;      //전투행동 단서 로그
+    public string BtlActClueLog
     {
-        get { return _actClueLog; }
+        get { return _btlActClueLog; }
     }
 
     [Header("# Effect")]
@@ -182,14 +182,14 @@ public class EnemySystem : MonoBehaviour, ICreature
 
     void Awake()
     {
-        _act_stack = new Stack<BtlActClass>();
+        _btlActStack = new Stack<BtlAct>();
     }
 
-    public void Set_BattleEnemy(bool nowBattle, EnemyData new_enemy)
+    public void Set_BattleEnemy(bool isNowBattle, EnemyData new_enemy)
     {
-        _pannel_info.SetActive(nowBattle);
+        _pannel_info.SetActive(isNowBattle);    //적 기본정보창 on/off
 
-        if (nowBattle)
+        if (isNowBattle)
         {
             _data = new_enemy;
 
@@ -215,7 +215,7 @@ public class EnemySystem : MonoBehaviour, ICreature
             Destroy(_bt);
             _bt = null;
 
-            _actTypeList.Clear();
+            _btlActTypeList.Clear(); //보유한 전투행동 타입 목록 초기화
 
             _e_spr.gameObject.SetActive(false);  //적 스프라이트 off
         }
@@ -233,24 +233,24 @@ public class EnemySystem : MonoBehaviour, ICreature
         _apMax = _data.ApMax;
         _ap = Random.Range(1, _apMax + 1);
 
-        //행동목록 설정
-        _actTypeList.Clear();  //행동타입 목록 초기화
+        //전투행동 타입 목록 설정
+        _btlActTypeList.Clear(); //전투행동 타입 목록 초기화
 
-        _atkAct.Clear();
-        _atkAct = _data.Act_Atk.ToList();  //공격 행동 목록에 추가
-        if (_atkAct.Count > 0) _actTypeList.Add(BtlActData.ActionType.Atk);
+        _atkList.Clear();
+        _atkList = _data.Act_Atk.ToList();  //공격 행동 목록에 추가
+        if (_atkList.Count > 0) _btlActTypeList.Add(BtlActData.ActType.Atk);
 
-        _defAct.Clear();
-        _defAct = _data.Act_Def.ToList();  //방어 행동 목록에 추가
-        if (_defAct.Count > 0) _actTypeList.Add(BtlActData.ActionType.Def);
+        _defList.Clear();
+        _defList = _data.Act_Def.ToList();  //방어 행동 목록에 추가
+        if (_defList.Count > 0) _btlActTypeList.Add(BtlActData.ActType.Def);
 
-        _dgeAct.Clear();
-        _dgeAct = _data.Act_Dge.ToList();  //회피 행동 목록에 추가
-        if (_dgeAct.Count > 0) _actTypeList.Add(BtlActData.ActionType.Dge);
+        _dgeList.Clear();
+        _dgeList = _data.Act_Dge.ToList();  //회피 행동 목록에 추가
+        if (_dgeList.Count > 0) _btlActTypeList.Add(BtlActData.ActType.Dge);
 
-        _tacAct.Clear();
-        _tacAct = _data.Act_Tac.ToList();  //전술 행동 목록에 추가
-        if (_tacAct.Count > 0) _actTypeList.Add(BtlActData.ActionType.Tac);
+        _tacList.Clear();
+        _tacList = _data.Act_Tac.ToList();  //전술 행동 목록에 추가
+        if (_tacList.Count > 0) _btlActTypeList.Add(BtlActData.ActType.Tac);
 
         //새로 설정된 값을 적용
         _txt_name.text = NAME;  //이름
@@ -280,7 +280,7 @@ public class EnemySystem : MonoBehaviour, ICreature
         _bt.Apply();
     }
 
-    public bool IsPlayer() => false;
+    public bool IsPlayer() => false;    //플레이어인가? => False
 
     public void Change_Hp(bool plus, int value)
     {
@@ -387,8 +387,10 @@ public class EnemySystem : MonoBehaviour, ICreature
         else
             _acMax -= value;
 
-        if (_ac >= _acMax)      //최대 HP가 현재 HP보다 낮아졌을 경우
-            _ac = _acMax;       //낮아진 최대 HP만큼 현재 HP를 설정
+        /*
+        if (_ac >= _acMax)      //최대 방어도가 현재 방어도보다 낮아졌을 경우
+            _ac = _acMax;       //낮아진 최대 방어도만큼 현재 방어도를 설정
+        */
 
         //변경된 값만큼 수치 변경
         _icon_ac.SetActive(_acMax != 0);
@@ -468,7 +470,6 @@ public class EnemySystem : MonoBehaviour, ICreature
             Change_Hp(false, dmg);
 
         ParticleSystem eff = null;
-        ParticleSystem eff_sub = null;
 
         if (dmgType == BtlActData.DamageType.Defense)
             eff = Instantiate(_eff_block, _eff_group);  //방어 이펙트 파티클
@@ -496,28 +497,30 @@ public class EnemySystem : MonoBehaviour, ICreature
         dmgText.GetChild(1).GetComponent<TextMeshPro>().text = dmg.ToString();
     }
 
-    public void Request_NextAction()    //전투 시스템에서 다음 턴 행동을 요청
+    public void Request_NextBtlAct()    //전투 시스템에서 다음 턴 전투행동을 요청
     {
         _bt.scripts = new TextAsset[] { _data.BT };
         _bt.Compile();
         _bt.Apply();
 
-        if (_act_stack.Count == 0)  //행동 스탯에 행동이 없을 경우
+        if (_btlActStack.Count == 0)  //전투행동 스택에 행동이 없을 경우
         {
-            //행동트리를 통해 행동 선택
+            //행동트리를 통해 전투행동 선택
             _bt.Tick();
         }
 
-        var peek = _act_stack.Peek().Data;    //행동 스택 맨 위의 행동
-        Debug.Log("적이 다음 할 행동: " + peek.Name);
+        var peek = _btlActStack.Peek().Data;    //전투행동 스택 맨 위의 행동
+        Debug.Log("적이 다음 할 전투행동: " + peek.Name);
 
-        if (peek.NoDice == false && _ap < peek.DiceMin)  //스택 맨 위의 행동이 행동력을 소모하면서, 현재 행동력이 최소 행동력보다 낮으면
+        //스택 맨 위의 전투행동이 행동력을 소모하고
+        //현재 행동력이 최소 행동력보다 낮으면
+        if (peek.NoDice == false && _ap < peek.DiceMin)  
         {
-            _act_stack.Push(_waitAct);    //대기 행동 PUSH
-            Debug.Log("하지만 행동력이 부족해 " + _waitAct.Data.Name + " 하기로 함");
+            _btlActStack.Push(_wait);    //대기 행동 PUSH
+            Debug.Log("하지만 행동력이 부족해 " + _wait.Data.Name + " 하기로 함");
         }
 
-        BtlActClass nowAct = _act_stack.Pop();
+        BtlAct nowAct = _btlActStack.Pop();
         BtlActData data = nowAct.Data;
 
         //주사위 개수가 사전에 지정되지 않았을 경우
@@ -555,18 +558,18 @@ public class EnemySystem : MonoBehaviour, ICreature
         for (int i = 0; i < _nowDice; i++)
             _result[i] = statArr[Random.Range(0, statArr.Length)];
 
-        //전투 시스템에 행동 정보 전달
-        _btlSys.Set_BtlAct_Enemy(data, _result);
+        //전투 시스템에 전투행동 정보 전달
+        _btlSys.SetBtlAct_Enemy(data, _result);
 
-        //현재 고른 행동 정보 초기화
-        _nowDice = 0;               //행동의 주사위 개수 초기화
+        //현재 고른 전투행동 정보 초기화
+        _nowDice = 0;               //전투행동의 주사위 개수 초기화
 
         _result = new int[5] { -1, -1, -1, -1, -1 };    //주사위 값 전부 초기화
     }
 
     ///////////////////////BT에서 사용되는 함수들///////////////////////
     [Task]
-    public bool Is_TrueOrFalse() //무작위로
+    public bool Is_50Percent() //50% 확률로
     {
         if (Random.value < 0.5f) return true;
         else return false;
@@ -580,52 +583,66 @@ public class EnemySystem : MonoBehaviour, ICreature
     }
 
     [Task]
-    public bool Is_AtkSuccess() //이전 턴 공격 성공 여부 반환
+    public bool Is_AtkSuccess() //이전 턴 공격 성공 시 True
     {
         if (_btlSys.E_HIT_ATK) return true;
         else return false;
     }
 
     [Task]
-    public bool Is_DefSuccess() //이전 턴 방어 성공 여부 반환
+    public bool Is_DefSuccess() //이전 턴 방어 성공 시 True
     {
         if (_btlSys.E_HIT_DEF) return true;
         else return false;
     }
 
     [Task]
-    public bool Is_DgeSuccess() //이전 턴 회피 성공 여부 반환
+    public bool Is_DgeSuccess() //이전 턴 회피 성공 시 True
     {
         if (_btlSys.E_HIT_DGE) return true;
         else return false;
     }
 
     [Task]
-    public bool Is_TacSuccess() //이전 턴 전술 사용 여부 반환
+    public bool Is_TacSuccess() //이전 턴 전술 사용 시 True
     {
         if (_btlSys.E_HIT_TAC) return true;
         else return false;
     }
 
     [Task]
-    public bool Is_P_Ap_0Under()  //플레이어 행동력 0이하 여부 반환
+    public bool Is_P_Ap_0Under()  //플레이어 행동력 0 이하면 True
     {
         if (PlayerSys.AP <= 0) return true;
         else return false;
     }
 
     [Task]
-    public bool Is_P_Ap_4Over() //플레이어 행동력 
+    public bool Is_P_Ap_2Under()    //플레이어 행동력 2 이하면 True
+    {
+        if (PlayerSys.AP <= 2) return true;
+        else return false;
+    }
+
+    [Task]
+    public bool Is_P_Ap_3Over()     //플레이어 행동력 3 이상이면 True
+    {
+        if (PlayerSys.AP >= 3) return true;
+        else return false;
+    }
+
+    [Task]
+    public bool Is_P_Ap_4Over()     //플레이어 행동력 4 이상이면 True
     {
         if (PlayerSys.AP >= 4) return true;
         else return false;
     }
 
     [Task]
-    public bool Is_P_FailDefDge()   //플레이어 방어/회피 무의미했는지 여부 반환
+    public bool Is_P_FailDefDge()   //플레이어 방어/회피 무의미했다면 True
     {
-        if ((_btlSys.P_LAST == BtlActData.ActionType.Def && _btlSys.P_HIT_DEF == false) ||
-            (_btlSys.P_LAST == BtlActData.ActionType.Dge && _btlSys.P_HIT_DGE == false))
+        if ((_btlSys.P_LAST == BtlActData.ActType.Def && _btlSys.P_HIT_DEF == false) ||
+            (_btlSys.P_LAST == BtlActData.ActType.Dge && _btlSys.P_HIT_DGE == false))
         {
             return true;
         }
@@ -634,40 +651,40 @@ public class EnemySystem : MonoBehaviour, ICreature
     }
 
     [Task]
-    public bool Is_P_LastWait() //플레이어 마지막 행동이 대기인지 여부 반환
+    public bool Is_P_LastWait() //플레이어 마지막 전투행동이 대기면 True
     {
-        if (_btlSys.P_LAST == BtlActData.ActionType.Wait)
+        if (_btlSys.P_LAST == BtlActData.ActType.Wait)
             return true;
         else
             return false;
     }
 
     [Task]
-    public bool Push_RandomAction() //무작위 행동 PUSH
+    public bool Push_RandomBtlAct() //무작위 전투행동 PUSH 
     {
-        BtlActData.ActionType type = BtlActData.ActionType.No;
+        BtlActData.ActType type = BtlActData.ActType.No;
 
-        Debug.Log("선택 가능한 행동 타입 개수: " + _actTypeList.Count);
+        Debug.Log("선택 가능한 전투행동 타입 개수: " + _btlActTypeList.Count);
 
-        if (_actTypeList.Count > 0)
-            type = _actTypeList[Random.Range(0, _actTypeList.Count)];
+        if (_btlActTypeList.Count > 0)
+            type = _btlActTypeList[Random.Range(0, _btlActTypeList.Count)];
 
-        _actClueLog = "";
+        _btlActClueLog = "";
         switch (type)
         {
-            case BtlActData.ActionType.No:
+            case BtlActData.ActType.No:
                 Debug.Log("적은 아무 행동도 할 수 없음");
                 break;
-            case BtlActData.ActionType.Atk:
+            case BtlActData.ActType.Atk:
                 Push_RandomAtk();
                 break;
-            case BtlActData.ActionType.Def:
+            case BtlActData.ActType.Def:
                 Push_RandomDef();
                 break;
-            case BtlActData.ActionType.Dge:
+            case BtlActData.ActType.Dge:
                 Push_RandomDge();
                 break;
-            case BtlActData.ActionType.Tac:
+            case BtlActData.ActType.Tac:
                 Push_RandomTac();
                 break;
         }
@@ -678,14 +695,14 @@ public class EnemySystem : MonoBehaviour, ICreature
     [Task]
     public bool Push_RandomAtk()    //무작위 공격 행동 PUSH
     {
-        BtlActClass act;
+        BtlAct act;
 
-        if (_atkAct.Count != 0)    //공격 행동을 보유했을 경우
-            act = _atkAct[Random.Range(0, _atkAct.Count)];    //무작위 공격 행동 지정
+        if (_atkList.Count != 0)    //공격 행동을 보유했을 경우
+            act = _atkList[Random.Range(0, _atkList.Count)];    //무작위 공격 행동 지정
         else
             return false;
 
-        _act_stack.Push(act);
+        _btlActStack.Push(act);
 
         var actData = act.Data;
 
@@ -701,10 +718,10 @@ public class EnemySystem : MonoBehaviour, ICreature
     [Task]
     public bool Push_RandomDef()    //무작위 방어 행동 PUSH
     {
-        BtlActClass act;
+        BtlAct act;
 
-        if (_defAct.Count != 0)    //방어 행동을 보유했을 경우
-            act = _defAct[Random.Range(0, _defAct.Count)];    //무작위 방어 행동 지정
+        if (_defList.Count != 0)    //방어 행동을 보유했을 경우
+            act = _defList[Random.Range(0, _defList.Count)];    //무작위 방어 행동 지정
         else
             return false;
 
@@ -717,7 +734,7 @@ public class EnemySystem : MonoBehaviour, ICreature
         }
         else
         {
-            _act_stack.Push(act);
+            _btlActStack.Push(act);
         }
 
         return true;
@@ -726,10 +743,10 @@ public class EnemySystem : MonoBehaviour, ICreature
     [Task]
     public bool Push_RandomDge()    //무작위 회피 행동 push
     {
-        BtlActClass act;
+        BtlAct act;
 
-        if (_dgeAct.Count != 0)    //회피 행동을 보유했을 경우
-            act = _dgeAct[Random.Range(0, _dgeAct.Count)];    //무작위 회피 행동 지정
+        if (_dgeList.Count != 0)    //회피 행동을 보유했을 경우
+            act = _dgeList[Random.Range(0, _dgeList.Count)];    //무작위 회피 행동 지정
         else
             return false;
 
@@ -742,7 +759,7 @@ public class EnemySystem : MonoBehaviour, ICreature
         }
         else
         {
-            _act_stack.Push(act);
+            _btlActStack.Push(act);
         }
 
         return true;
@@ -751,14 +768,12 @@ public class EnemySystem : MonoBehaviour, ICreature
     [Task]
     public bool Push_RandomTac()    //무작위 전술 행동 push
     {
-        BtlActClass act;
+        BtlAct act;
 
-        if (_tacAct.Count != 0)    //전술 행동을 보유했을 경우
-            act = _tacAct[Random.Range(0, _tacAct.Count)];    //무작위 전술 행동 지정
+        if (_tacList.Count != 0)    //전술 행동을 보유했을 경우
+            act = _tacList[Random.Range(0, _tacList.Count)];    //무작위 전술 행동 지정
         else
             return false;
-
-        _act_stack.Push(act);
 
         var actData = act.Data;
 
@@ -767,6 +782,10 @@ public class EnemySystem : MonoBehaviour, ICreature
             Debug.Log("행동력 부족으로 대기");
             Push_Wait();
         }
+        else
+        {
+            _btlActStack.Push(act);
+        }
 
         return true;
     }
@@ -774,8 +793,8 @@ public class EnemySystem : MonoBehaviour, ICreature
     [Task]
     public bool Push_Wait() //대기 행동 push
     {
-        _actClueLog = "";
-        _act_stack.Push(_waitAct);
+        _btlActClueLog = "";
+        _btlActStack.Push(_wait);
 
         return true;
     }
@@ -783,7 +802,7 @@ public class EnemySystem : MonoBehaviour, ICreature
     [Task]
     public bool Set_ActClueLog0()
     {
-        if (_data.ActClueLog.Length > 0) _actClueLog = _data.ActClueLog[0];
+        if (_data.ActClueLog.Length > 0) _btlActClueLog = _data.ActClueLog[0];
 
         return true;
     }
@@ -791,7 +810,7 @@ public class EnemySystem : MonoBehaviour, ICreature
     [Task]
     public bool Set_ActClueLog1()
     {
-        if (_data.ActClueLog.Length > 1) _actClueLog = _data.ActClueLog[1];
+        if (_data.ActClueLog.Length > 1) _btlActClueLog = _data.ActClueLog[1];
 
         return true;
     }
@@ -799,7 +818,7 @@ public class EnemySystem : MonoBehaviour, ICreature
     [Task]
     public bool Set_ActClueLog2()
     {
-        if (_data.ActClueLog.Length > 2) _actClueLog = _data.ActClueLog[2];
+        if (_data.ActClueLog.Length > 2) _btlActClueLog = _data.ActClueLog[2];
 
         return true;
     }
@@ -807,7 +826,7 @@ public class EnemySystem : MonoBehaviour, ICreature
     [Task]
     public bool Set_ActClueLog3()
     {
-        if (_data.ActClueLog.Length > 3) _actClueLog = _data.ActClueLog[3];
+        if (_data.ActClueLog.Length > 3) _btlActClueLog = _data.ActClueLog[3];
 
         return true;
     }
@@ -815,7 +834,7 @@ public class EnemySystem : MonoBehaviour, ICreature
     [Task]
     public bool Set_ActClueLog4()
     {
-        if (_data.ActClueLog.Length > 4) _actClueLog = _data.ActClueLog[4];
+        if (_data.ActClueLog.Length > 4) _btlActClueLog = _data.ActClueLog[4];
 
         return true;
     }
@@ -823,7 +842,7 @@ public class EnemySystem : MonoBehaviour, ICreature
     [Task]
     public bool Set_ActClueLog5()
     {
-        if (_data.ActClueLog.Length > 5) _actClueLog = _data.ActClueLog[5];
+        if (_data.ActClueLog.Length > 5) _btlActClueLog = _data.ActClueLog[5];
 
         return true;
     }

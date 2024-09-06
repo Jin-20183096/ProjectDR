@@ -7,7 +7,7 @@ public class GameLog : MonoBehaviour
 {
     public enum LogSituation
     {
-        No, EvntStart, BtlTurnStart, ActEffect, BtlFlow, RunEnd, EvntSuccess, EvntFail, EvntResult
+        No, EvntStart, BtlTurnStart, BtlActEffect, BtlFlow, RunEnd, EvntSuccess, EvntFail, EvntResult
     }
 
     [SerializeField]
@@ -98,7 +98,7 @@ public class GameLog : MonoBehaviour
             NewLog(MakeSentence((isP ? _p_name : _e_name) + "의 공격이 명중해,\n",
                                 (isP ? _e_name : _p_name), targetPost, effText));
 
-        LogPrint_Start(LogSituation.ActEffect);
+        LogPrint_Start(LogSituation.BtlActEffect);
     }
 
     public void SetLog_AtkDmg(bool isP, string targetPost, string effText) //로그 설정: 공격 피해 주었을 때 효과 출력
@@ -112,7 +112,7 @@ public class GameLog : MonoBehaviour
             NewLog(MakeSentence((isP ? _p_name : _e_name) + "의 공격이", (isP ? _e_name : _p_name) + "에게 피해를 주어,\n",
                                 (isP ? _e_name : _p_name), targetPost, effText));
 
-        LogPrint_Start(LogSituation.ActEffect);
+        LogPrint_Start(LogSituation.BtlActEffect);
     }
 
     public void SetLog_AtkBlocked(bool isP, string targetPost, string effText) //로그 설정: 공격이 막혔을 때 효과 출력
@@ -125,7 +125,7 @@ public class GameLog : MonoBehaviour
             NewLog(MakeSentence((isP ? _p_name : _e_name) + "의 공격이 막혀,\n",
                                 (isP ? _e_name : _p_name), targetPost, effText));
             
-        LogPrint_Start(LogSituation.ActEffect);
+        LogPrint_Start(LogSituation.BtlActEffect);
     }
 
     public void SetLog_AtkMissed(bool isP, string targetPost, string effText)  //로그 설정: 공격이 빗나갔을 때 효과 출력
@@ -138,7 +138,7 @@ public class GameLog : MonoBehaviour
             NewLog(MakeSentence((isP ? _p_name : _e_name) + "의 공격이 빗나가,\n",
                                 (isP ? _e_name : _p_name), targetPost, effText));
 
-        LogPrint_Start(LogSituation.ActEffect);
+        LogPrint_Start(LogSituation.BtlActEffect);
     }
 
     public void SetLog_DefEffect(bool isP, string targetPost, string effText)  //로그 설정: 방어 효과 출력
@@ -151,7 +151,7 @@ public class GameLog : MonoBehaviour
             NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", "공격을 방어해,\n",
                                 (isP ? _e_name : _p_name), targetPost, effText));
         
-        LogPrint_Start(LogSituation.ActEffect);
+        LogPrint_Start(LogSituation.BtlActEffect);
     }
 
     public void SetLog_DefEffect_NoAtk(bool isP, string targetPost, string effText)    //로그 설정: 상대가 공격하지 않았을 때 방어 효과 출력
@@ -164,7 +164,7 @@ public class GameLog : MonoBehaviour
             NewLog(MakeSentence((isP ? _e_name : _p_name), "[이/가]", "공격하지 않아,\n",
                                 (isP ? _p_name : _e_name), targetPost, effText));
 
-        LogPrint_Start(LogSituation.ActEffect);
+        LogPrint_Start(LogSituation.BtlActEffect);
     }
 
     public void SetLog_DefEffect_Wait(bool isP, string targetPost, string effText)     //로그 설정: 상대가 대기했을 떄 방어 효과 출력
@@ -177,7 +177,7 @@ public class GameLog : MonoBehaviour
             NewLog(MakeSentence((isP ? _e_name : _p_name), "[이/가]", "상황을 지켜볼 때,\n",
                                 (isP ? _p_name : _e_name), targetPost, effText));
 
-        LogPrint_Start(LogSituation.ActEffect);
+        LogPrint_Start(LogSituation.BtlActEffect);
     }
 
     public void SetLog_DgeEffect(bool isP, string targetPost, string effText)  //로그 설정: 회피 효과 출력
@@ -190,7 +190,7 @@ public class GameLog : MonoBehaviour
             NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", "공격을 피해,\n",
                                 (isP ? _e_name : _p_name), targetPost, effText));
 
-        LogPrint_Start(LogSituation.ActEffect);
+        LogPrint_Start(LogSituation.BtlActEffect);
     }
 
     public void SetLog_DgeEffect_Fail(bool isP, string targetPost, string effText) //로그 설정: 회피 조건 실패 시 효과 출력
@@ -203,7 +203,7 @@ public class GameLog : MonoBehaviour
             NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", "공격을 피하지 못해,\n",
                                 (isP ? _e_name : _p_name), targetPost, effText));
 
-        LogPrint_Start(LogSituation.ActEffect);
+        LogPrint_Start(LogSituation.BtlActEffect);
     }
 
     public void SetLog_DgeEffect_NoAtk(bool isP, string targetPost, string effText)    //로그 설정: 상대가 공격하지 않았을 때 회피 효과 출력
@@ -216,7 +216,7 @@ public class GameLog : MonoBehaviour
             NewLog(MakeSentence((isP ? _e_name : _p_name), "[이/가]", "공격하지 않아,\n",
                                 (isP ? _p_name : _e_name), targetPost, effText));
 
-        LogPrint_Start(LogSituation.ActEffect);
+        LogPrint_Start(LogSituation.BtlActEffect);
     }
 
     public void SetLog_AbilityEffect(bool isP, string ability, string targetPost, string effText)  //로그 설정: 능력 효과 출력
@@ -227,7 +227,7 @@ public class GameLog : MonoBehaviour
             NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", "\"" + ability + "\"의 효과로\n",
                                 (isP ? _e_name : _p_name), targetPost, effText));
 
-        LogPrint_Start(LogSituation.ActEffect);
+        LogPrint_Start(LogSituation.BtlActEffect);
     }
 
     public void SetLog_RunAct(bool isP, bool success) //로그 설정: 도망 행동
@@ -417,21 +417,21 @@ public class GameLog : MonoBehaviour
                 _evntSys.EvntActList_OnOff(true);   //이벤트 시작(로그 출력이 완료된 시점에, 이벤트 행동 목록 출력)
                 break;
             case LogSituation.BtlTurnStart:
-                _btlSys.BtlActList_OnOff(true); //전투 턴 시작(로그 출력이 완료된 시점에, 전투 행동 목록 출력)
+                _btlSys.BtlActList_OnOff(true);     //전투 턴 시작(로그 출력이 완료된 시점에, 전투 행동 목록 출력)
                 break;
-            case LogSituation.ActEffect:        //행동 효과 처리 로그 출력
+            case LogSituation.BtlActEffect:          //스킬 효과 처리 로그 출력
                 _btlSys.Set_EffectProcess(false);
                 break;
-            case LogSituation.BtlFlow:          //전투 처리 로그 출력
+            case LogSituation.BtlFlow:              //전투 처리 로그 출력
                 _btlSys.Set_BattleProcess(false);
                 break;
-            case LogSituation.EvntSuccess:      //이벤트 성공 결과
+            case LogSituation.EvntSuccess:          //이벤트 성공 결과
                 _evntSys.StartCoroutine(_evntSys.EventResultFlow(true));
                 break;
-            case LogSituation.EvntFail:      //이벤트 실패 결과 (값 미달 실패)
+            case LogSituation.EvntFail:             //이벤트 실패 결과 (값 미달 실패)
                 _evntSys.StartCoroutine(_evntSys.EventResultFlow(false));
                 break;
-            case LogSituation.EvntResult:       //이벤트 결과 처리 종료
+            case LogSituation.EvntResult:           //이벤트 결과 처리 종료
                 _evntSys.Set_ResultProcess(false);
                 break;
         }

@@ -15,19 +15,15 @@ MonoBehaviour:
   _icon: {fileID: 1049883436, guid: 832b35751793d10448ae1bd27b2f4046, type: 3}
   _name: "\uC190\uB3C4\uB07C"
   _type: 0
-  Action:
+  BtlAct:
     NormalAtk_Arr:
-    - {fileID: 11400000, guid: 2fe8d8e8c10f4a148809fbb659bbc033, type: 2}
-    - {fileID: 11400000, guid: 34eab5d4383510445bacba0fd2dea740, type: 2}
-    AtkAct_Arr:
-    - {fileID: 11400000, guid: 8188ad7884e76c446984efa79d987986, type: 2}
-    - {fileID: 11400000, guid: c4de770d3928e704dbdd4fb2a7b70117, type: 2}
-    DefAct_Arr:
-    - {fileID: 11400000, guid: aea4259d0b821014e9cedccdf30d937e, type: 2}
-    DgeAct_Arr:
-    - {fileID: 11400000, guid: 16703902592f3264d9b74b455350efb7, type: 2}
+    - {fileID: 11400000, guid: 57fb52664e012754fbe0419910789155, type: 2}
+    - {fileID: 11400000, guid: cf31cc61144b9de46aff278557ab3e3b, type: 2}
+    AtkAct_Arr: []
+    DefAct_Arr: []
+    DgeAct_Arr: []
     TacAct_Arr: []
-  Ability_Arr: []
+  Trait_Arr: []
   Armor:
     Material: 0
   Clip_Idle: {fileID: 7400000, guid: 8c40dd111c2b7dc4e94c1fc5425f83e3, type: 2}
@@ -37,3 +33,4 @@ MonoBehaviour:
   Clip_Atk2:
   - {fileID: 7400000, guid: 3bf423a8aee2d5846978cb665543a36b, type: 2}
   - {fileID: 7400000, guid: b21b7dc68c96c6642a2d01a9f8a18c62, type: 2}
+  Clip_Atk3: []

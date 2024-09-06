@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ItemData : ScriptableObject
 {
-    public enum ItemType { Weapon, Head, Body, Leg, SubWp, Amulet, Ring }
+    public enum ItemType { Weapon, Head, Body, Leg, SubWp, Accessory }
 
     public enum ArmorMaterial { No, Cloth, Leather, Metal }
 
@@ -23,11 +23,11 @@ public class ItemData : ScriptableObject
     private ItemType _type; //아이템 타입
     public ItemType Type { get { return _type; } }
 
-    [Header("# Action -----")]
-    public ActionClass Action;
+    [Header("# BtlAct -----")]
+    public BtlActSet BtlAct;
 
-    [Header("# Ability -----")]
-    public AbilityData[] Ability_Arr;
+    [Header("# Trait -----")]
+    public TraitData[] Trait_Arr;
 
     [Header("# Armor -----")]
     public ArmorClass Armor;
@@ -39,17 +39,17 @@ public class ItemData : ScriptableObject
     public AnimationClip[] Clip_Atk3;
 
     [Serializable]
-    public class ActionClass
+    public class BtlActSet
     {
         public BtlActData[] NormalAtk_Arr;  //기본 공격 행동 목록
 
-        public BtlActData[] AtkAct_Arr; //공격 행동 목록
+        public BtlActData[] AtkAct_Arr;     //공격 행동 목록
 
-        public BtlActData[] DefAct_Arr; //방어 행동 목록
+        public BtlActData[] DefAct_Arr;     //방어 행동 목록
 
-        public BtlActData[] DgeAct_Arr; //회피 행동 목록
+        public BtlActData[] DgeAct_Arr;     //회피 행동 목록
 
-        public BtlActData[] TacAct_Arr; //전술 행동 목록
+        public BtlActData[] TacAct_Arr;     //전술 행동 목록
     }
 
     [Serializable]

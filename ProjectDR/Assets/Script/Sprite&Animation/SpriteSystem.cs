@@ -8,12 +8,14 @@ public class SpriteSystem : MonoBehaviour
     [SerializeField]
     private BattleSystem _btlSys;
 
+    /*
     public enum AtkMoveSet { No, Atk1, Atk2, Atk3 }
     public enum DefMoveSet { No, Def }
     public enum DgeMoveSet { No, Dge }
     public enum TacMoveSet { No, Tac }
-
+    
     public enum CommonTrigger { Idle, Walk, Dmg }
+    */
 
     private SpriteRenderer _spr;
     private Animator _anima;
@@ -43,7 +45,7 @@ public class SpriteSystem : MonoBehaviour
     [SerializeField]
     private Material _hitMat_w;
 
-    private string _actTrigger;
+    //private string _actTrigger;
 
     void Awake()
     {
@@ -243,7 +245,7 @@ public class SpriteSystem : MonoBehaviour
         _equipSpr[(int)type].Renderer_OnOff(data != null);
     }
 
-    public IEnumerator HitFlash()
+    public IEnumerator HitFlash()   //««∞› ¿Ã∆Â∆Æ
     {
         _spr.material = _hitMat_b;
 

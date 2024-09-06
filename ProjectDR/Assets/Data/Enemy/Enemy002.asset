@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1939a4dae118b8409e226be6f082c86, type: 3}
+  m_Name: Enemy002
+  m_EditorClassIdentifier: 
+  Name: "\uBC15\uC950"
+  _hp_minMax: 0200000004000000
+  AC: 0
+  ApMax: 6
+  STR: 
+  INT: 
+  DEX: 
+  AGI: 040000000400000004000000050000000500000005000000
+  CON: 010000000100000001000000010000000100000001000000
+  WIL: 
+  Act_Atk:
+  - Data: {fileID: 11400000, guid: 49bcb0f8c171ae549b846325d2c401ce, type: 2}
+    Stat: 5
+    Upgrade: 0
+  Act_Def: []
+  Act_Dge:
+  - Data: {fileID: 11400000, guid: 265887af914a6064c8d99ba5d0dcc83a, type: 2}
+    Stat: 4
+    Upgrade: 0
+  Act_Tac: []
+  BT: {fileID: 4900000, guid: 2de6aca384e6c054cbfb3956dd4821ef, type: 3}
+  ActClueLog:
+  - "\uBC15\uC950\uB294 \uB0A0\uCE74\uB85C\uC6B4 \uC774\uBE68\uC744 \uB4DC\uB7EC\uB0B4\uACE0
+    \uC788\uB2E4."
+  - "\uBC15\uC950\uB294 \uB0A0\uAC1C\uB97C \uAC00\uBCCD\uAC8C \uB5A8\uBA74\uC11C
+    \uAE34\uC7A5\uD558\uACE0 \uC788\uB2E4"
+  - "\uBC15\uC950\uB294 \uB0A0\uAC1C\uB97C \uCC9C\uCC9C\uD788 \uD37C\uB355\uC774\uBA70
+    \uC544\uB798\uB97C \uC0B4\uD3C8\uB2E4."
+  DefaultSprite: {fileID: -311926099, guid: c95430b2810d1aa4a86dd9640ee1c472, type: 3}
+  Anima_Ctrl: {fileID: 9100000, guid: 4f7417128d90a7e4aa1d8ab643da9bbb, type: 2}
+  Exp: 0200000004000000
+  Item: []

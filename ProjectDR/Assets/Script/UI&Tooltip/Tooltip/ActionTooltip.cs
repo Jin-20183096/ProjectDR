@@ -72,7 +72,7 @@ public class ActionTooltip : MonoBehaviour
         }
 
         _txt_info.gameObject.SetActive(true);
-        _txt_info.text = data.ActionInfo;
+        _txt_info.text = data.Info;
 
         Canvas.ForceUpdateCanvases();
         _layout.enabled = false;

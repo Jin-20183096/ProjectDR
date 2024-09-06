@@ -48,7 +48,7 @@ public class DiceResultPannel : MonoBehaviour
     public void ActionInfoPannel_OnOff(bool b)  //행동 정보창 OnOff
         => _pannel_actInfo.SetActive(b);
 
-    public void Change_ActInfo(BtlActData.ActionType type, string actName)  //행동 정보창 정보 변경
+    public void Change_ActInfo(BtlActData.ActType type, string actName)  //행동 정보창 정보 변경
     {
         _icon_actType.sprite = _spr_actType[(int)type];
         _txt_actName.text = actName;

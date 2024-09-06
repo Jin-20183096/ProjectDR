@@ -216,7 +216,7 @@ public class ItemTooltip : MonoBehaviour
             _partition2.SetActive(true);    //툴팁 구분선 2 활성화
     }
 
-    public void Change_Action1(ICreature.BtlActClass btlAct)
+    public void Change_Action1(ICreature.BtlAct btlAct)
     {
         var data = btlAct.Data;
 
@@ -230,15 +230,12 @@ public class ItemTooltip : MonoBehaviour
             _act1.SetActive(true);
             _act1_typeIcon.sprite = _spr_typeIcon[(int)data.Type];
 
-            string upgradeStr = "";
-            if (btlAct.Upgrade > 0) upgradeStr = " +" + btlAct.Upgrade;
-
-            _act1_name.text = data.Name + upgradeStr;
+            _act1_name.text = data.Name;
             _act1_stat.text = _statName_arr[(int)btlAct.Stat];
         }
     }
 
-    public void Change_Action2(ICreature.BtlActClass btlAct)
+    public void Change_Action2(ICreature.BtlAct btlAct)
     {
         var data = btlAct.Data;
         
@@ -252,15 +249,12 @@ public class ItemTooltip : MonoBehaviour
             _act2.SetActive(true);
             _act2_typeIcon.sprite = _spr_typeIcon[(int)data.Type];
 
-            string upgradeStr = "";
-            if (btlAct.Upgrade > 0) upgradeStr = " +" + btlAct.Upgrade;
-
-            _act2_name.text = data.Name + upgradeStr;
+            _act2_name.text = data.Name;
             _act2_stat.text = _statName_arr[(int)btlAct.Stat];
         }
     }
 
-    public void Change_Ability(AbilityData ability)
+    public void Change_Ability(TraitData ability)
     {
         if (ability == null)
         {

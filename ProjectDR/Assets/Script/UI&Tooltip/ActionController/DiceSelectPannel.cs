@@ -119,60 +119,56 @@ public class DiceSelectPannel : MonoBehaviour
                 //모든 주사위 ~ 조건일 때 활성화
                 _pannel_diceRule_preview.transform.GetChild(1).gameObject.SetActive(rule >= CheckRule.Each_Up);
 
-                if (rule == CheckRule.Total_Odd || rule == CheckRule.Total_Even ||
-                    rule == CheckRule.Each_Odd || rule == CheckRule.Each_Even)
+                _txt_checkValue1.gameObject.SetActive(true);
+                _txt_checkValue1.text = evntAct.CheckValue1.ToString();
+
+                if (rule == CheckRule.Total_Between ||
+                    rule == CheckRule.Each_Between)
                 {
-                    _txt_checkValue1.gameObject.SetActive(false);
+                    _txt_ruleText_B.gameObject.SetActive(true);
+                    _txt_checkValue2.gameObject.SetActive(false);
 
-                    _txt_ruleText_A.gameObject.SetActive(false);
+                    if (evntAct.CheckValue1 == evntAct.CheckValue2)
+                    {
+                        _txt_ruleText_A.gameObject.SetActive(false);
 
-                    if (rule == CheckRule.Total_Odd || rule == CheckRule.Each_Odd)
-                        _txt_ruleText_B.text = "홀수일 때 성공";
+                        _txt_ruleText_B.text = "일 때 성공";
+                    }
                     else
-                        _txt_ruleText_B.text = "짝수일 때 성공";
+                    {
+                        _txt_ruleText_A.text = "이상";
+                        _txt_ruleText_A.gameObject.SetActive(true);
+
+                        _txt_checkValue2.text = evntAct.CheckValue2.ToString();
+                        _txt_checkValue2.gameObject.SetActive(true);
+
+                        _txt_ruleText_B.text = "이하일 때 성공";
+                    }
                 }
                 else
                 {
-                    _txt_checkValue1.gameObject.SetActive(true);
-                    _txt_checkValue1.text = evntAct.CheckValue1.ToString();
+                    _txt_ruleText_A.gameObject.SetActive(false);
+                    _txt_checkValue2.gameObject.SetActive(false);
 
-                    if (rule == CheckRule.Total_Between ||
-                    rule == CheckRule.Each_Between)
+                    if (rule == CheckRule.Total_Up || rule == CheckRule.Each_Up)
+                        _txt_ruleText_B.text = "이상일 때 성공";
+                    else if (rule == CheckRule.Total_Down || rule == CheckRule.Each_Down)
+                        _txt_ruleText_B.text = "이하일 때 성공";
+                    else if (rule == CheckRule.Total_Odd || rule == CheckRule.Each_Odd)
                     {
-                        if (evntAct.CheckValue1 == evntAct.CheckValue2)
-                        {
-                            _txt_ruleText_A.gameObject.SetActive(false);
-
-                            _txt_ruleText_B.text = "일 때 성공";
-                        }
-                        else
-                        {
-                            _txt_ruleText_A.gameObject.SetActive(true);
-                            _txt_ruleText_A.text = "이상";
-
-                            _txt_checkValue2.gameObject.SetActive(true);
-                            _txt_checkValue2.text = evntAct.CheckValue2.ToString();
-
-                            _txt_ruleText_B.text = "이하일 때 성공";
-                        }
+                        _txt_checkValue1.gameObject.SetActive(false);
+                        _txt_ruleText_B.text = "홀수일 때 성공";
                     }
-                    else
+                    else if (rule == CheckRule.Total_Even || rule == CheckRule.Each_Even)
                     {
-                        _txt_ruleText_A.gameObject.SetActive(false);
-                        _txt_checkValue2.gameObject.SetActive(false);
-
-                        if (rule == CheckRule.Total_Up || rule == CheckRule.Each_Up)
-                            _txt_ruleText_B.text = "이상일 때 성공";
-                        else if (rule == CheckRule.Total_Down || rule == CheckRule.Each_Down)
-                            _txt_ruleText_B.text = "이하일 때 성공";
-                    }
+                        _txt_checkValue1.gameObject.SetActive(false);
+                        _txt_ruleText_B.text = "짝수일 때 성공";
+                    } 
                 }
             }
-        }
 
-        Canvas.ForceUpdateCanvases();
-        _pannel_diceRule_preview.enabled = false;
-        _pannel_diceRule_preview.enabled = true;
+            Refresh_Layout();
+        }
     }
 
     public void NowDice_MouseOver(int order)    //주사위 슬롯에 마우스 오버
@@ -368,5 +364,17 @@ public class DiceSelectPannel : MonoBehaviour
     public void DiceZero()
     {
         _nowDice = 0;
+    }
+
+    void Refresh_Layout()
+    {
+        Canvas.ForceUpdateCanvases();
+        _pannel_diceRule_preview.enabled = false;
+        _pannel_diceRule_preview.enabled = true;
+
+        var fitter = _txt_ruleText_A.transform.parent.GetComponent<ContentSizeFitter>();
+
+        fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+        fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
     }
 }

@@ -61,6 +61,8 @@ public class RewardPannel : MonoBehaviour
         if (exp > 0)
         {
             _text_getExp.gameObject.SetActive(exp > 0);
+            if (exp > 0)
+                _text_getExp.text = "+" + exp;
             _exp_get = exp;
             StartCoroutine("ExpMeter_Up");
         }
@@ -68,7 +70,7 @@ public class RewardPannel : MonoBehaviour
 
     IEnumerator ExpMeter_Up()
     {
-        _text_getExp.text = "+" + _exp_get;
+        //_text_getExp.text = "+" + _exp_get;
         yield return new WaitForSecondsRealtime(1/2f);
         _btlSys.Set_RewardExpProcess(true);
 
@@ -85,11 +87,12 @@ public class RewardPannel : MonoBehaviour
             
             _exp_get--;
 
+            /*
             if (_exp_get > 0)
                 _text_getExp.text = "+" + _exp_get;
             else
                 _text_getExp.text = "";
-
+            */
             _text_lv.text = PlayerSys.LV.ToString();
             _text_exp.text = PlayerSys.EXP.ToString();
             _text_expMax.text = PlayerSys.EXP_MAX.ToString();
@@ -153,7 +156,7 @@ public class RewardPannel : MonoBehaviour
 
         statArr[order] += 1;    //해당 위치의 스탯 1 상승
 
-        PlayerSys.Change_ActionStat(true, ICreature.Stats.STR, statArr);    //플레이어에게 레벨업 스탯 적용
+        PlayerSys.Change_ActStat(true, ICreature.Stats.STR, statArr);    //플레이어에게 레벨업 스탯 적용
         _pannel_lvUp.Set_StatUpCursor(ICreature.Stats.STR, order, 1);       //스탯 커서 적용
         _pannel_lvUp.ButtonActive_STR(false);   //이 스탯의 버튼 비활성화
 
@@ -179,7 +182,7 @@ public class RewardPannel : MonoBehaviour
 
         statArr[order] += 1;    //해당 위치의 스탯 1 상승
 
-        PlayerSys.Change_ActionStat(true, ICreature.Stats.INT, statArr);    //플레이어에게 레벨업 스탯 적용
+        PlayerSys.Change_ActStat(true, ICreature.Stats.INT, statArr);    //플레이어에게 레벨업 스탯 적용
         _pannel_lvUp.Set_StatUpCursor(ICreature.Stats.INT, order, 1);       //스탯 커서 적용
         _pannel_lvUp.ButtonActive_INT(false);   //이 스탯의 버튼 비활성화
 
@@ -205,7 +208,7 @@ public class RewardPannel : MonoBehaviour
 
         statArr[order] += 1;    //해당 위치의 스탯 1 상승
 
-        PlayerSys.Change_ActionStat(true, ICreature.Stats.DEX, statArr);    //플레이어에게 레벨업 스탯 적용
+        PlayerSys.Change_ActStat(true, ICreature.Stats.DEX, statArr);    //플레이어에게 레벨업 스탯 적용
         _pannel_lvUp.Set_StatUpCursor(ICreature.Stats.DEX, order, 1);       //스탯 커서 적용
         _pannel_lvUp.ButtonActive_DEX(false);   //이 스탯의 버튼 비활성화
 
@@ -231,7 +234,7 @@ public class RewardPannel : MonoBehaviour
 
         statArr[order] += 1;    //해당 위치의 스탯 1 상승
 
-        PlayerSys.Change_ActionStat(true, ICreature.Stats.AGI, statArr);    //플레이어에게 레벨업 스탯 적용
+        PlayerSys.Change_ActStat(true, ICreature.Stats.AGI, statArr);    //플레이어에게 레벨업 스탯 적용
         _pannel_lvUp.Set_StatUpCursor(ICreature.Stats.AGI, order, 1);       //스탯 커서 적용
         _pannel_lvUp.ButtonActive_AGI(false);   //이 스탯의 버튼 비활성화
 
@@ -257,7 +260,7 @@ public class RewardPannel : MonoBehaviour
 
         statArr[order] += 1;    //해당 위치의 스탯 1 상승
 
-        PlayerSys.Change_ActionStat(true, ICreature.Stats.CON, statArr);    //플레이어에게 레벨업 스탯 적용
+        PlayerSys.Change_ActStat(true, ICreature.Stats.CON, statArr);    //플레이어에게 레벨업 스탯 적용
         _pannel_lvUp.Set_StatUpCursor(ICreature.Stats.CON, order, 1);       //스탯 커서 적용
         _pannel_lvUp.ButtonActive_CON(false);   //이 스탯의 버튼 비활성화
 
@@ -283,7 +286,7 @@ public class RewardPannel : MonoBehaviour
 
         statArr[order] += 1;    //해당 위치의 스탯 1 상승
 
-        PlayerSys.Change_ActionStat(true, ICreature.Stats.WIL, statArr);    //플레이어에게 레벨업 스탯 적용
+        PlayerSys.Change_ActStat(true, ICreature.Stats.WIL, statArr);    //플레이어에게 레벨업 스탯 적용
         _pannel_lvUp.Set_StatUpCursor(ICreature.Stats.WIL, order, 1);       //스탯 커서 적용
         _pannel_lvUp.ButtonActive_WIL(false);   //이 스탯의 버튼 비활성화
 
@@ -301,7 +304,7 @@ public class RewardPannel : MonoBehaviour
 
         statArr[order] += 1;    //해당 위치의 스탯 1 상승
 
-        PlayerSys.Change_ActionStat(true, stat, statArr);   //플레이어에게 레벨업 스탯 적용
+        PlayerSys.Change_ActStat(true, stat, statArr);   //플레이어에게 레벨업 스탯 적용
         _pannel_lvUp.Set_StatUpCursor(stat, order, 1);      //스탯 커서 적용
 
         //스탯 상승이 완료되었으므로, 레벨업

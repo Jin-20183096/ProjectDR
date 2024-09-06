@@ -23,8 +23,8 @@ public class DungeonEventSystem : MonoBehaviour
 
     [SerializeField]
     private PlayerSystem _playerSys;
-    private DungeonSystem _dgnSys;  //이벤트 몰입 시, 이벤트를 유발한 던전 스크립트 넘겨받아 기록해야함
-    private GameObject _camera_dgn; //이벤트 몰입 시, 던전 카메라 스크립트를 넘겨받아 기록해야함
+    private DungeonSystem _dgnSys;  //이벤트 돌입 시, 이벤트를 유발한 던전 스크립트 넘겨받아 기록해야함
+    private GameObject _camera_dgn; //이벤트 돌입 시, 던전 카메라 스크립트를 넘겨받아 기록해야함
 
     [SerializeField]
     private ActionController _actController;    //행동 컨트롤러
@@ -32,7 +32,7 @@ public class DungeonEventSystem : MonoBehaviour
     private DiceResultPannel _p_resultPannel;   //플레이어 주사위 결과창
 
     [SerializeField]
-    private GameLog _evntLog;           //전투 로그
+    private GameLog _evntLog;           //이벤트 로그
     [SerializeField]
     private ItemSystem _itemSys;        //아이템 시스템
     [SerializeField]
@@ -40,7 +40,7 @@ public class DungeonEventSystem : MonoBehaviour
 
     [Header("# Camera")]
     [SerializeField]
-    private GameObject _camera_evnt;     //전투 카메라
+    private GameObject _camera_evnt;     //이벤트 카메라
 
     [Header("# Event UI & Sprite")]
     [SerializeField]
@@ -81,7 +81,7 @@ public class DungeonEventSystem : MonoBehaviour
         public CheckRule Rule;  //주사위 체크 규칙
 
         public int CheckValue1; //주사위 체크 행동 시 조건값1
-        public int CheckValue2; //주사위 체크 행동 시 조건값
+        public int CheckValue2; //주사위 체크 행동 시 조건값2
     }
 
     [SerializeField]
@@ -164,7 +164,7 @@ public class DungeonEventSystem : MonoBehaviour
         //플레이어 메뉴 버튼 Off
         _playerSys.MenuButton_OnOff_Status(false);
         _playerSys.MenuButton_OnOff_Inventory(false);
-        _playerSys.MenuButton_OnOff_ActList(false);
+        _playerSys.MenuButton_OnOff_BtlAct(false);
 
         //이벤트 오브젝트 스프라이트 설정
         _evnt_anima.gameObject.SetActive(true);
@@ -202,6 +202,8 @@ public class DungeonEventSystem : MonoBehaviour
             if (act.CheckStat == ICreature.Stats.LUC)
             {
                 //체크 룰과 주사위 개수, 최소 최대값 선정
+                rule = (CheckRule)Random.Range(1, (int)CheckRule.Each_Up);
+
             }
             else if (act.CheckStat != ICreature.Stats.No)   //다른 스탯 체크일 경우
             {
@@ -371,9 +373,9 @@ public class DungeonEventSystem : MonoBehaviour
         var index = -1;
 
         if (isSuccess)  //행동 성공 시
-            index = act.Data.Result_Success[Random.Range(0, act.Data.Result_Success.Length)];
+            index = act.Data.Result_Success[Random.Range(0, act.Data.Result_Success.Length)];   //성공 결과 중 무작위 선정
         else
-            index = act.Data.Result_Fail[Random.Range(0, act.Data.Result_Fail.Length)];
+            index = act.Data.Result_Fail[Random.Range(0, act.Data.Result_Fail.Length)]; //실패 결과 중 무작위 선정
 
         result = _nowEvnt.Result[index];
 
@@ -383,7 +385,7 @@ public class DungeonEventSystem : MonoBehaviour
 
         for (int i = 0; i < result.Type.Length; i++)
         {
-            yield return new WaitUntil(() => _resultProcess == false);  //다른 결과가 진행 중일 경우 실행 잠시 중단
+            yield return new WaitUntil(() => _resultProcess == false);  //다른 결과가 처리 중일 경우 실행 잠시 중단
 
             switch (result.Type[i])
             {
@@ -433,7 +435,7 @@ public class DungeonEventSystem : MonoBehaviour
                     //플레이어 메뉴 버튼 On                    
                     _playerSys.MenuButton_OnOff_Status(true);
                     _playerSys.MenuButton_OnOff_Inventory(true);
-                    _playerSys.MenuButton_OnOff_ActList(true);
+                    _playerSys.MenuButton_OnOff_BtlAct(true);
 
                     //_actController.Set_ActListSituation(ActionController.Situation.No); //이벤트 행동 목록, 주사위 보드 off
                     EvntActList_OnOff(false);
@@ -509,55 +511,49 @@ public class DungeonEventSystem : MonoBehaviour
                 //모든 주사위 ~ 조건일 때 활성화
                 _pannel_diceRule.transform.GetChild(1).gameObject.SetActive(rule >= CheckRule.Each_Up);
 
-                if (rule == CheckRule.Total_Odd || rule == CheckRule.Total_Even ||
-                    rule == CheckRule.Each_Odd || rule == CheckRule.Each_Even)
+                _txt_checkValue1.gameObject.SetActive(true);
+                _txt_checkValue1.text = evntAct.CheckValue1.ToString();
+
+                if (rule == CheckRule.Total_Between ||
+                    rule == CheckRule.Each_Between)
                 {
-                    _txt_checkValue1.gameObject.SetActive(false);
+                    if (evntAct.CheckValue1 == evntAct.CheckValue2)
+                    {
+                        _txt_ruleText_A.gameObject.SetActive(false);
 
-                    _txt_ruleText_A.gameObject.SetActive(false);
-
-                    if (rule == CheckRule.Total_Odd || rule == CheckRule.Each_Odd)
-                        _txt_ruleText_B.text = "홀수일 때 성공";
+                        _txt_ruleText_B.text = "일 때 성공";
+                    }
                     else
-                        _txt_ruleText_B.text = "짝수일 때 성공";
+                    {
+                        _txt_ruleText_A.gameObject.SetActive(true);
+                        _txt_ruleText_A.text = "이상";
+
+                        _txt_checkValue2.gameObject.SetActive(true);
+                        _txt_checkValue2.text = evntAct.CheckValue2.ToString();
+
+                        _txt_ruleText_B.text = "이하일 때 성공";
+                    }
                 }
                 else
                 {
-                    _txt_checkValue1.gameObject.SetActive(true);
-                    _txt_checkValue1.text = evntAct.CheckValue1.ToString();
+                    _txt_ruleText_A.gameObject.SetActive(false);
+                    _txt_checkValue2.gameObject.SetActive(false);
 
-                    if (rule == CheckRule.Total_Between ||
-                    rule == CheckRule.Each_Between)
+                    if (rule == CheckRule.Total_Up || rule == CheckRule.Each_Up)
+                        _txt_ruleText_B.text = "이상일 때 성공";
+                    else if (rule == CheckRule.Total_Down || rule == CheckRule.Each_Down)
+                        _txt_ruleText_B.text = "이하일 때 성공";
+                    else if (rule == CheckRule.Total_Odd || rule == CheckRule.Each_Odd)
                     {
-                        if (evntAct.CheckValue1 == evntAct.CheckValue2)
-                        {
-                            _txt_ruleText_A.gameObject.SetActive(false);
-
-                            _txt_ruleText_B.text = "일 때 성공";
-                        }
-                        else
-                        {
-                            _txt_ruleText_A.gameObject.SetActive(true);
-                            _txt_ruleText_A.text = "이상";
-
-                            _txt_checkValue2.gameObject.SetActive(true);
-                            _txt_checkValue2.text = evntAct.CheckValue2.ToString();
-
-                            _txt_ruleText_B.text = "이하일 때 성공";
-                        }
+                        _txt_checkValue1.gameObject.SetActive(false);
+                        _txt_ruleText_B.text = "홀수일 때 성공";
                     }
-                    else
+                    else if (rule == CheckRule.Total_Even || rule == CheckRule.Each_Even)
                     {
-                        _txt_ruleText_A.gameObject.SetActive(false);
-                        _txt_checkValue2.gameObject.SetActive(false);
-
-                        if (rule == CheckRule.Total_Up || rule == CheckRule.Each_Up)
-                            _txt_ruleText_B.text = "이상일 때 성공";
-                        else if (rule == CheckRule.Total_Down || rule == CheckRule.Each_Down)
-                            _txt_ruleText_B.text = "이하일 때 성공";
+                        _txt_checkValue1.gameObject.SetActive(false);
+                        _txt_ruleText_B.text = "짝수일 때 성공";
                     }
                 }
-
             }
         }
 

@@ -7,7 +7,9 @@ public class DiceSetting : MonoBehaviour
     [SerializeField]
     private ActionController _actController;
     [SerializeField]
-    private Renderer[] _diceSide;   //주사위 면의 렌더링
+    private Renderer[] _diceSide;   //주사위 면의 렌더러
+    [SerializeField]
+    private SpriteRenderer[] _dicePip;  //주사위 눈의 렌더러
 
     private BoxCollider _collider;
     private Rigidbody _rigid;
@@ -33,10 +35,10 @@ public class DiceSetting : MonoBehaviour
         _rigid.useGravity = b;  //중력설정 OnOff
     }
 
-    public void Change_DiceSide(Material[] mat)    //스탯에 맞게 주사위 렌더링 변경
+    public void Change_DicePip(Sprite[] spr)    //스탯에 맞게 주사위 눈 스프라이트 변경
     {
-        for (int i = 0; i < _diceSide.Length; i++)
-            _diceSide[i].material = mat[i];
+        for (int i = 0; i < _dicePip.Length; i++)
+            _dicePip[i].sprite = spr[i];
     }
 
     public void Set_DiceTransform(Vector3 boardVec) //주사위 회전 방향과 위치 무작위 설정

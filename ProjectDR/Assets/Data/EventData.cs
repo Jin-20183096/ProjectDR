@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class EventData : ScriptableObject
 {
-    public enum EventType   //Battle 타입과 같은 전투 이벤트는 enum에서 항상 맨 뒤에 배치시켜야 함
+    public enum EventType   //Battle 타입 등의 전투 이벤트는 enum에서 항상 맨 뒤에 배치시켜야 함
     { No, Event, Battle, Boss }
 
     public enum CheckRule

@@ -8,7 +8,7 @@ public class EnemyData : ScriptableObject
     [TextArea(1, 3)]
     public string Name;     //이름
     [SerializeField]
-    private int[] _hp_minMax = new int[2];  //적 최소 HP ~ 최대 HP
+    private int[] _hp_minMax = new int[2];  //적 최소 ~ 최대 HP
     public int HP_MIN { get { return _hp_minMax[0]; } }
     public int HP_MAX { get { return _hp_minMax[1]; } }
 
@@ -23,10 +23,10 @@ public class EnemyData : ScriptableObject
     public int[] CON;  //건강 스탯
     public int[] WIL;  //의지 스탯
 
-    public ICreature.BtlActClass[] Act_Atk; //공격 행동 목록
-    public ICreature.BtlActClass[] Act_Def; //방어 행동 목록
-    public ICreature.BtlActClass[] Act_Dge; //회피 행동 목록
-    public ICreature.BtlActClass[] Act_Tac; //전술 행동 목록
+    public ICreature.BtlAct[] Act_Atk; //공격 행동 목록
+    public ICreature.BtlAct[] Act_Def; //방어 행동 목록
+    public ICreature.BtlAct[] Act_Dge; //회피 행동 목록
+    public ICreature.BtlAct[] Act_Tac; //전술 행동 목록
 
     [Header("# BT")]
     public TextAsset BT;

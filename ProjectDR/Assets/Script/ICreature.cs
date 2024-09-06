@@ -4,7 +4,8 @@ public interface ICreature
 {
     public enum Stats
     {
-        No, STR, INT, DEX, AGI, CON, WIL, HP, AC,
+        No, STR, INT, DEX, AGI, CON, WIL,
+        HP, AC,
         RE_STR, RE_INT, RE_DEX, RE_AGI, RE_CON, RE_WIL,
         LUC, RE_LUC
     }
@@ -20,10 +21,9 @@ public interface ICreature
     public void TakeDamage(int dmg, BtlActData.DamageType dmgType); //피해 받음
 
     [Serializable]
-    public class BtlActClass
+    public class BtlAct
     {
-        public BtlActData Data; //행동 데이터
-        public Stats Stat;      //행동의 스탯
-        public int Upgrade;     //행동 강화 수치
+        public BtlActData Data; //전투 행동 데이터
+        public Stats Stat;      //행동 스탯
     }
 }

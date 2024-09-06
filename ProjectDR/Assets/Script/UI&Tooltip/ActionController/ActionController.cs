@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using static PlayerSystem;
-using static UnityEngine.UIElements.UxmlAttributeDescription;
 
 public class ActionController : MonoBehaviour
 {
@@ -15,7 +14,7 @@ public class ActionController : MonoBehaviour
     public enum Situation { Off, No, Event, Battle }
 
     [SerializeField]
-    private Situation _situation;   //행동 결정하는 상황
+    private Situation _situation;   //행동을 결정하는 상황
     public Situation SITUATION
     {
         get { return _situation; }
@@ -23,9 +22,9 @@ public class ActionController : MonoBehaviour
 
     [Header("# Select Action")]
     [SerializeField]
-    private BtlActData _nowAct_btl;                  //선택한 전투 행동
+    private BtlActData _nowAct_btl;                 //선택한 행동 (전투)
     [SerializeField]
-    private EventData.EventAction _nowAct_evnt;   //선택한 행동 (이벤트)
+    private EventData.EventAction _nowAct_evnt;     //선택한 행동 (이벤트)
 
     [Header("# Action Dice Info")]
     [SerializeField]
@@ -80,11 +79,13 @@ public class ActionController : MonoBehaviour
 
     [Header("# Graphic Referernce")]
     [SerializeField]
-    private Sprite[] _spr_actType;      //행동타입 스프라이트
+    private Sprite[] _spr_actType;      //행동 타입 스프라이트
     [SerializeField]
     private Material[] _mat_diceSide;   //주사위 면 material
+    [SerializeField]
+    private Sprite[] _spr_dicePip;      //주사위 눈 스프라이트
 
-    private string[] _statName_arr = { "", "힘", "지능", "손재주", "민첩", "건강", "의지"};
+    private string[] _statName_arr = { "", "힘", "지능", "손재주", "민첩", "건강", "의지" };
     private string _statName_luc = "행운";
 
     public void Set_ActListSituation(Situation situation)   //행동목록 상황 설정
@@ -424,7 +425,7 @@ public class ActionController : MonoBehaviour
                     _nowDice += 1;  //주사위 개수 1개 증가 (기본적으로 굴리는 주사위 1개)
 
                     //행동 타입 아이콘, 행동명 설정
-                    _resultPannel.Change_ActInfo(BtlActData.ActionType.No, _nowAct_evnt.Name); //행동 타입 아이콘, 행동명 설정
+                    _resultPannel.Change_ActInfo(BtlActData.ActType.No, _nowAct_evnt.Name); //행동 타입 아이콘, 행동명 설정
 
                     Set_DiceSide(_nowStat); //결정한 행동에 맞게 주사위 오브젝트 설정
                     DiceRoll(); //주사위 굴리기
@@ -444,7 +445,7 @@ public class ActionController : MonoBehaviour
 
     public void Set_DiceSide(ICreature.Stats stat)  //주사위 오브젝트의 각 면을 스탯에 맞게 변경
     {
-        Material[] mat = new Material[6];
+        Sprite[] spr = new Sprite[6];
         int[] temp_stat = new int[6];
 
         switch (stat)
@@ -475,15 +476,15 @@ public class ActionController : MonoBehaviour
         for (int i = 0; i < temp_stat.Length; i++)
         {
             if (temp_stat[i] >= 10)     //10 이상의 스탯은 10으로 취급
-                mat[i] = _mat_diceSide[10];
+                spr[i] = _spr_dicePip[10];
             else if (temp_stat[i] <= 0) //0 이하의 스탯은 0으로 취급
-                mat[i] = _mat_diceSide[0];
+                spr[i] = _spr_dicePip[0];
             else
-                mat[i] = _mat_diceSide[temp_stat[i]];
+                spr[i] = _spr_dicePip[temp_stat[i]];
         }
 
         foreach (DiceSetting d in _diceObj)
-            d.Change_DiceSide(mat);
+            d.Change_DicePip(spr);
     }
 
     public void DiceRoll()  //주사위 굴림
@@ -629,7 +630,7 @@ public class ActionController : MonoBehaviour
         if (_situation == Situation.Battle) //전투 행동을 개시할 경우
         {
             //전투 시스템에 행동 정보 전달
-            _btlSys.Set_BtlAct_Player(_nowAct_btl, _nowResult);
+            _btlSys.SetBtlAct_Player(_nowAct_btl, _nowResult);
         }
         else if (_situation == Situation.Event) //주사위 체크 행동을 개시할 경우
         {

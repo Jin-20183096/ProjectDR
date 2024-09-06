@@ -154,29 +154,29 @@ public class PlayerSystem : MonoBehaviour, ICreature
     }
 
     [SerializeField]
-    private List<BtlActClass> _actList; //행동 리스트
-    public List<BtlActClass> ActList
+    private List<BtlAct> _actList; //전투 행동 리스트
+    public List<BtlAct> ActList
     {
         get
         {
             var actList = _actList.ToList();
-            actList.Add(_waitAct);
+            actList.Add(_wait);
             return actList;
         }
     }
 
     [SerializeField]
-    private BtlActClass _waitAct;   //대기 행동
+    private BtlAct _wait;   //대기 행동
 
     [SerializeField]
-    private List<BtlActClass> _actList_unarm;   //맨손 행동 리스트
+    private List<BtlAct> _actList_unarm;   //맨손 전투 행동 리스트
 
     [Header("# Menu Screen")]
     [Header("   > Info Pannel")]
     [SerializeField]
-    private bool _isOn_infoPannel;
+    private bool _isOn_infoPannel;  //기본정보창 활성화 여부
     [SerializeField]
-    private PlayerInfoPannel _infoPannel;
+    private PlayerInfoPannel _infoPannel;   //기본정보창 스크립트
 
     [Header("   > Status Screen")]
     [SerializeField]
@@ -194,15 +194,15 @@ public class PlayerSystem : MonoBehaviour, ICreature
     [SerializeField]
     private GameObject _inventoryScr;  //인벤토리창 스크립트
 
-    [Header("   > Action Screen")]
+    [Header("   > BtlAct Screen")]
     [SerializeField]
-    private bool _isOn_actScr;  //행동창 활성화 여부
+    private bool _isOn_btlActScr;  //전투행동창 활성화 여부
     [SerializeField]
-    private bool _isActChange;  //보유 행동의 변경 여부 (변경점이 있다면, 행동목록 창이 활성화될 때 목록 정보를 갱신해줌)
+    private bool _isBtlActChange;  //보유 전투 행동의 변경 여부 (변경점이 있다면, 전투행동창이 활성화될 때 정보 갱신)
     [SerializeField]
-    private PlayerMenuButton _btn_actScr;   //행동창 버튼
+    private PlayerMenuButton _btn_btlActScr;   //전투행동창 버튼
     [SerializeField]
-    private ActionScreen _actScr;   //행동창 스크립트
+    private ActionScreen _btlActScr;   //전투행동창 스크립트
 
     [Header("# Sprite Reference")]
     [SerializeField]
@@ -258,7 +258,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
         Change_ApMax(true, 0);
         Change_Ap(true, 0);
 
-        Armed_OnOff(ItemSys.Get_PlayerArmed()); //무기 장비 상태 체크
+        Armed_OnOff(ItemSys.Get_PlayerArmed()); //무기 장착 여부 체크
         _sorting = GetComponent<SortingGroup>();
     }
 
@@ -281,7 +281,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
         }
     }
 
-    public bool IsPlayer() => true;
+    public bool IsPlayer() => true;     //플레이어인가? => True
 
     public void Change_Name(string name)
     {
@@ -518,7 +518,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
         }
     }
 
-    public void Change_ActionStat(bool plus, Stats stat, int[] stat_arr)
+    public void Change_ActStat(bool plus, Stats stat, int[] stat_arr)
     {
         int[] changingStat = { };
 
@@ -558,8 +558,6 @@ public class PlayerSystem : MonoBehaviour, ICreature
 
     public void TakeDamage(int dmg, BtlActData.DamageType dmgType)
     {
-        
-
         if (_ac >= 1)    //방어도가 1 이상 존재할 때
         {
             int realDmg;    //실제 피해량
@@ -575,7 +573,6 @@ public class PlayerSystem : MonoBehaviour, ICreature
                 //방어도 텍스트
                 var acText = Instantiate(_dmgText_prefab.transform, _eff_group);
 
-                //acText.position = _p_spr_btl.transform.position;
                 acText.position = new Vector3(_p_spr_btl.transform.position.x,
                                             _p_spr_btl.transform.position.y + 2f, _p_spr_btl.transform.position.z);
                 acText.GetChild(0).GetComponent<TextMeshPro>().text = "<sprite=0> " + (dmg - realDmg).ToString();
@@ -626,9 +623,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
         if (dmgType == BtlActData.DamageType.Defense)
             eff = Instantiate(_eff_block, _eff_group);  //방어 이펙트 파티클 
         else
-        {
-            eff = Instantiate(_eff_hit, _eff_group);
-        }
+            eff = Instantiate(_eff_hit, _eff_group);    //피격 이펙트 파티클
 
         var pos = _p_spr_btl.transform.position;
         var sizeY = _p_spr_btl.GetComponent<SpriteRenderer>().bounds.size.y;
@@ -678,33 +673,33 @@ public class PlayerSystem : MonoBehaviour, ICreature
             _statusScr.Change_Reroll(reroll_stat, _reroll[(int)reroll_stat]);
     }
 
-    public void Change_BtlAct(bool plus, BtlActClass btlAct)
+    public void Change_BtlAct(bool plus, BtlAct active)   //전투행동 변경
     {
         if (plus)   //행동 추가
-            _actList.Add(btlAct);
+            _actList.Add(active);
         else
-            _actList.Remove(btlAct);
+            _actList.Remove(active);
 
-        //행동들을 행동 타입에 맞게 정렬
+        //전투 행동들을 행동 타입에 맞게 정렬
         _actList.Sort((x, y) => string.Compare(x.Data.Type.ToString(), y.Data.Type.ToString()));
 
-        //행동목록 창에 정보 연동
-        if (_isOn_actScr)
-            _actScr.Change_BtlActList();
+        //전투행동창에 정보 갱신
+        if (_isOn_btlActScr)
+            _btlActScr.Change_BtlActList();
         else
-            _isActChange = true;
+            _isBtlActChange = true;
     }
 
     public void Armed_OnOff(bool b) //무장 or 맨손
     {
         if (b)  //무장했을 경우
         {
-            foreach (BtlActClass act in _actList_unarm)
+            foreach (BtlAct act in _actList_unarm)
                 Change_BtlAct(false, act);  //맨손 행동을 전부 제거
         }
         else
         {
-            foreach (BtlActClass act in _actList_unarm)
+            foreach (BtlAct act in _actList_unarm)
                 Change_BtlAct(true, act);   //맨손 행동을 전부 추가
         }
     }
@@ -794,22 +789,22 @@ public class PlayerSystem : MonoBehaviour, ICreature
         }
     }
 
-    public void ActionScreen_OnOff()    //행동창 OnOff
+    public void BtlActScreen_OnOff()    //전투행동창 OnOff
     {
         if (STCanvas.DRAG == false)
         {
-            _isOn_actScr = !_isOn_actScr;
-            _actScr.gameObject.SetActive(_isOn_actScr);
+            _isOn_btlActScr = !_isOn_btlActScr;
+            _btlActScr.gameObject.SetActive(_isOn_btlActScr);
 
-            if (_isOn_actScr)
+            if (_isOn_btlActScr)
             {
                 //인벤토리 UI 우선순위 최상위
-                _actScr.transform.SetAsLastSibling();
+                _btlActScr.transform.SetAsLastSibling();
 
-                if (_isActChange)   //보유한 행동에 변화가 생겼을 경우
+                if (_isBtlActChange)   //보유한 전투행동에 변화가 생겼을 경우
                 {
-                    _actScr.Change_BtlActList();    //행동 목록 동기화
-                    _isActChange = false;           //행동 목록 변화 없음으로 처리
+                    _btlActScr.Change_BtlActList();    //전투행동창 갱신
+                    _isBtlActChange = false;           //전투행동 변화 없음으로 처리
                 }
             }
         }
@@ -839,16 +834,16 @@ public class PlayerSystem : MonoBehaviour, ICreature
         _btn_inventoryScr.gameObject.SetActive(b);
     }
 
-    public void MenuButton_OnOff_ActList(bool b)    //행동창 버튼 OnOff
+    public void MenuButton_OnOff_BtlAct(bool b)    //전투행동창 버튼 OnOff
     {
-        //행동목록 버튼을 비활성화할 때, 행동목록이 활성화 중이라면
-        if (b == false && _isOn_actScr)
+        //전투행동창 버튼을 비활성화할 때, 전투행동창이 활성화 중이라면
+        if (b == false && _isOn_btlActScr)
         {
-            _btn_actScr.Button_OnOff();  //버튼 Off 상태
-            ActionScreen_OnOff();          //행동목록창 Off 상태
+            _btn_btlActScr.Button_OnOff();   //버튼 Off 상태
+            BtlActScreen_OnOff();            //전투행동창 Off 상태
         }
 
-        _btn_actScr.gameObject.SetActive(b);
+        _btn_btlActScr.gameObject.SetActive(b);
     }
 
     public void EquipItem(ItemData item)    //아이템 장비

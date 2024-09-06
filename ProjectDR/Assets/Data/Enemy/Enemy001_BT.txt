@@ -5,13 +5,13 @@ tree("Root")
 		tree("P_DefDgeFail")
 		tree("P_WaitAndAp4Over")
 		tree("Ap0Check")
-		Push_RandomAction
+		Push_RandomBtlAct
 
 ///////////////////
 tree("Ap2Under")
 	sequence
 		Is_Ap_2Under
-		Is_TrueOrFalse
+		Is_50Percent
 		Push_Wait
 ///////////////////
 tree("DgeSuccess")

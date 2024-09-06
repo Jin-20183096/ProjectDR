@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using static ICreature;
 using static PlayerSystem;
 using static SingleToneCanvas;
 using Random = UnityEngine.Random;
@@ -12,7 +13,7 @@ public class ItemSystem : MonoBehaviour
     public static ItemSystem ItemSys = null;
 
     public enum ItemSlotType { Equip, Inventory, Reward }
-    public enum ItemOptionType { Stat, Action, Ability }
+    public enum ItemOptionType { Stat, BtlAct, Trait }
 
     [Serializable]
     private class ItemClass
@@ -27,17 +28,17 @@ public class ItemSystem : MonoBehaviour
         public int Stat2_Value;
         public int[] Stat2_Arr;
 
-        //행동
-        public ICreature.BtlActClass BtlAct1 = null;
-        public ICreature.BtlActClass BtlAct2 = null;
+        //전투행동
+        public ICreature.BtlAct BtlAct1 = null;
+        public ICreature.BtlAct BtlAct2 = null;
 
-        //능력
-        public AbilityData Ability = null;
+        //특성
+        public TraitData Trait = null;
     }
 
     [Header("# Item Slots & Classes")]
     [SerializeField]
-    private ItemSlot[] _slot_equip;         //장비 슬롯 (0: 무기 / 1: 머리 / 2: 상의 / 3: 하의 / 4: 보조 / 5: 목걸이 / 6&7: 반지)
+    private ItemSlot[] _slot_equip;         //장비 슬롯 (0: 무기 / 1: 머리 / 2: 상의 / 3: 하의 / 4: 보조 / 5, 6, 7: 장신구)
     [SerializeField]
     private ItemClass[] _itemClass_equip;   //장비 슬롯의 아이템 클래스들
 
@@ -86,7 +87,7 @@ public class ItemSystem : MonoBehaviour
     {
         set { _isOn_inventory = value; }
     }
-    private bool _isOn_reward;          //보상창 활성화 여부
+    private bool _isOn_reward;          //전리품창 활성화 여부
     public bool ON_REWARD
     {
         set { _isOn_reward = value; }
@@ -99,8 +100,8 @@ public class ItemSystem : MonoBehaviour
     private int _needCost_hp = 2;       //HP 스탯 1 상승의 필요 코스트
     private int _needCost_ac = 3;       //방어도 스탯 1 상승의 필요 코스트
     
-    private int _needCost_btlAct = 2;   //행동 추가 시 필요 코스트
-    private int _needCost_ability = 2;  //능력 추가 시 필요한 코스트
+    private int _needCost_btlAct = 2;   //전투행동 추가 시 필요 코스트
+    private int _needCost_trait = 2;    //특성 추가 시 필요한 코스트
 
     [Header("# Sprite")]
     [SerializeField]
@@ -146,7 +147,7 @@ public class ItemSystem : MonoBehaviour
         Create_Item(_test_item[3], ItemSlotType.Inventory, 7);
     }
 
-    public bool Get_PlayerArmed()   //플레이어 무기 장비 여부 반환
+    public bool Get_PlayerArmed()   //플레이어 무기 장착 여부 반환
     {
         return _itemClass_equip[0].Data != null;
     }
@@ -161,7 +162,7 @@ public class ItemSystem : MonoBehaviour
         }
     }
 
-    public void Reward_Clear()      //보상창 아이템 초기화
+    public void Reward_Clear()      //전리품창 아이템 초기화
     {
         for (int i = 0; i < _slot_reward.Length; i++)
         {
@@ -208,67 +209,65 @@ public class ItemSystem : MonoBehaviour
     //create 무기
     public void Create_Weapon(ItemData data, ItemSlotType slot, int index)
     {
-        //스탯 1 (행동1 관련 스탯)
-        var stat1 = ICreature.Stats.No;
+        //스탯 1
+        var stat1 = Stats.No;
         int[] stat1_arr = { };
-        //스탯 2 
-        var stat2 = ICreature.Stats.No;
+        //스탯 2
+        var stat2 = Stats.No;
         var stat2_value = 0;
         int[] stat2_arr = { };
-        //행동1
+        //전투행동 1
         BtlActData btlAct1 = null;
-        ICreature.Stats btlAct1_stat = ICreature.Stats.No;  //행동1 스탯
-        int btlAct1_upgrade = 0;
-        //행동2
+        Stats btlAct1_stat = Stats.No;  //전투행동 1 스탯
+        //전투행동 2
         BtlActData btlAct2 = null;
-        ICreature.Stats btlAct2_stat = ICreature.Stats.No;  //행동2 스탯
-        int btlAct2_upgrade = 0;
-        //능력
-        AbilityData ability = null;
+        Stats btlAct2_stat = Stats.No;  //전투행동 2 스탯
+        //특성
+        TraitData trait = null;
 
         //각 옵션에 부여된 코스트량
         int cost_stat1 = 0;
         int cost_stat2 = 0;
         int cost_btlAct2 = 0;
-        int cost_ability = 0;
+        int cost_trait = 0;
 
         //생성 방식에 따라 옵션 값 생성
         //1. 옵션 생성에 필요한 코스트 설정
-        //2. 무기의 공격 행동 목록에서 행동 하나를 무작위로 선택해 추가 후 코스트 소모.
-        //  그 행동 관련 스탯을 스탯 1로 선택하고 코스트 소모.
-        //3. 이후 행동 하나를 더 추가할지, 능력을 보유할지 무작위로 결정
-        //4. 보유한 코스트를 소모하면서 무기의 스탯, 행동, 능력에 코스트를 부여.
+        //2. 무기의 공격 행동 목록에서 하나를 무작위로 선택해 추가 후 코스트 소모.
+        //  그 행동 스탯을 스탯 1로 선택하고 코스트 소모.
+        //3. 행동을 더 추가할지, 특성을 보유할지 무작위로 결정
+        //4. 보유한 코스트를 소모하면서 무기의 스탯, 전투행동, 특성에 코스트를 부여.
         //5. 남은 코스트가 0일 때, 각 옵션에 부여된 코스트에 따라 옵션 구체화
         //6. 모든 옵션 설정이 끝나면, 아이템 생성
 
         //1. 옵션 생성에 필요한 코스트 설정
         int cost = Random.Range(_cost, _cost+6);   //임시 코스트
 
-        //2. 무기의 공격행동 목록에서 행동 하나를 무작위로 선택해 추가 후 코스트 소모.
-        btlAct1 = data.Action.NormalAtk_Arr[Random.Range(0, data.Action.NormalAtk_Arr.Length)];
+        //2. 무기의 공격 행동 목록에서 하나를 무작위로 선택해 추가 후 코스트 소모.
+        btlAct1 = data.BtlAct.NormalAtk_Arr[Random.Range(0, data.BtlAct.NormalAtk_Arr.Length)];
         btlAct1_stat = btlAct1.Stats_Arr[Random.Range(0, btlAct1.Stats_Arr.Length)];
         cost -= _needCost_btlAct;
-        //그 행동 관련 스탯을 스탯 1로 선택하고 코스트 소모
+        //그 행동 스탯을 스탯 1로 선택하고 코스트 소모
         stat1 = btlAct1_stat;
         stat1_arr = new int[] { 0, 0, 0, 0, 0, 0 };
         cost -= _needCost_stat;
         cost_stat1 += _needCost_stat;
 
-        //3. 행동 하나를 더 추가할지, 능력을 보유할지 무작위로 결정
+        //3. 행동을 더 추가할지, 특성을 보유할지 무작위로 결정
         //
         //
 
-        //4. 보유한 코스트를 소모해서, 이 무기의 스탯, 행동, 능력에 코스트를 부여함.
+        //4. 보유한 코스트를 소모해서, 이 무기의 스탯, 전투행동, 특성에 코스트를 부여함.
         List<ItemOptionType> option_list = new List<ItemOptionType>()
-            { ItemOptionType.Stat, ItemOptionType.Action };
+            { ItemOptionType.Stat, ItemOptionType.BtlAct };
 
         /*
         if (data.Action.AtkAct_Arr.Length > 0 || data.Action.DefAct_Arr.Length > 0
-            || data.Action.DgeAct_Arr.Length > 0 || data.Action.TacAct_Arr.Length > 0)  //아이템 데이터에 행동이 존재하는지 체크
+            || data.Action.DgeAct_Arr.Length > 0 || data.Action.TacAct_Arr.Length > 0)  //아이템 데이터에 전투행동이 존재하는지 체크
             option_list.Add(ItemOptionType.Action);
         
         if (data.Ability_Arr.Length > 0)
-            option_list.Add(ItemOptionType.Ability);    //아이템 데이터에 능력이 존재하는지 체크
+            option_list.Add(ItemOptionType.Ability);    //아이템 데이터에 특성이 존재하는지 체크
         */
         while (cost > 0)
         {
@@ -285,20 +284,20 @@ public class ItemSystem : MonoBehaviour
                     else
                         cost_stat2 += use_cost;
                     break;
-                case ItemOptionType.Action:
-                    if (cost_btlAct2 < _needCost_btlAct)
+                case ItemOptionType.BtlAct:
+                    if (cost_btlAct2 < _needCost_trait)
                     {
                         use_cost = 1;
                         cost_btlAct2 += use_cost;
 
-                        if (cost_btlAct2 >= _needCost_btlAct)   //행동2를 만들기 충분한 코스트가 모였다면
-                            option_list.Remove(ItemOptionType.Action);  //더 이상 행동 2에 코스트를 모으지 않음
+                        if (cost_btlAct2 >= _needCost_trait)    //전투행동 2를 만들기 충분한 코스트가 모였다면
+                            option_list.Remove(ItemOptionType.BtlAct);  //더 이상 전투행동 2에 코스트를 모으지 않음
                     }
                     break;
-                case ItemOptionType.Ability:
-                    //능력 생성과 소모 코스트를 설정
+                case ItemOptionType.Trait:
+                    //특성 생성과 소모 코스트를 설정
                     use_cost = Random.Range(1, 3);
-                    cost_ability += use_cost;
+                    cost_trait += use_cost;
                     break;
             }
 
@@ -307,19 +306,19 @@ public class ItemSystem : MonoBehaviour
 
         //4) 남은 코스트가 0일 때 각 옵션에 부여된 코스트에 따라 옵션 구체화
         Debug.Log("-----------무기 생성-----------");
-        Debug.Log("행동 1: " + btlAct1.Name + " / 코스트: " + _needCost_btlAct);
+        Debug.Log("전투행동 1: " + btlAct1.Name + " / 코스트: " + _needCost_btlAct);
         
         Debug.Log("스탯 1: " + stat1 + " / 코스트: " + cost_stat1);
 
         //스탯2가 결정되지 않았고 코스트가 존재할 경우 스탯 결정
-        if (stat2 == ICreature.Stats.No && cost_stat2 > 0)
+        if (stat2 == Stats.No && cost_stat2 > 0)
         {
             //stat2 = (ICreature.Stats)Random.Range(1, Enum.GetValues(typeof(ICreature.Stats)).Length);   //무작위 스탯
-            stat2 = (ICreature.Stats)Random.Range(1, (int)ICreature.Stats.LUC); //행운 관련 스탯을 제외한 무작위 스탯
+            stat2 = (Stats)Random.Range(1, (int)Stats.LUC); //행운 관련 스탯을 제외한 무작위 스탯
 
             if (stat1 == stat2)
             {
-                stat2 = ICreature.Stats.No; //스탯2를 없애고, 스탯1과 통합
+                stat2 = Stats.No; //스탯2를 없애고, 스탯1과 통합
 
                 //스탯1의 코스트에 스탯2 코스트의 절반만큼 코스트 전달
                 cost_stat1 += cost_stat2 / 2;
@@ -329,7 +328,7 @@ public class ItemSystem : MonoBehaviour
             }
             else
             {
-                if (stat2 < ICreature.Stats.HP) //행동 스탯일 때
+                if (stat2 < Stats.HP) //행동 스탯일 때
                     stat2_arr = new int[] { 0, 0, 0, 0, 0, 0 };
 
                 Debug.Log("스탯 2: " + stat2 + " / 코스트: " + cost_stat2);
@@ -338,14 +337,14 @@ public class ItemSystem : MonoBehaviour
         else
             Debug.Log("스탯 2 코스트:    " + cost_stat2);
 
-        if (stat1 != ICreature.Stats.No && stat1 < ICreature.Stats.HP) //스탯 1이 행동 스탯일 때
+        if (stat1 != Stats.No && stat1 < Stats.HP) //스탯 1이 행동 스탯일 때
         {
             var nowCost = cost_stat1;
             var nextCost = 1;
 
             if (nowCost < nextCost)    //스탯을 생성할 코스트가 없으면
             {
-                stat1 = ICreature.Stats.No;   //스탯 제거
+                stat1 = Stats.No;   //스탯 제거
                 stat1_arr = new int[] { };
             }
             else
@@ -361,14 +360,14 @@ public class ItemSystem : MonoBehaviour
             }
         }
 
-        if (stat2 != ICreature.Stats.No && stat2 < ICreature.Stats.HP) //스탯 2가 행동 스탯일 때
+        if (stat2 != Stats.No && stat2 < Stats.HP) //스탯 2가 행동 스탯일 때
         {
             var nowCost = cost_stat2;
             var nextCost = 1;
 
             if (nowCost < nextCost)    //스탯을 생성할 코스트가 없으면
             {
-                stat2 = ICreature.Stats.No;   //스탯 제거
+                stat2 = Stats.No;   //스탯 제거
                 stat2_arr = new int[] { };
             }
             else
@@ -383,32 +382,32 @@ public class ItemSystem : MonoBehaviour
                 }
             }
         }
-        else if (stat2 == ICreature.Stats.AC)   //스탯 1이 방어도일 때
+        else if (stat2 == Stats.AC)   //스탯 1이 방어도일 때
         {
             //스탯에 따라 지정된 비율만큼 코스트를 수치로 변환
             stat2_value = Cost_To_StatValue(stat2, cost_stat2);
 
             if (stat2_value == 0)   //수치가 0이면
-                stat2 = ICreature.Stats.No;   //스탯 제거
+                stat2 = Stats.No;   //스탯 제거
         }
-        else if (stat2 != ICreature.Stats.No)    //방어도를 제외한 주요 스탯 (HP, 재굴림)
+        else if (stat2 != Stats.No)    //방어도를 제외한 주요 스탯 (HP, 재굴림)
         {
             //스탯에 따라 지정된 비율만큼 코스트를 수치로 변환
             stat2_value = Cost_To_StatValue(stat2, cost_stat2);
 
             if (stat2_value == 0)   //수치가 0이면
-                stat2 = ICreature.Stats.No;   //스탯 제거
+                stat2 = Stats.No;   //스탯 제거
         }
 
-        if (cost_btlAct2 >= _needCost_btlAct)   //행동2 생성에 필요한 만큼 코스트가 있으면
+        if (cost_btlAct2 >= _needCost_btlAct)   //전투행동 2 생성에 필요한 만큼 코스트가 있으면
         {
             //이 무기가 보유 중인 행동 타입 리스트 생성
-            List<BtlActData.ActionType> actTypeList = new List<BtlActData.ActionType>();
+            List<BtlActData.ActType> actTypeList = new List<BtlActData.ActType>();
 
-            if (data.Action.AtkAct_Arr.Length > 0) actTypeList.Add(BtlActData.ActionType.Atk);
-            if (data.Action.DefAct_Arr.Length > 0) actTypeList.Add(BtlActData.ActionType.Def);
-            if (data.Action.DgeAct_Arr.Length > 0) actTypeList.Add(BtlActData.ActionType.Dge);
-            if (data.Action.TacAct_Arr.Length > 0) actTypeList.Add(BtlActData.ActionType.Tac);
+            if (data.BtlAct.AtkAct_Arr.Length > 0) actTypeList.Add(BtlActData.ActType.Atk);
+            if (data.BtlAct.DefAct_Arr.Length > 0) actTypeList.Add(BtlActData.ActType.Def);
+            if (data.BtlAct.DgeAct_Arr.Length > 0) actTypeList.Add(BtlActData.ActType.Dge);
+            if (data.BtlAct.TacAct_Arr.Length > 0) actTypeList.Add(BtlActData.ActType.Tac);
 
             if (actTypeList.Count > 0)  //보유한 행동 타입이 1개 이상일 때
             {
@@ -420,23 +419,23 @@ public class ItemSystem : MonoBehaviour
 
                 switch (makeActType)
                 {
-                    case BtlActData.ActionType.Atk:
-                        makeActArr = data.Action.AtkAct_Arr;
+                    case BtlActData.ActType.Atk:
+                        makeActArr = data.BtlAct.AtkAct_Arr;
                         break;
-                    case BtlActData.ActionType.Def:
-                        makeActArr = data.Action.DefAct_Arr;
+                    case BtlActData.ActType.Def:
+                        makeActArr = data.BtlAct.DefAct_Arr;
                         break;
-                    case BtlActData.ActionType.Dge:
-                        makeActArr = data.Action.DgeAct_Arr;
+                    case BtlActData.ActType.Dge:
+                        makeActArr = data.BtlAct.DgeAct_Arr;
                         break;
-                    case BtlActData.ActionType.Tac:
-                        makeActArr = data.Action.TacAct_Arr;
+                    case BtlActData.ActType.Tac:
+                        makeActArr = data.BtlAct.TacAct_Arr;
                         break;
                 }
 
                 BtlActData makeAct = makeActArr[Random.Range(0, makeActArr.Length)];    //그 타입의 무작위 행동 선택
 
-                if (makeAct == btlAct1) //선택한 행동이 행동1과 동일한 경우
+                if (makeAct == btlAct1) //선택한 행동이 전투행동 1과 동일한 경우
                 {
                     Debug.Log("행동2가 행동1과 같음");
 
@@ -445,61 +444,59 @@ public class ItemSystem : MonoBehaviour
                     {
                         switch (actTypeList[Random.Range(0, actTypeList.Count)])
                         {
-                            case BtlActData.ActionType.Atk:
-                                makeActArr = data.Action.AtkAct_Arr;
+                            case BtlActData.ActType.Atk:
+                                makeActArr = data.BtlAct.AtkAct_Arr;
                                 break;
-                            case BtlActData.ActionType.Def:
-                                makeActArr = data.Action.DefAct_Arr;
+                            case BtlActData.ActType.Def:
+                                makeActArr = data.BtlAct.DefAct_Arr;
                                 break;
-                            case BtlActData.ActionType.Dge:
-                                makeActArr = data.Action.DgeAct_Arr;
+                            case BtlActData.ActType.Dge:
+                                makeActArr = data.BtlAct.DgeAct_Arr;
                                 break;
-                            case BtlActData.ActionType.Tac:
-                                makeActArr = data.Action.TacAct_Arr;
+                            case BtlActData.ActType.Tac:
+                                makeActArr = data.BtlAct.TacAct_Arr;
                                 break;
                         }
 
                         makeAct = makeActArr[Random.Range(0, makeActArr.Length)];   //그 타입의 무작위 행동 선택
 
-                        //행동2 생성
+                        //전투행동 2 생성
                         btlAct2 = makeAct;
                         btlAct2_stat = btlAct2.Stats_Arr[Random.Range(0, btlAct2.Stats_Arr.Length)];
 
-                        btlAct2_upgrade = cost_btlAct2 - _needCost_btlAct;  //행동2 강화 수치 설정
+                        Debug.Log("전투행동 2: " + btlAct2.Name + " / 코스트: " + cost_btlAct2);
                     }
                     else    //더 이상 선택할 수 있는 행동 타입이 없으면
                     {
                         Debug.Log("더 추가 할 수 있는 행동이 없음");
-                        //행동을 추가하지 않고 종료
+                        //전투행동 2를 추가하지 않고 종료
                         btlAct2 = null;
-                        btlAct2_stat = ICreature.Stats.No;
+                        btlAct2_stat = Stats.No;
                     }
                 }
                 else
                 {
                     makeAct = makeActArr[Random.Range(0, makeActArr.Length)];   //그 타입의 무작위 행동 선택
 
-                    //행동2 생성
+                    //전투행동 2 생성
                     btlAct2 = makeAct;
                     btlAct2_stat = btlAct2.Stats_Arr[Random.Range(0, btlAct2.Stats_Arr.Length)];
 
-                    btlAct2_upgrade = cost_btlAct2 - _needCost_btlAct;  //행동2 강화 수치 설정
+                    Debug.Log("전투행동 2: " + btlAct2.Name + " / 코스트: " + cost_btlAct2);
                 }
             }
-
-            Debug.Log("행동 2: " + btlAct2.Name + " / 코스트: " + cost_btlAct2);
         }
-        else    //행동2 생성을 위한 코스트가 없으면
+        else    //전투행동 2 생성을 위한 코스트가 없으면
         {
-            //행동 제거
+            //전투행동 2 제거
             btlAct2 = null;
-            btlAct2_stat = ICreature.Stats.No;
-            Debug.Log("행동 2 코스트: " + cost_btlAct2 + " 코스트 부족으로 행동 제거");
+            btlAct2_stat = Stats.No;
+            Debug.Log("전투행동 2 코스트: " + cost_btlAct2 + " 코스트 부족으로 전투행동 2 제거");
         }
 
-        //Debug.Log("능력 코스트:      " + cost_ability);
-        if (cost_ability >= _needCost_ability)  //능력 생성에 필요한 만큼의 코스트가 있으면
-            ability = data.Ability_Arr[Random.Range(0, data.Ability_Arr.Length)];
+        //Debug.Log("특성 코스트:      " + cost_ability);
+        if (cost_trait >= _needCost_trait)  //특성 생성에 필요한 만큼 코스트가 있으면
+            trait = data.Trait_Arr[Random.Range(0, data.Trait_Arr.Length)];
 
         //5. 모든 옵션 설정이 끝나면, 아이템 생성
         ItemClass[] createGroup = null;
@@ -532,22 +529,20 @@ public class ItemSystem : MonoBehaviour
             Stat2 = stat2,
             Stat2_Arr = stat2_arr.ToArray(),
             Stat2_Value = stat2_value,
-            //행동1
-            BtlAct1 = new ICreature.BtlActClass()
+            //전투행동 1
+            BtlAct1 = new ICreature.BtlAct()
             {
                 Data = btlAct1,
                 Stat = btlAct1_stat,
-                Upgrade = Cost_To_Upgrade(btlAct1_upgrade)
             },
-            //행동2
-            BtlAct2 = new ICreature.BtlActClass()
+            //전투행동 2
+            BtlAct2 = new ICreature.BtlAct()
             {
                 Data = btlAct2,
                 Stat = btlAct2_stat,
-                Upgrade = Cost_To_Upgrade(btlAct2_upgrade)
             },
-            //능력
-            Ability = ability
+            //특성
+            Trait = trait
         };
         Debug.Log("---------------------------------");
         createSlot[index].EXIST = true; //아이템 생성 후 그 슬롯 아이템 존재 여부 true
@@ -557,37 +552,37 @@ public class ItemSystem : MonoBehaviour
     public void Create_Armor(ItemData data, ItemSlotType slot, int index)
     {
         //스탯1
-        ICreature.Stats stat1 = ICreature.Stats.No; //방어구 스탯1
-        int stat1_value = 0;                        // 일반 스탯: 정수 변수
-        int[] stat1_arr = { };                      // 행동 스탯: 정수 배열
+        Stats stat1 = Stats.No;
+        int stat1_value = 0;
+        int[] stat1_arr = { };
         //스탯2
-        ICreature.Stats stat2 = ICreature.Stats.No; //방어구 스탯2
-        int stat2_value = 0;                        // 일반 스탯: 정수 변수
-        int[] stat2_arr = { };                      // 행동 스탯: 정수 배열
-        //능력
-        AbilityData ability = null;
+        Stats stat2 = Stats.No;
+        int stat2_value = 0;                        
+        int[] stat2_arr = { };                      
+        //특성
+        TraitData trait = null;
 
         //각 옵션에 부여된 코스트량
         int cost_stat1 = 0;
         int cost_stat2 = 0;
-        int cost_ability = 0;
+        int cost_trait = 0;
 
         //생성 방식에 따라 옵션 값 생성
         //1) 옵션 생성에 필요한 코스트 설정
         //2) 스탯1을 결정짓는 방어구 부위 및 재질이면, 스탯 1을 설정 후 코스트 소모
-        //3) 능력을 부여할지 무작위로 결정
-        //4) 보유한 코스트를 소모하면서, 이 방어구의 스탯, 능력에 코스트 부여
+        //3) 특성을 부여할지 무작위로 결정
+        //4) 보유한 코스트를 소모하면서, 이 방어구의 스탯, 특성에 코스트 부여
         //5) 남은 코스트가 0일 때, 각 옵션에 부여된 코스트에 따라 옵션 구체화
         //6) 모든 옵션 설정이 끝나면, 아이템 생성
 
         //<<방어구 부위, 재질 별 특징>>
         //  [금속]: <방어도 스탯 보유>
         //  [가죽]: <HP 스탯 보유>
-        //  [천]: <능력 확정 보유>
-        //  [머리]: <행동 스탯의 코스트 증가>
-        //  [상의]: <HP와 방어도 스탯의 코스트 증가>
+        //  [천]: <특성 확정 보유>
+        //  [머리]: <행동 스탯 증가>
+        //  [상의]: <HP와 방어도 스탯 증가>
         //  [하의]: <스탯1이 행동 스탯이면 스탯2 = 그 스탯의 재굴림
-        //          스탯1이 재굴림 스탯이면 스탯2 =  그 재굴림의 행동 스탯>
+        //          스탯1이 재굴림 스탯이면 스탯2 =  그 재굴림의 스탯>
 
         //1) 옵션 생성에 필요한 코스트 설정
         int cost = Random.Range(_cost, _cost + 6);   //임시 코스트
@@ -599,7 +594,7 @@ public class ItemSystem : MonoBehaviour
         Debug.Log("-----------방어구 생성-----------");
         if (material == ItemData.ArmorMaterial.Metal)   //금속 방어구일 때
         {
-            stat1 = ICreature.Stats.AC; //방어도 스탯 보유
+            stat1 = Stats.AC; //방어도 스탯 보유
 
             //스탯 생성을 위한 코스트 소모
             cost -= _needCost_ac;
@@ -607,7 +602,7 @@ public class ItemSystem : MonoBehaviour
         }
         else if (material == ItemData.ArmorMaterial.Leather)    //가죽 방어구일 때
         {
-            stat1 = ICreature.Stats.HP; //HP 스탯 보유
+            stat1 = Stats.HP; //HP 스탯 보유
 
             //스탯 생성을 위한 코스트 소모
             cost -= _needCost_hp;
@@ -615,7 +610,7 @@ public class ItemSystem : MonoBehaviour
         }
         else if (material == ItemData.ArmorMaterial.Cloth)      //천 방어구일 때
         {
-            //능력 확정 보유
+            //특성 확정 보유
         }
         /*
         if (type == ItemData.ItemType.Head) //머리 방어구일 때
@@ -648,11 +643,11 @@ public class ItemSystem : MonoBehaviour
         }
         */
 
-        //3) 능력을 부여할지 무작위로 결정
+        //3) 특성을 부여할지 무작위로 결정
         //
         //
 
-        //4) 보유한 코스트를 소모하면서, 이 방어구의 스탯에 코스트 부여
+        //4) 보유한 코스트를 소모하면서, 이 방어구의 스탯, 특성에 코스트 부여
         while (cost > 0)
         {
             /*
@@ -686,55 +681,55 @@ public class ItemSystem : MonoBehaviour
         //   이 때, 방어구 부위와 재질에 따른 특징을 반영
 
         //스탯1이 결정되지 않았고 코스트가 존재할 경우 스탯 결정
-        if (stat1 == ICreature.Stats.No && cost_stat1 > 0)
+        if (stat1 == Stats.No && cost_stat1 > 0)
         {
             //stat1 = (ICreature.Stats)Random.Range(1, Enum.GetValues(typeof(ICreature.Stats)).Length);   //무작위 스탯
-            stat1 = (ICreature.Stats)Random.Range(1, (int)ICreature.Stats.LUC);     //행운 관련 스탯을 제외한 무작위 스탯
+            stat1 = (Stats)Random.Range(1, (int)Stats.LUC);     //행운 관련 스탯을 제외한 무작위 스탯
 
-            if (stat1 < ICreature.Stats.HP) //행동 스탯일 때
+            if (stat1 < Stats.HP) //행동 스탯일 때
                 stat1_arr = new int[] { 0, 0, 0, 0, 0, 0 };
         }
 
         //스탯2가 결정되지 않았고 코스트가 존재할 경우 스탯 결정
-        if (stat2 == ICreature.Stats.No && cost_stat2 > 0)
+        if (stat2 == Stats.No && cost_stat2 > 0)
         {
-            if (type == ItemData.ItemType.Leg && stat1 != ICreature.Stats.No)  //하의 방어구일 때
+            if (type == ItemData.ItemType.Leg && stat1 != Stats.No)  //하의 방어구일 때
             {
-                if (stat1 < ICreature.Stats.HP)             //스탯1이 행동 스탯인 경우
+                if (stat1 < Stats.HP)             //스탯1이 행동 스탯인 경우
                 {
-                    switch (stat1)  //스탯2를 스탯1에 대응되는 재굴림으로
+                    switch (stat1)  //스탯2를 스탯1의 재굴림으로
                     {
-                        case ICreature.Stats.STR: stat2 = ICreature.Stats.RE_STR; break;
-                        case ICreature.Stats.INT: stat2 = ICreature.Stats.RE_INT; break;
-                        case ICreature.Stats.DEX: stat2 = ICreature.Stats.RE_DEX; break;
-                        case ICreature.Stats.AGI: stat2 = ICreature.Stats.RE_AGI; break;
-                        case ICreature.Stats.CON: stat2 = ICreature.Stats.RE_CON; break;
-                        case ICreature.Stats.WIL: stat2 = ICreature.Stats.RE_WIL; break;
+                        case Stats.STR: stat2 = Stats.RE_STR; break;
+                        case Stats.INT: stat2 = Stats.RE_INT; break;
+                        case Stats.DEX: stat2 = Stats.RE_DEX; break;
+                        case Stats.AGI: stat2 = Stats.RE_AGI; break;
+                        case Stats.CON: stat2 = Stats.RE_CON; break;
+                        case Stats.WIL: stat2 = Stats.RE_WIL; break;
                     }
                 }
-                else if (stat1 >= ICreature.Stats.RE_STR)   //스탯1이 재굴림인 경우
+                else if (stat1 >= Stats.RE_STR)   //스탯1이 재굴림인 경우
                 {
                     switch (stat1)  //스탯2를 스탯1에 대응되는 행동 스탯으로
                     {
-                        case ICreature.Stats.RE_STR: stat2 = ICreature.Stats.STR; break;
-                        case ICreature.Stats.RE_INT: stat2 = ICreature.Stats.INT; break;
-                        case ICreature.Stats.RE_DEX: stat2 = ICreature.Stats.DEX; break;
-                        case ICreature.Stats.RE_AGI: stat2 = ICreature.Stats.AGI; break;
-                        case ICreature.Stats.RE_CON: stat2 = ICreature.Stats.CON; break;
-                        case ICreature.Stats.RE_WIL: stat2 = ICreature.Stats.WIL; break;
+                        case Stats.RE_STR: stat2 = Stats.STR; break;
+                        case Stats.RE_INT: stat2 = Stats.INT; break;
+                        case Stats.RE_DEX: stat2 = Stats.DEX; break;
+                        case Stats.RE_AGI: stat2 = Stats.AGI; break;
+                        case Stats.RE_CON: stat2 = Stats.CON; break;
+                        case Stats.RE_WIL: stat2 = Stats.WIL; break;
                     }
                 }
                 else
                     //stat2 = (ICreature.Stats)Random.Range(1, Enum.GetValues(typeof(ICreature.Stats)).Length);   //무작위 스탯
-                    stat2 = (ICreature.Stats)Random.Range(1, (int)ICreature.Stats.LUC);     //행운 관련 스탯을 제외한 무작위 스탯
+                    stat2 = (Stats)Random.Range(1, (int)Stats.LUC);     //행운 관련 스탯을 제외한 무작위 스탯
             }
             else
                 //stat2 = (ICreature.Stats)Random.Range(1, Enum.GetValues(typeof(ICreature.Stats)).Length);   //무작위 스탯
-                stat2 = (ICreature.Stats)Random.Range(1, (int)ICreature.Stats.LUC);     //행운 관련 스탯을 제외한 무작위 스탯
+                stat2 = (Stats)Random.Range(1, (int)Stats.LUC);     //행운 관련 스탯을 제외한 무작위 스탯
 
             if (stat1 == stat2)
             {
-                stat2 = ICreature.Stats.No; //스탯2를 없애고, 스탯1과 통합
+                stat2 = Stats.No; //스탯2를 없애고, 스탯1과 통합
 
                 //스탯1의 코스트에 스탯2 코스트의 절반만큼 코스트 전달
                 cost_stat1 += cost_stat2 / 2;
@@ -746,7 +741,7 @@ public class ItemSystem : MonoBehaviour
             {
                 Debug.Log("스탯 2: " + stat2 + " / 코스트: " + cost_stat2);
 
-                if (stat2 < ICreature.Stats.HP) //행동 스탯일 때
+                if (stat2 < Stats.HP) //행동 스탯일 때
                     stat2_arr = new int[] { 0, 0, 0, 0, 0, 0 };
             }
         }
@@ -755,9 +750,9 @@ public class ItemSystem : MonoBehaviour
 
         Debug.Log("스탯 1: " + stat1 + " / 코스트: " + cost_stat1);
 
-        if (stat1 != ICreature.Stats.No)
+        if (stat1 != Stats.No)
         {
-            if (stat1 < ICreature.Stats.HP) //스탯 1이 행동 스탯일 때
+            if (stat1 < Stats.HP) //스탯 1이 행동 스탯일 때
             {
                 if (type == ItemData.ItemType.Head) //머리 방어구이면
                 {
@@ -771,7 +766,7 @@ public class ItemSystem : MonoBehaviour
 
                 if (nowCost < nextCost)    //스탯을 생성할 코스트가 없으면
                 {
-                    stat1 = ICreature.Stats.No;   //스탯 제거
+                    stat1 = Stats.No;   //스탯 제거
                     stat1_arr = new int[] { };
                 }
                 else
@@ -789,7 +784,7 @@ public class ItemSystem : MonoBehaviour
             else    //스탯 1이 HP, 방어도, 재굴림
             {
                 if (type == ItemData.ItemType.Body &&
-                    (stat1 == ICreature.Stats.HP || stat1 == ICreature.Stats.AC))
+                    (stat1 == Stats.HP || stat1 == Stats.AC))
                 {
                     //HP, 방어도의 코스트 증가: (코스트) + (코스트 / 2)로 스탯 생성
                     cost_stat1 = (cost_stat1) + (cost_stat1 / 2);
@@ -800,13 +795,13 @@ public class ItemSystem : MonoBehaviour
                 stat1_value = Cost_To_StatValue(stat1, cost_stat1);
 
                 if (stat1_value == 0)   //수치가 0이면
-                    stat1 = ICreature.Stats.No; //스탯 제거
+                    stat1 = Stats.No; //스탯 제거
             }
         }
 
-        if (stat2 != ICreature.Stats.No)
+        if (stat2 != Stats.No)
         {
-            if (stat2 < ICreature.Stats.HP) //스탯 2가 행동 스탯일 때
+            if (stat2 < Stats.HP) //스탯 2가 행동 스탯일 때
             {
                 if (type == ItemData.ItemType.Head) //머리 방어구이면
                 {
@@ -820,7 +815,7 @@ public class ItemSystem : MonoBehaviour
 
                 if (nowCost < nextCost)    //스탯을 생성할 코스트가 없으면
                 {
-                    stat2 = ICreature.Stats.No;   //스탯 제거
+                    stat2 = Stats.No;   //스탯 제거
                     stat2_arr = new int[] { };
                 }
                 else
@@ -838,7 +833,7 @@ public class ItemSystem : MonoBehaviour
             else    //스탯 2가 HP, 방어도, 재굴림
             {
                 if (type == ItemData.ItemType.Body &&
-                    (stat2 == ICreature.Stats.HP || stat2 == ICreature.Stats.AC))
+                    (stat2 == Stats.HP || stat2 == Stats.AC))
                 {
                     //HP, 방어도의 코스트 증가: (코스트) + (코스트 / 2)로 스탯 생성
                     cost_stat2 = (cost_stat2) + (cost_stat2 / 2);
@@ -849,14 +844,14 @@ public class ItemSystem : MonoBehaviour
                 stat2_value = Cost_To_StatValue(stat2, cost_stat2);
 
                 if (stat2_value == 0)   //수치가 0이면
-                    stat2 = ICreature.Stats.No; //스탯 제거
+                    stat2 = Stats.No; //스탯 제거
             }
         }
 
-        if (cost_ability >= _needCost_ability)  //능력 생성에 필요한 만큼의 코스트가 있으면
+        if (cost_trait >= _needCost_trait)  //특성 생성에 필요한 만큼의 코스트가 있으면
         {
-            ability = data.Ability_Arr[Random.Range(0, data.Ability_Arr.Length)];
-            Debug.Log("능력 코스트:      " + cost_ability);
+            trait = data.Trait_Arr[Random.Range(0, data.Trait_Arr.Length)];
+            Debug.Log("특성 코스트:      " + cost_trait);
         }
 
         ItemClass[] createGroup = null;
@@ -890,50 +885,28 @@ public class ItemSystem : MonoBehaviour
             Stat2 = stat2,
             Stat2_Value = stat2_value,
             Stat2_Arr = stat2_arr.ToArray(),
-            //능력
-            Ability = ability
+            //특성
+            Trait = trait
         };
 
         Debug.Log("---------------------------------");
         createSlot[index].EXIST = true; //아이템 생성 후 그 슬롯 아이템 존재 여부 true
     }
 
-    //목걸이 생성
-    public void Create_Amulet(ItemData data, ItemSlotType slot, int index)
+    //장신구 생성
+    public void Create_Accessory(ItemData data, ItemSlotType slot, int index)
     {
 
     }
 
-    //반지 생성
-    public void Create_Ring(ItemData data, ItemSlotType slot, int index)
-    {
-
-    }
-
-    int Cost_To_Upgrade(int cost)   //코스트를 소모해 행동 강화수치로 반환
-    {
-        var nowCost = cost;
-        var nextCost = 2;
-        var value = 0;
-
-        while (nowCost >= nextCost) //행동 강화에 필요한 코스트가 존재할 경우
-        {
-            nowCost -= nextCost;    //코스트 차감
-            value++;                //행동 1단계 강화
-            nextCost++;             //다음 단계에 필요한 코스트 1 상승
-        }
-
-        return value;
-    }
-
-    int Cost_To_StatValue(ICreature.Stats stat, int cost)   //코스트를 소모해 비율에 맞는 스탯값으로 반환
+    int Cost_To_StatValue(Stats stat, int cost)   //코스트를 소모해 비율에 맞는 스탯값으로 반환
     {
         switch (stat)
         {
-            case ICreature.Stats.HP:    //HP
+            case Stats.HP:    //HP
                 //return cost / _needCost_hp + cost / (_needCost_hp + 1);
                 return cost / _needCost_hp;
-            case ICreature.Stats.AC:    //방어도
+            case Stats.AC:    //방어도
                 return cost / _needCost_ac;
             default:    //재굴림
                 var nowCost = cost;
@@ -1024,34 +997,34 @@ public class ItemSystem : MonoBehaviour
             _itemTooltip.Change_Name(item.Data.Name);       //아이템 이름
             _itemTooltip.Change_ItemType(item.Data.Type);   //아이템 타입 아이콘
 
-            if (item.Stat1 != ICreature.Stats.No)   //스탯1이 존재할 때
+            if (item.Stat1 != Stats.No)   //스탯1이 존재할 때
             {
-                if (item.Stat1 <= ICreature.Stats.WIL)
+                if (item.Stat1 <= Stats.WIL)
                     _itemTooltip.Change_ActionStat1(item.Stat1, item.Stat1_Arr);    //행동 스탯
                 else
                     _itemTooltip.Change_Stat1(item.Stat1, item.Stat1_Value);        //기본 스탯
             }
 
-            if (item.Stat2 != ICreature.Stats.No)   //스탯2가 존재할 때
+            if (item.Stat2 != Stats.No)   //스탯2가 존재할 때
             {
-                if (item.Stat2 <= ICreature.Stats.WIL)
+                if (item.Stat2 <= Stats.WIL)
                     _itemTooltip.Change_ActionStat2(item.Stat2, item.Stat2_Arr);    //행동 스탯
                 else
                     _itemTooltip.Change_Stat2(item.Stat2, item.Stat2_Value);        //기본 스탯
             }
 
             if (item.BtlAct1 != null)
-                _itemTooltip.Change_Action1(item.BtlAct1);  //행동1
+                _itemTooltip.Change_Action1(item.BtlAct1);  //전투행동 1
             if (item.BtlAct2 != null)
-                _itemTooltip.Change_Action2(item.BtlAct2);  //행동2
+                _itemTooltip.Change_Action2(item.BtlAct2);  //전투행동 2
 
-            if (item.Ability != null)
-                _itemTooltip.Change_Ability(item.Ability);  //능력
+            if (item.Trait != null)
+                _itemTooltip.Change_Ability(item.Trait);  //특성
 
             //만약 해당 아이템이 장비 슬롯 밖의 장비 아이템인 경우
             //동일한 타입의 장비를 착용 중이라면, 장착 중 아이템의 툴팁 준비
             if (slot != ItemSlotType.Equip &&
-                item.Data.Type <= ItemData.ItemType.Ring &&
+                item.Data.Type <= ItemData.ItemType.Accessory &&
                 _itemClass_equip[(int)item.Data.Type].Data != null)
             {
                 //장착 중 아이템 표시
@@ -1072,29 +1045,29 @@ public class ItemSystem : MonoBehaviour
             _itemTooltip_equip.Change_Name(item.Data.Name); //아이템 툴팁 활성화
             _itemTooltip_equip.Change_ItemType(item.Data.Type); //아이템 타입 아이콘
 
-            if (item.Stat1 != ICreature.Stats.No)   //스탯1이 존재할 때
+            if (item.Stat1 != Stats.No)   //스탯1이 존재할 때
             {
-                if (item.Stat1 <= ICreature.Stats.WIL)  //행동 스탯의 경우
+                if (item.Stat1 <= Stats.WIL)
                     _itemTooltip_equip.Change_ActionStat1(item.Stat1, item.Stat1_Arr);  //행동 스탯
                 else
                     _itemTooltip_equip.Change_Stat1(item.Stat1, item.Stat1_Value);      //기본 스탯
             }
 
-            if (item.Stat2 != ICreature.Stats.No)   //스탯2이 존재할 때
+            if (item.Stat2 != Stats.No)   //스탯2이 존재할 때
             {
-                if (item.Stat2 <= ICreature.Stats.WIL)  //행동 스탯의 경우
+                if (item.Stat2 <= Stats.WIL)
                     _itemTooltip_equip.Change_ActionStat2(item.Stat2, item.Stat2_Arr);  //행동 스탯
                 else
                     _itemTooltip_equip.Change_Stat2(item.Stat2, item.Stat2_Value);      //기본 스탯
             }
 
             if (item.BtlAct1 != null)
-                _itemTooltip_equip.Change_Action1(item.BtlAct1);    //행동 1
+                _itemTooltip_equip.Change_Action1(item.BtlAct1);    //전투행동 1
             if (item.BtlAct2 != null)
-                _itemTooltip_equip.Change_Action2(item.BtlAct2);    //행동 2
+                _itemTooltip_equip.Change_Action2(item.BtlAct2);    //전투행동 2
 
-            if (item.Ability != null)
-                _itemTooltip_equip.Change_Ability(item.Ability);    //능력
+            if (item.Trait != null)
+                _itemTooltip_equip.Change_Ability(item.Trait);    //특성
         }
     }
 
@@ -1145,27 +1118,33 @@ public class ItemSystem : MonoBehaviour
                 break;
         }
 
-        if ((int)tempGroup[index].Data.Type <= (int)ItemData.ItemType.Ring) //우클릭한 아이템이 장비 아이템이면
+        if ((int)tempGroup[index].Data.Type <= (int)ItemData.ItemType.Accessory) //우클릭한 아이템이 장비 아이템이면
         {
             ItemTooltip_Off();  //아이템 툴팁 Off
             tempSlot[index].StopCoroutine("Print_ItemTooltip");
 
             //아이템이 장착될 슬롯 인덱스 지정
-            if (tempGroup[index].Data.Type != ItemData.ItemType.Ring)   //우클릭한 장비가 반지가 아닌 장비인 경우
+            if (tempGroup[index].Data.Type != ItemData.ItemType.Accessory)  //우클릭한 장비가 장신구가 아닌 장비인 경우
                 equip_index = (int)tempGroup[index].Data.Type;  //장비 타입에 따른 슬롯 위치 지정
-            else    //우클릭한 장비가 반지인 경우
+            else    //우클릭한 장비가 장신구인 경우
             {
-                if (_itemClass_equip[(int)ItemData.ItemType.Ring].Data = null)  //1번쨰 반지 슬롯이 비어있으면, 그 슬롯 위치로
-                    equip_index = (int)ItemData.ItemType.Ring;
+                //1번째 장신구 슬롯이 비어있으면, 그 위치로
+                if (_itemClass_equip[(int)ItemData.ItemType.Accessory].Data = null)
+                    equip_index = (int)ItemData.ItemType.Accessory;
+                //2번째 장신구 슬롯이 비어있으면, 그 위치로
+                else if (_itemClass_equip[(int)ItemData.ItemType.Accessory + 1].Data = null)
+                    equip_index = (int)ItemData.ItemType.Accessory + 1;
                 else
-                {   //1번째 반지 슬롯에 반지가 있을 경우
-                    if (_itemClass_equip[(int)ItemData.ItemType.Ring + 1].Data = null)  //2번째 반지 슬롯이 비어있으면, 그 슬롯 위치로
-                        equip_index = (int)ItemData.ItemType.Ring + 1;
-                    else                                                                //1, 2번째 반지 슬롯 모두 반지가 있을 경우
+                {
+                    //3번째 장신구 슬롯이 비어있으면, 그 위치로
+                    if (_itemClass_equip[(int)ItemData.ItemType.Accessory + 2].Data = null)
+                        equip_index = (int)ItemData.ItemType.Accessory + 2;
+                    else    //모든 슬롯에 장신구가 있으면
                     {
-                        //장착할 슬롯을 고르는 창을 등장시켜야 함.
-                        //우선은 1번째 슬롯으로 고정
-                        equip_index = (int)ItemData.ItemType.Ring;
+                        //교체할 장신구를 선택하는 창 등장시키기
+
+                        //당장은 첫번째 장신구와 교체하기
+                        equip_index = (int)ItemData.ItemType.Accessory;
                     }
                 }
             }
@@ -1286,7 +1265,7 @@ public class ItemSystem : MonoBehaviour
                 {
                     if (_dropClass.Data != null)    //드롭한 슬롯에 아이템이 있다면
                     {
-                        //<드래그 아이템 타입>과 <드롭 아이템 타입>이 동일할 때, 장착 중인 장비를 인벤토리/전리품의 아이템과 교체
+                        //<드래그 아이템 타입>과 <드롭 아이템 타입>이 동일할 때, 장착 중인 장비를 인벤토리/전리품과 교체
                         if (_dragSlot.EQUIP_TYPE == _dropClass.Data.Type)
                         {
                             Change_EquipItem(false, _dragClass);    //드래그한 장비해제
@@ -1464,17 +1443,17 @@ public class ItemSystem : MonoBehaviour
     //장비 장착/해제
     void Change_EquipItem(bool isEquip, ItemClass itemClass)    //isEquip에 따라 장착 또는 해제
     {
-        if (itemClass.Stat1 != ICreature.Stats.No)  //스탯 1이 존재할 경우
+        if (itemClass.Stat1 != Stats.No)  //스탯 1이 존재할 경우
             Manage_EquipStat(isEquip, itemClass.Stat1, itemClass.Stat1_Arr, itemClass.Stat1_Value); //isEquip에 따라 스탯1 추가/제거
-        if (itemClass.Stat2 != ICreature.Stats.No)  //스탯 2가 존재할 경우
+        if (itemClass.Stat2 != Stats.No)  //스탯 2가 존재할 경우
             Manage_EquipStat(isEquip, itemClass.Stat2, itemClass.Stat2_Arr, itemClass.Stat2_Value); //isEquip에 따라 스탯2 추가/제거
 
-        if (itemClass.BtlAct1 != null)   //전투행동1이 존재할 경우
-            Manage_BtlAct(isEquip, itemClass.BtlAct1);   //전투행동1 추가/제거
-        if (itemClass.BtlAct2 != null)   //전투행동2가 존재할 경우
-            Manage_BtlAct(isEquip, itemClass.BtlAct2);   //전투행동2 추가/제거
+        if (itemClass.BtlAct1 != null)   //전투행동 1이 존재할 경우
+            Manage_BtlAct(isEquip, itemClass.BtlAct1);   //전투행동 1 추가/제거
+        if (itemClass.BtlAct2 != null)   //전투행동 2가 존재할 경우
+            Manage_BtlAct(isEquip, itemClass.BtlAct2);   //전투행동 2 추가/제거
 
-        //능력 존재 시 추가/제거
+        //특성 존재 시 추가/제거
 
         if (isEquip)
             PlayerSys.EquipItem(itemClass.Data);    //아이템 장착
@@ -1483,18 +1462,18 @@ public class ItemSystem : MonoBehaviour
     }
 
     //아이템 교체시 증감되는 스탯 관리
-    void Manage_EquipStat(bool plus, ICreature.Stats stat, int[] stat_arr, int stat_value)  //bool값에 따라 해당 스탯값을 증감
+    void Manage_EquipStat(bool plus, Stats stat, int[] stat_arr, int stat_value)  //bool값에 따라 해당 스탯을 증감
     {
-        if (stat <= ICreature.Stats.WIL)    //행동스탯인 경우
-            PlayerSys.Change_ActionStat(plus, stat, stat_arr);
-        else    //일반스탯인 경우
+        if (stat <= Stats.WIL)    //행동 스탯인 경우
+            PlayerSys.Change_ActStat(plus, stat, stat_arr);
+        else    //주요 스탯인 경우
         {
             switch (stat)
             {
-                case ICreature.Stats.HP:
+                case Stats.HP:
                     PlayerSys.Change_HpMax(plus, stat_value);
                     break;
-                case ICreature.Stats.AC:
+                case Stats.AC:
                     PlayerSys.Change_ACMax(plus, stat_value);
                     break;
                 default:
@@ -1504,10 +1483,10 @@ public class ItemSystem : MonoBehaviour
         }
     }
 
-    //아이템 교체시 변경되는 행동 관리
-    void Manage_BtlAct(bool plus, ICreature.BtlActClass btlAct)     //bool값에 따라 전투행동을 추가/제거
+    //아이템 교체시 변경되는 전투행동 관리
+    void Manage_BtlAct(bool plus, BtlAct act)     //bool값에 따라 전투행동을 추가/제거
     {
-        if (btlAct.Data != null)
-            PlayerSys.Change_BtlAct(plus, btlAct);
+        if (act.Data != null)
+            PlayerSys.Change_BtlAct(plus, act);
     }
 }

@@ -15,18 +15,14 @@ MonoBehaviour:
   _icon: {fileID: -1539877647, guid: 832b35751793d10448ae1bd27b2f4046, type: 3}
   _name: "\uCC3D"
   _type: 0
-  Action:
+  BtlAct:
     NormalAtk_Arr:
-    - {fileID: 11400000, guid: 29b35bf4224c8364eb8e46000c35c056, type: 2}
-    AtkAct_Arr:
-    - {fileID: 11400000, guid: a48f6b12b06810b42a896867d62bde9d, type: 2}
-    DefAct_Arr:
-    - {fileID: 11400000, guid: aea4259d0b821014e9cedccdf30d937e, type: 2}
-    DgeAct_Arr:
-    - {fileID: 11400000, guid: 16703902592f3264d9b74b455350efb7, type: 2}
+    - {fileID: 11400000, guid: ff6fd2274d5692e469d5c6297aac4c1c, type: 2}
+    AtkAct_Arr: []
+    DefAct_Arr: []
+    DgeAct_Arr: []
     TacAct_Arr: []
-  Ability_Arr:
-  - {fileID: 11400000, guid: d5ad3e474c14cd643a474634f0cb5f00, type: 2}
+  Trait_Arr: []
   Armor:
     Material: 0
   Clip_Idle: {fileID: 7400000, guid: 52a171c8032f75a4f820ce83babbfab1, type: 2}

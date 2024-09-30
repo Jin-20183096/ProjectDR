@@ -230,6 +230,13 @@ public class GameLog : MonoBehaviour
         LogPrint_Start(LogSituation.BtlActEffect);
     }
 
+    public void SetLog_Wait(bool isP, int getAp)
+    {
+        NewLog(MakeSentence((isP ? _p_name : _e_name), "[은/는]", "상황을 지켜보면서, 행동력을", getAp.ToString(), "얻었다"));
+
+        LogPrint_Start(LogSituation.BtlActEffect);
+    }
+
     public void SetLog_RunAct(bool isP, bool success) //로그 설정: 도망 행동
     {
         if (success)

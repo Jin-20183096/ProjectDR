@@ -2,7 +2,7 @@ using UnityEngine;
 
 [CreateAssetMenu(fileName = "Dge001", menuName = "ScrObj/BtlAct_Dge/000~025/Dge001", order = 1)]   //커스텀 메뉴 추가
 
-public class Dge001 : BtlAct_Dge
+public class Dge001 : BtlActData
 {
     //Dge001: 회피
 

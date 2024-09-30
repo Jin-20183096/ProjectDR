@@ -47,10 +47,6 @@ public class StatusScreen : MonoBehaviour, IPointerClickHandler
     [SerializeField]
     private Image[] _img_AGI;              //πŒ√∏ ¡÷ªÁ¿ß Ω∫≈»
     [SerializeField]
-    private TextMeshProUGUI _txt_reroll_CON;    //∞«∞≠ ¿Á±º∏≤
-    [SerializeField]
-    private Image[] _img_CON;              //∞«∞≠ ¡÷ªÁ¿ß Ω∫≈»
-    [SerializeField]
     private TextMeshProUGUI _txt_reroll_WIL;    //¿«¡ˆ ¿Á±º∏≤
     [SerializeField]
     private Image[] _img_WIL;              //¿«¡ˆ ¡÷ªÁ¿ß Ω∫≈»
@@ -111,9 +107,6 @@ public class StatusScreen : MonoBehaviour, IPointerClickHandler
             case ICreature.Stats.AGI:
                 _txt_reroll_AGI.text = value.ToString();
                 break;
-            case ICreature.Stats.CON:
-                _txt_reroll_CON.text = value.ToString();
-                break;
             case ICreature.Stats.WIL:
                 _txt_reroll_WIL.text = value.ToString();
                 break;
@@ -137,9 +130,6 @@ public class StatusScreen : MonoBehaviour, IPointerClickHandler
                 break;
             case ICreature.Stats.AGI:
                 temp_stat = _img_AGI;
-                break;
-            case ICreature.Stats.CON:
-                temp_stat = _img_CON;
                 break;
             case ICreature.Stats.WIL:
                 temp_stat = _img_WIL;

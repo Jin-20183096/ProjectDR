@@ -85,7 +85,7 @@ public class ActionController : MonoBehaviour
     [SerializeField]
     private Sprite[] _spr_dicePip;      //주사위 눈 스프라이트
 
-    private string[] _statName_arr = { "", "힘", "지능", "손재주", "민첩", "건강", "의지" };
+    private string[] _statName_arr = { "", "힘", "지능", "손재주", "민첩", "의지" };
     private string _statName_luc = "행운";
 
     public void Set_ActListSituation(Situation situation)   //행동목록 상황 설정
@@ -346,9 +346,6 @@ public class ActionController : MonoBehaviour
                 case ICreature.Stats.AGI:   //민첩
                     statArr = PlayerSys.AGI;
                     break;
-                case ICreature.Stats.CON:   //건강
-                    statArr = PlayerSys.CON;
-                    break;
                 case ICreature.Stats.WIL:   //의지
                     statArr = PlayerSys.WIL;
                     break;
@@ -462,9 +459,6 @@ public class ActionController : MonoBehaviour
             case ICreature.Stats.AGI:
                 temp_stat = PlayerSys.AGI;
                 break;
-            case ICreature.Stats.CON:
-                temp_stat = PlayerSys.CON;
-                break;
             case ICreature.Stats.WIL:
                 temp_stat = PlayerSys.WIL;
                 break;
@@ -500,7 +494,7 @@ public class ActionController : MonoBehaviour
         _resultPannel.SetAble_RerollButton(false);      //재굴림 버튼 상호작용 Off
 
         _resultPannel.ActStartButton_OnOff(true);       //행동 개시 버튼 On
-        //_resultPannel.SetAble_ActStartButton(false);    //행동 개시 버튼 상호작용 Off
+        _resultPannel.SetAble_ActStartButton(false);    //행동 개시 버튼 상호작용 Off
 
         Set_DiceObj();  //주사위 오브젝트 배치
     }
@@ -514,7 +508,7 @@ public class ActionController : MonoBehaviour
             _nowReroll--;
 
             _resultPannel.SetAble_RerollButton(false);      //재굴림 버튼 상호작용 불가 처리
-            //_resultPannel.SetAble_ActStartButton(false);    //행동 개시 버튼 상호작용 불가 처리
+            _resultPannel.SetAble_ActStartButton(false);    //행동 개시 버튼 상호작용 불가 처리
 
             Set_DiceObj();  //주사위 오브젝트 배치
         }
@@ -565,9 +559,6 @@ public class ActionController : MonoBehaviour
             case ICreature.Stats.AGI:
                 value = PlayerSys.AGI[result];
                 break;
-            case ICreature.Stats.CON:
-                value = PlayerSys.CON[result];
-                break;
             case ICreature.Stats.WIL:
                 value = PlayerSys.WIL[result];
                 break;
@@ -582,9 +573,6 @@ public class ActionController : MonoBehaviour
             _nowResult[order] = 0;  //0 이하의 스탯은 10으로 취급
         else
             _nowResult[order] = value;
-
-        _resultPannel.Set_MomentDiceResult(order, _nowResult[order]);
-        Calc_DiceTotal();
     }
 
     public void Add_StopDice(int order)
@@ -593,14 +581,14 @@ public class ActionController : MonoBehaviour
         _resultPannel.Set_StopDiceResult(order, _nowResult[order]);
     }
 
-    public void Calc_DiceTotal()   //혀재 주사위 총합을 기록
+    public void Calc_DiceTotal()   //현재 주사위 총합을 기록
     {
         _nowTotal = 0;
 
         for (int i = 0; i < _nowDice; i++)
             _nowTotal += _nowResult[i];
 
-        _resultPannel.Change_DiceTotal(_nowTotal.ToString());
+        _resultPannel.Change_DiceTotal(/*_nowTotal.ToString()*/"");
 
         _resultPannel.SetAble_ActStartButton(true);    //행동 개시 버튼 상호작용 On
     }
@@ -609,20 +597,27 @@ public class ActionController : MonoBehaviour
     {
         if (_stopDice >= _nowDice)  //모든 주사위가 멈췄다면
         {
+            _nowTotal = 0;
+
+            //행동에 따라 총합을 계산
+            for (int i = 0; i < _nowDice; i++)
+                _nowTotal += _nowResult[i];
+
+            _resultPannel.SetAble_ActStartButton(true); //행동 개시 버튼 활성화
+
             if (_nowReroll > 0)
                 _resultPannel.SetAble_RerollButton(true);   //남은 재굴림 횟수 > 0이면, 재굴림 버튼 상호작용 가능
         }
+        else
+            return;
+
+        _resultPannel.Change_DiceTotal(_nowTotal.ToString());
     }
 
     public void ActionStart()
     {
         Dice_Off(); //주사위 오브젝트 Off
         _diceBoard.SetActive(false);    //주사위 보드 Off
-
-        for (int i = 0; i < _nowDice; i++)
-        {
-            _resultPannel.Set_StopDiceResult(i, _nowResult[i]);
-        }
 
         _resultPannel.RerollButton_OnOff(false);    //재굴림 버튼 Off
         _resultPannel.ActStartButton_OnOff(false);  //행동 개시 버튼 Off

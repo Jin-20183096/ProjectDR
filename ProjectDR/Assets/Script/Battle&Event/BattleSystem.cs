@@ -150,12 +150,14 @@ public class BattleSystem : MonoBehaviour
     {
         get { return _p_hitTac; }
     }
+    /*
     [SerializeField]
     private bool _p_hitWait;        //플레이어 이번 턴 대기 사용 여부
     public bool P_HIT_WAIT
     {
         get { return _p_hitWait; }
     }
+    */
     [SerializeField]
     private bool _e_hitAtk;         //적 이번 턴 공격 명중 여부
     public bool E_HIT_ATK
@@ -186,13 +188,14 @@ public class BattleSystem : MonoBehaviour
     {
         get { return _e_hitTac; }
     }
+    /*
     [SerializeField]
     private bool _e_hitWait;        //적 이번 턴 대기 사용 여부
     public bool E_HIT_WAIT
     {
         get { return _e_hitWait; }
     }
-
+    */
     [SerializeField]
     private BtlActData.ActType _p_lastType;
     public BtlActData.ActType P_LAST
@@ -204,6 +207,17 @@ public class BattleSystem : MonoBehaviour
     public BtlActData.ActType E_LAST
     {
         get { return _e_lastType; }
+    }
+
+    private int _p_getAp;
+    public int P_GETAP
+    {
+        get { return _p_getAp; }
+    }
+    private int _e_getAp;
+    public int E_GETAP
+    {
+        get { return _e_getAp; }
     }
 
     [Header("# Background")]
@@ -289,16 +303,16 @@ public class BattleSystem : MonoBehaviour
         _p_hitDef = false;
         _p_hitDge = false;
         _p_hitTac = false;
-        _p_hitWait = false;
         _e_hitAtk = false;
         _e_makeDmg = false;
         _e_hitDef = false;
         _e_hitDge = false;
         _e_hitTac = false;
-        _e_hitWait = false;
 
         _p_lastType = BtlActData.ActType.No;
         _e_lastType = BtlActData.ActType.No;
+        _p_getAp = 0;
+        _e_getAp = 0;
 
         //적 등장 로그
         Refresh_Log();
@@ -341,6 +355,12 @@ public class BattleSystem : MonoBehaviour
         //적이 전투행동 결정을 완료한 경우, 다음 단계로 돌입
         if (_e_btlAct != null)
             Battle_PreProcess();
+        else
+        {
+            Debug.Log("((적이 플레이어 행동 결정 때까지 행동을 선택하지 못했음))");
+            //적 다음 전투행동 요청
+            _enemySys.Request_NextBtlAct();
+        }
     }
 
     public void SetBtlAct_Enemy(BtlActData act, int[] diceResult) //적 전투행동 결정 완료
@@ -401,16 +421,16 @@ public class BattleSystem : MonoBehaviour
         _p_hitDef = false;
         _p_hitDge = false;
         _p_hitTac = false;
-        _p_hitWait = false;
         _e_hitAtk = false;
         _e_makeDmg = false;
         _e_hitDef = false;
         _e_hitDge = false;
         _e_hitTac = false;
-        _e_hitWait = false;
 
         _p_lastType = BtlActData.ActType.No;
         _e_lastType = BtlActData.ActType.No;
+        _p_getAp = 0;
+        _e_getAp = 0;
 
         //서로의 전투행동과 특성으로 인해 변경된 주사위 결과를 다시 한번 표시
         Change_DiceResult_Player(); //플레이어 주사위 결과 재표시
@@ -424,7 +444,7 @@ public class BattleSystem : MonoBehaviour
             BtlActData.ActType.Dge,
             BtlActData.ActType.Def,
             BtlActData.ActType.Atk,
-            BtlActData.ActType.Wait
+            //BtlActData.ActType.Wait
         };
 
         foreach (BtlActData.ActType type in actType_speed)
@@ -571,16 +591,16 @@ public class BattleSystem : MonoBehaviour
             _p_hitDef = false;
             _p_hitDge = false;
             _p_hitTac = false;
-            _p_hitWait = false;
             _e_hitAtk = false;
             _e_makeDmg = false;
             _e_hitDef = false;
             _e_hitDge = false;
             _e_hitTac = false;
-            _e_hitWait = false;
 
             _p_lastType = BtlActData.ActType.No;
             _e_lastType = BtlActData.ActType.No;
+            _p_getAp = 0;
+            _e_getAp = 0;
 
             //플레이어 메뉴 버튼 On
             _playerSys.MenuButton_OnOff_Status(true);
@@ -671,16 +691,16 @@ public class BattleSystem : MonoBehaviour
         _p_hitDef = false;
         _p_hitDge = false;
         _p_hitTac = false;
-        _p_hitWait = false;
         _e_hitAtk = false;
         _e_makeDmg = false;
         _e_hitDef = false;
         _e_hitDge = false;
         _e_hitTac = false;
-        _e_hitWait = false;
 
         _p_lastType = BtlActData.ActType.No;
         _e_lastType = BtlActData.ActType.No;
+        _p_getAp = 0;
+        _e_getAp = 0;
 
         //플레이어 메뉴 버튼 On
         _playerSys.MenuButton_OnOff_Status(true);
@@ -733,7 +753,7 @@ public class BattleSystem : MonoBehaviour
         //주사위 결과창 정보 변경
         pannel.ActionInfoPannel_OnOff(true);        //전투행동 정보 패널 On
         pannel.Change_ActInfo(act.Type, act.Name);  //전투행동 타입 아이콘, 행동명 변경
-        pannel.Change_DiceTotal(act.NoDice ? "" : total.ToString());    //전투행동의 주사위 총합 변경
+        pannel.Change_DiceTotal(/*act.NoDice ? "" : total.ToString()*/"");    //전투행동의 주사위 총합 변경
 
         pannel.DiceResultPannel_OnOff(true);    //주사위 결과창 On
         pannel.Set_NewDiceTotal(nowDice);       //주사위 결과창 초기화
@@ -756,7 +776,7 @@ public class BattleSystem : MonoBehaviour
         //주사위 결과창 정보 변경
         pannel.ActionInfoPannel_OnOff(true);        //전투행동 정보 패널 On
         pannel.Change_ActInfo(act.Type, act.Name);  //전투행동 타입 아이콘, 전투행동명 변경
-        pannel.Change_DiceTotal(act.NoDice ? "" : total.ToString());    //전투행동의 주사위 총합 변경
+        pannel.Change_DiceTotal(/*act.NoDice ? "" : total.ToString()*/"");    //전투행동의 주사위 총합 변경
 
         pannel.DiceResultPannel_OnOff(true);    //주사위 결과창 On
         pannel.Set_NewDiceTotal(nowDice);       //주사위 결과창 초기화
@@ -889,9 +909,6 @@ public class BattleSystem : MonoBehaviour
                 case BtlActData.ActType.Tac:
                     StartCoroutine(Tac(act.IsPlayer));
                     break;
-                case BtlActData.ActType.Wait:
-                    StartCoroutine(Wait(act.IsPlayer));
-                    break;
             }
         }
 
@@ -914,20 +931,21 @@ public class BattleSystem : MonoBehaviour
                 _playerSys.Change_Ap_UsePreview(0);         //소모 예정 행동력 표기 Off
             }
 
-            _p_btlAct.Effect_Tac(true, this);
+            _p_btlAct.Effect_Pre(true, this);
             _p_hitTac = true;
         }
         else            //적이 전술 행동 사용
         {
             //적 행동력 소모 여부에 따라 행동력을 소모
             if (_e_btlAct.NoDice == false)
-                _playerSys.Change_Ap(false, _e_nowDice);
+                _enemySys.Change_Ap(false, _e_nowDice);
 
-            _e_btlAct.Effect_Tac(false, this);
+            _e_btlAct.Effect_Pre(false, this);
             _e_hitTac = true;
         }
 
-        yield return new WaitUntil(() => _battleProcess == false);  //로그 출력이 끝날때까지 대기
+        yield return new WaitUntil(() => _effectProcess == false);  //전술 행동의 로그가 끝날 때까지 대기
+        Set_BattleProcess(false);
 
         //전투행동 종료 처리
         if (isPlayer) _p_btlActEnd = true;
@@ -1066,6 +1084,8 @@ public class BattleSystem : MonoBehaviour
         //공격 상태 돌입 (이 상태에서 행동 히트박스가 충돌했을 때, 공격 체크 코루틴을 호출하는 방식)
         if (isPlayer)
         {
+            _p_resultPannel.Change_DiceTotal(_p_btlAct.Calc_Total(_p_result).ToString());
+
             if (_playerSys.HP <= 0)
             {
                 _p_btlActEnd = true;
@@ -1089,6 +1109,8 @@ public class BattleSystem : MonoBehaviour
         }
         else
         {
+            _e_resultPannel.Change_DiceTotal(_e_btlAct.Calc_Total(_e_result).ToString());
+
             if (_enemySys.HP <= 0)
             {
                 _e_btlActEnd = true;
@@ -1111,6 +1133,7 @@ public class BattleSystem : MonoBehaviour
         AudioSys.Play_Sfx(Sfx.Atk);
     }
 
+    /*
     public IEnumerator Wait(bool isPlayer)  //대기
     {
         yield return new WaitUntil(() => _battleProcess == false);  //다른 전투행동 처리가 끝날 때까지 대기
@@ -1161,7 +1184,7 @@ public class BattleSystem : MonoBehaviour
         else
             _e_btlActEnd = true;
     }
-
+    */
     public IEnumerator AtkHit(bool toEnemy) //대상을 공격함
     {
         var log = "";
@@ -1366,7 +1389,10 @@ public class BattleSystem : MonoBehaviour
 
         //전투행동 직전, 직후 효과 체크 (isPre에 따라 갈림)
         if (isPre)
-            _p_btlAct.Effect_Pre(true, this);
+        {
+            if (_p_btlAct.Type != BtlActData.ActType.Tac)   //전술 행동의 효과는 행동 개시 시에 처리
+                _p_btlAct.Effect_Pre(true, this);
+        }
         else
             _p_btlAct.Effect_Post(true, this);
 
@@ -1399,7 +1425,10 @@ public class BattleSystem : MonoBehaviour
 
         //전투행동 직전, 직후 효과 체크 (isPre에 따라 갈림)
         if (isPre)
-            _e_btlAct.Effect_Pre(false, this);
+        {
+            if (_e_btlAct.Type != BtlActData.ActType.Tac)   //전술 행동의 효과는 행동 개시 시에 처리
+                _e_btlAct.Effect_Pre(false, this);
+        }
         else
             _e_btlAct.Effect_Post(false, this);
 
@@ -1419,6 +1448,12 @@ public class BattleSystem : MonoBehaviour
     }
 
     public void Set_EffectProcess(bool b) => _effectProcess = b;
+
+    public void SetLog_Wait(bool isP)
+    {
+        Refresh_Log();
+        _btlLog.SetLog_Wait(isP, 2);
+    }
 
     public void SetLog_AtkHit(bool isP, string targetPost, string effText) //공격 명중 효과 로그
     {
@@ -1530,8 +1565,24 @@ public class BattleSystem : MonoBehaviour
     public void Change_Ac_Player(bool plus, int value) => _playerSys.Change_AC(plus, value);
     public void Change_Ac_Enemy(bool plus, int value) => _enemySys.Change_AC(plus, value);
 
-    public void Change_Ap_Player(bool plus, int value) => _playerSys.Change_Ap(plus, value);
-    public void Change_Ap_Enemy(bool plus, int value) => _enemySys.Change_Ap(plus, value);
+    public void Change_Ap_Player(bool plus, int value)
+    {
+        _playerSys.Change_Ap(plus, value);
+
+        if (plus)
+            _p_getAp += value;
+        else
+            _p_getAp -= value;
+    }
+    public void Change_Ap_Enemy(bool plus, int value)
+    {
+        _enemySys.Change_Ap(plus, value);
+
+        if (plus)
+            _e_getAp += value;
+        else
+            _e_getAp -= value;
+    }
 
     public void Change_DiceTotal_Player(bool plus, int value)
     {

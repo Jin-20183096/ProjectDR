@@ -2,7 +2,7 @@ using UnityEngine;
 
 [CreateAssetMenu(fileName = "BtlAct005", menuName = "ScrObj/BtlAct000~025/BtlAct005", order = 5)]   //커스텀 메뉴 추가
 
-public class BtlAct005 : BtlAct_Atk
+public class BtlAct005 : BtlActData
 {
     //005 가르기
 

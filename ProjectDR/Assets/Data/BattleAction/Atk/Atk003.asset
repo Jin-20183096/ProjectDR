@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Atk003
   m_EditorClassIdentifier: 
   Name: "\uD6C4\uB824\uCE58\uAE30"
-  Stats_Arr: 0100000006000000
+  Stats_Arr: 0100000005000000
   Type: 1
   DmgType: 2
   Dice_MinMax: 0100000002000000
   Info: "\uC8FC\uC0AC\uC704 \uCD1D\uD569\uB9CC\uD07C \uC0C1\uB300\uB97C \uACF5\uACA9\uD55C\uB2E4."
   NoDice: 0
+  NoReroll: 0

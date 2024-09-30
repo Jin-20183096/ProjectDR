@@ -23,7 +23,7 @@ MonoBehaviour:
     ActList:
     - Name: "\uADFC\uCC98\uC5D0\uC11C \uC5F4\uC1E0\uB97C \uCC3E\uC544\uBCF8\uB2E4"
       IsDiceCheck: 1
-      CheckStat: 15
+      CheckStat: 14
       Result_Success: 00000000
       Result_Fail: 01000000
     - Name: "\uC790\uBB3C\uC1E0\uB97C \uB534\uB2E4"

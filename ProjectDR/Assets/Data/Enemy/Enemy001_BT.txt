@@ -28,7 +28,7 @@ tree("P_DefDgeFail")
 ///////////////////
 tree("P_WaitAndAp4Over")
 	sequence
-		Is_P_LastWait
+		Is_P_GetAp
 		Is_P_Ap_4Over
 		Set_ActClueLog2
 		Push_RandomDge

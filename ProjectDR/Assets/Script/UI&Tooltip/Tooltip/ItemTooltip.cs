@@ -83,7 +83,7 @@ public class ItemTooltip : MonoBehaviour
     private Sprite[] _spr_typeIcon;
 
     private string[] _statName_arr = { "", 
-                                    "Èû", "Áö´É", "¼ÕÀçÁÖ", "¹ÎÃ¸", "°Ç°­", "ÀÇÁö", "HP", "¹æ¾îµµ",
+                                    "Èû", "Áö´É", "¼ÕÀçÁÖ", "¹ÎÃ¸", "ÀÇÁö", "HP", "¹æ¾îµµ",
                                     "Èû Àç±¼¸²", "Áö´É Àç±¼¸²", "¼ÕÀçÁÖ Àç±¼¸²", "¹ÎÃ¸ Àç±¼¸²", "°Ç°­ Àç±¼¸²", "ÀÇÁö Àç±¼¸²",
                                     "Çà¿î", "Çà¿î Àç±¼¸²"};
 
@@ -175,11 +175,11 @@ public class ItemTooltip : MonoBehaviour
         for (int i = 0; i < _img_actStat1.Length; i++)
         {
             if (arr[i] >= 10)
-                _img_actStat1[i].sprite = _spr_diceSide[10];
+                _img_actStat1[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[10];
             else if (arr[i] <= 0)
-                _img_actStat1[i].sprite = _spr_diceSide[0];
+                _img_actStat1[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[0];
             else
-                _img_actStat1[i].sprite = _spr_diceSide[arr[i]];
+                _img_actStat1[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[arr[i]];
 
             if (arr[i] == 0)
                 _img_actStat1[i].color = new Color(1, 1, 1, 0.3f);
@@ -197,11 +197,11 @@ public class ItemTooltip : MonoBehaviour
         for (int i = 0; i < _img_actStat2.Length; i++)
         {
             if (arr[i] >= 10)
-                _img_actStat2[i].sprite = _spr_diceSide[10];
+                _img_actStat2[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[10];
             else if (arr[i] <= 0)
-                _img_actStat2[i].sprite = _spr_diceSide[0];
+                _img_actStat2[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[0];
             else
-                _img_actStat2[i].sprite = _spr_diceSide[arr[i]];
+                _img_actStat2[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[arr[i]];
 
             if (arr[i] == 0)
                 _img_actStat2[i].color = new Color(1, 1, 1, 0.3f);

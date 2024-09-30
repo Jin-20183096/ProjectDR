@@ -20,8 +20,6 @@ public class ActionListSlot : MonoBehaviour, IActionListSlot, IPointerEnterHandl
     private TextMeshProUGUI _txt_actName;
     [SerializeField]
     private TextMeshProUGUI _txt_actStat;
-    [SerializeField]
-    private TextMeshProUGUI _txt_useAp;
 
     private RectTransform _rect;
     private Image _img;
@@ -47,17 +45,10 @@ public class ActionListSlot : MonoBehaviour, IActionListSlot, IPointerEnterHandl
         _txt_actName.text = name;
 
         if (isNoDice)
-        {
             _txt_actStat.gameObject.SetActive(false);
-            _txt_useAp.gameObject.SetActive(useAp > 0);
-
-            if (useAp > 0)
-                _txt_useAp.text = useAp.ToString();
-        }
         else
         {
             _txt_actStat.gameObject.SetActive(true);
-            _txt_useAp.gameObject.SetActive(false);
             _txt_actStat.text = stat;
         }
     }

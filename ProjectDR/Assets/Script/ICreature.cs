@@ -4,7 +4,7 @@ public interface ICreature
 {
     public enum Stats
     {
-        No, STR, INT, DEX, AGI, CON, WIL,
+        No, STR, INT, DEX, AGI, WIL,
         HP, AC,
         RE_STR, RE_INT, RE_DEX, RE_AGI, RE_CON, RE_WIL,
         LUC, RE_LUC

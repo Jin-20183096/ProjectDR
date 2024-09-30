@@ -20,7 +20,6 @@ public class EnemyData : ScriptableObject
     public int[] INT;  //Áö´É ½ºÅÈ
     public int[] DEX;  //¼ÕÀçÁÖ ½ºÅÈ
     public int[] AGI;  //¹ÎÃ¸ ½ºÅÈ
-    public int[] CON;  //°Ç°­ ½ºÅÈ
     public int[] WIL;  //ÀÇÁö ½ºÅÈ
 
     public ICreature.BtlAct[] Act_Atk; //°ø°İ Çàµ¿ ¸ñ·Ï

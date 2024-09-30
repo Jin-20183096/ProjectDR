@@ -13,7 +13,7 @@ public class ActionScreen : MonoBehaviour, IPointerClickHandler
     [SerializeField]
     private Sprite[] _spr_actType;      //전투행동 타입 아이콘
 
-    private string[] _statName_arr = { "", "힘", "지능", "손재주", "민첩", "건강", "의지" };
+    private string[] _statName_arr = { "", "힘", "지능", "손재주", "민첩", "의지" };
 
     public void OnPointerClick(PointerEventData eventData)
     {

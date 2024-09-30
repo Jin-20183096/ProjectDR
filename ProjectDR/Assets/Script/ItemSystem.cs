@@ -21,16 +21,16 @@ public class ItemSystem : MonoBehaviour
         public ItemData Data;
 
         //스탯
-        public ICreature.Stats Stat1;
+        public Stats Stat1;
         public int Stat1_Value;
         public int[] Stat1_Arr;
-        public ICreature.Stats Stat2;
+        public Stats Stat2;
         public int Stat2_Value;
         public int[] Stat2_Arr;
 
         //전투행동
-        public ICreature.BtlAct BtlAct1 = null;
-        public ICreature.BtlAct BtlAct2 = null;
+        public BtlAct BtlAct1 = null;
+        public BtlAct BtlAct2 = null;
 
         //특성
         public TraitData Trait = null;
@@ -703,7 +703,6 @@ public class ItemSystem : MonoBehaviour
                         case Stats.INT: stat2 = Stats.RE_INT; break;
                         case Stats.DEX: stat2 = Stats.RE_DEX; break;
                         case Stats.AGI: stat2 = Stats.RE_AGI; break;
-                        case Stats.CON: stat2 = Stats.RE_CON; break;
                         case Stats.WIL: stat2 = Stats.RE_WIL; break;
                     }
                 }
@@ -715,7 +714,6 @@ public class ItemSystem : MonoBehaviour
                         case Stats.RE_INT: stat2 = Stats.INT; break;
                         case Stats.RE_DEX: stat2 = Stats.DEX; break;
                         case Stats.RE_AGI: stat2 = Stats.AGI; break;
-                        case Stats.RE_CON: stat2 = Stats.CON; break;
                         case Stats.RE_WIL: stat2 = Stats.WIL; break;
                     }
                 }

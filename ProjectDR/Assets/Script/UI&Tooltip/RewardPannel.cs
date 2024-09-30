@@ -70,7 +70,6 @@ public class RewardPannel : MonoBehaviour
 
     IEnumerator ExpMeter_Up()
     {
-        //_text_getExp.text = "+" + _exp_get;
         yield return new WaitForSecondsRealtime(1/2f);
         _btlSys.Set_RewardExpProcess(true);
 
@@ -87,12 +86,6 @@ public class RewardPannel : MonoBehaviour
             
             _exp_get--;
 
-            /*
-            if (_exp_get > 0)
-                _text_getExp.text = "+" + _exp_get;
-            else
-                _text_getExp.text = "";
-            */
             _text_lv.text = PlayerSys.LV.ToString();
             _text_exp.text = PlayerSys.EXP.ToString();
             _text_expMax.text = PlayerSys.EXP_MAX.ToString();
@@ -147,7 +140,6 @@ public class RewardPannel : MonoBehaviour
         _pannel_lvUp.ActiveUI_INT(false);
         _pannel_lvUp.ActiveUI_DEX(false);
         _pannel_lvUp.ActiveUI_AGI(false);
-        _pannel_lvUp.ActiveUI_CON(false);
         _pannel_lvUp.ActiveUI_WIL(false);
 
         //무작위 위치의 스탯 1 상승
@@ -173,7 +165,6 @@ public class RewardPannel : MonoBehaviour
         _pannel_lvUp.ActiveUI_INT(false);
         _pannel_lvUp.ActiveUI_DEX(false);
         _pannel_lvUp.ActiveUI_AGI(false);
-        _pannel_lvUp.ActiveUI_CON(false);
         _pannel_lvUp.ActiveUI_WIL(false);
 
         //무작위 위치의 스탯 1 상승
@@ -199,7 +190,6 @@ public class RewardPannel : MonoBehaviour
         _pannel_lvUp.ActiveUI_INT(false);
         _pannel_lvUp.ActiveUI_DEX(false);
         _pannel_lvUp.ActiveUI_AGI(false);
-        _pannel_lvUp.ActiveUI_CON(false);
         _pannel_lvUp.ActiveUI_WIL(false);
 
         //무작위 위치의 스탯 1 상승
@@ -225,7 +215,6 @@ public class RewardPannel : MonoBehaviour
         _pannel_lvUp.ActiveUI_INT(false);
         _pannel_lvUp.ActiveUI_DEX(false);
         _pannel_lvUp.ActiveUI_AGI(false);
-        _pannel_lvUp.ActiveUI_CON(false);
         _pannel_lvUp.ActiveUI_WIL(false);
 
         //무작위 위치의 스탯 1 상승
@@ -241,32 +230,6 @@ public class RewardPannel : MonoBehaviour
         Random_StatUp();    //무작위 스탯 추가 상승
     }
 
-    public void Select_StatUp_CON() //건강 스탯 단련
-    {
-        //모든 스탯의 커서 OFF
-        _pannel_lvUp.AllStatUpCursor_Off();
-
-        //다른 스탯의 UI 비활성화
-        _pannel_lvUp.ActiveUI_STR(false);
-        _pannel_lvUp.ActiveUI_INT(false);
-        _pannel_lvUp.ActiveUI_DEX(false);
-        _pannel_lvUp.ActiveUI_AGI(false);
-        _pannel_lvUp.ActiveUI_CON(false);
-        _pannel_lvUp.ActiveUI_WIL(false);
-
-        //무작위 위치의 스탯 1 상승
-        int[] statArr = new int[6]; //적용할 스탯 배열
-        var order = Random.Range(0, 6); //상승할 스탯 위치
-
-        statArr[order] += 1;    //해당 위치의 스탯 1 상승
-
-        PlayerSys.Change_ActStat(true, ICreature.Stats.CON, statArr);    //플레이어에게 레벨업 스탯 적용
-        _pannel_lvUp.Set_StatUpCursor(ICreature.Stats.CON, order, 1);       //스탯 커서 적용
-        _pannel_lvUp.ButtonActive_CON(false);   //이 스탯의 버튼 비활성화
-
-        Random_StatUp();    //무작위 스탯 추가 상승
-    }
-
     public void Select_StatUp_WIL() //의지 스탯 단련
     {
         //모든 스탯의 커서 OFF
@@ -277,7 +240,6 @@ public class RewardPannel : MonoBehaviour
         _pannel_lvUp.ActiveUI_INT(false);
         _pannel_lvUp.ActiveUI_DEX(false);
         _pannel_lvUp.ActiveUI_AGI(false);
-        _pannel_lvUp.ActiveUI_CON(false);
         _pannel_lvUp.ActiveUI_WIL(false);
 
         //무작위 위치의 스탯 1 상승

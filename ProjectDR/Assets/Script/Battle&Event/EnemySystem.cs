@@ -111,12 +111,6 @@ public class EnemySystem : MonoBehaviour, ICreature
         get { return _stat_AGI; }
     }
     [SerializeField]
-    private int[] _stat_CON = { 0, 0, 0, 0, 0, 0 }; //건강
-    public int[] CON
-    {
-        get { return _stat_CON; }
-    }
-    [SerializeField]
     private int[] _stat_WIL = { 0, 0, 0, 0, 0, 0 }; //의지
     public int[] WIL
     {
@@ -268,7 +262,6 @@ public class EnemySystem : MonoBehaviour, ICreature
         _stat_INT = _data.INT.ToArray();
         _stat_DEX = _data.DEX.ToArray();
         _stat_AGI = _data.AGI.ToArray();
-        _stat_CON = _data.CON.ToArray();
         _stat_WIL = _data.WIL.ToArray();
 
         //행동 트리 할당 On
@@ -545,18 +538,26 @@ public class EnemySystem : MonoBehaviour, ICreature
             case Stats.AGI:
                 statArr = _stat_AGI;
                 break;
-            case Stats.CON:
-                statArr = _stat_CON;
-                break;
             case Stats.WIL:
                 statArr = _stat_WIL;
+                break;
+            default:
+                statArr = null;
                 break;
         }
 
         _result = new int[5] { -1, -1, -1, -1, -1 };
 
-        for (int i = 0; i < _nowDice; i++)
-            _result[i] = statArr[Random.Range(0, statArr.Length)];
+        try
+        {
+            for (int i = 0; i < _nowDice; i++)
+                _result[i] = statArr[Random.Range(0, statArr.Length)];
+        }
+        catch
+        {
+            Debug.Log("행동 결정 과정에 오류 발생 (code: 2)");
+            return;
+        }
 
         //전투 시스템에 전투행동 정보 전달
         _btlSys.SetBtlAct_Enemy(data, _result);
@@ -650,10 +651,11 @@ public class EnemySystem : MonoBehaviour, ICreature
             return false;
     }
 
+    
     [Task]
-    public bool Is_P_LastWait() //플레이어 마지막 전투행동이 대기면 True
+    public bool Is_P_GetAp()    //플레이어가 행동력을 획득했다면 True
     {
-        if (_btlSys.P_LAST == BtlActData.ActType.Wait)
+        if (_btlSys.P_GETAP > 0)
             return true;
         else
             return false;

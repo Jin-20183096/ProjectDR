@@ -64,19 +64,6 @@ public class LevelUpPannel : MonoBehaviour
     private TextMeshProUGUI[] _statUpText_AGI;  //민첩 스탯 상승 텍스트
 
     [SerializeField]
-    private Button _btn_CON;    //건강 스탯 버튼
-    [SerializeField]
-    private Image _trigger_CON; //건강 스탯 버튼 트리거
-    [SerializeField]
-    private TextMeshProUGUI _text_CON;  //건강 스탯 텍스트
-    [SerializeField]
-    private Image[] _img_CON;   //건강 주사위 이미지
-    [SerializeField]
-    private GameObject[] _statUpCursor_CON;     //건강 스탯 상승 커서
-    [SerializeField]
-    private TextMeshProUGUI[] _statUpText_CON;  //건강 스탯 상승 텍스트
-
-    [SerializeField]
     private Button _btn_WIL;    //의지 스탯 버튼
     [SerializeField]
     private Image _trigger_WIL; //의지 스탯 버튼 트리거
@@ -103,7 +90,6 @@ public class LevelUpPannel : MonoBehaviour
         var stat_int = PlayerSys.INT;
         var stat_dex = PlayerSys.DEX;
         var stat_agi = PlayerSys.AGI;
-        var stat_con = PlayerSys.CON;
         var stat_wil = PlayerSys.WIL;
 
         LevelUpEndButton_OnOff(false);
@@ -113,11 +99,11 @@ public class LevelUpPannel : MonoBehaviour
         for (int i = 0; i < stat_str.Length; i++)   //힘
         {
             if (stat_str[i] >= 10)
-                _img_STR[i].sprite = _spr_diceSide[10];
+                _img_STR[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[10];
             else if (stat_str[i] <= 0)
-                _img_STR[i].sprite = _spr_diceSide[0];
+                _img_STR[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[0];
             else
-                _img_STR[i].sprite = _spr_diceSide[stat_str[i]];
+                _img_STR[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[stat_str[i]];
 
             _statUpCursor_STR[i].SetActive(false);
             _statUpText_STR[i].text = "";
@@ -128,11 +114,11 @@ public class LevelUpPannel : MonoBehaviour
         for (int i = 0; i < stat_int.Length; i++)   //지능
         {
             if (stat_int[i] >= 10)
-                _img_INT[i].sprite = _spr_diceSide[10];
+                _img_INT[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[10];
             else if (stat_int[i] <= 0)
-                _img_INT[i].sprite = _spr_diceSide[0];
+                _img_INT[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[0];
             else
-                _img_INT[i].sprite = _spr_diceSide[stat_int[i]];
+                _img_INT[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[stat_int[i]];
 
             _statUpCursor_INT[i].SetActive(false);
             _statUpText_INT[i].text = "";
@@ -143,11 +129,11 @@ public class LevelUpPannel : MonoBehaviour
         for (int i = 0; i < stat_dex.Length; i++)   //손재주
         {
             if (stat_dex[i] >= 10)
-                _img_DEX[i].sprite = _spr_diceSide[10];
+                _img_DEX[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[10];
             else if (stat_dex[i] <= 0)
-                _img_DEX[i].sprite = _spr_diceSide[0];
+                _img_DEX[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[0];
             else
-                _img_DEX[i].sprite = _spr_diceSide[stat_dex[i]];
+                _img_DEX[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[stat_dex[i]];
 
             _statUpCursor_DEX[i].SetActive(false);
             _statUpText_DEX[i].text = "";
@@ -158,29 +144,14 @@ public class LevelUpPannel : MonoBehaviour
         for (int i = 0; i < stat_agi.Length; i++)   //민첩
         {
             if (stat_agi[i] >= 10)
-                _img_AGI[i].sprite = _spr_diceSide[10];
+                _img_AGI[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[10];
             else if (stat_agi[i] <= 0)
-                _img_AGI[i].sprite = _spr_diceSide[0];
+                _img_AGI[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[0];
             else
-                _img_AGI[i].sprite = _spr_diceSide[stat_agi[i]];
+                _img_AGI[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[stat_agi[i]];
 
             _statUpCursor_AGI[i].SetActive(false);
             _statUpText_AGI[i].text = "";
-        }
-
-        ButtonActive_CON(true);
-        ActiveUI_CON(true);
-        for (int i = 0; i < stat_con.Length; i++)   //건강
-        {
-            if (stat_con[i] >= 10)
-                _img_CON[i].sprite = _spr_diceSide[10];
-            else if (stat_con[i] <= 0)
-                _img_CON[i].sprite = _spr_diceSide[0];
-            else
-                _img_CON[i].sprite = _spr_diceSide[stat_con[i]];
-
-            _statUpCursor_CON[i].SetActive(false);
-            _statUpText_CON[i].text = "";
         }
 
         ButtonActive_WIL(true);
@@ -188,11 +159,11 @@ public class LevelUpPannel : MonoBehaviour
         for (int i = 0; i < stat_wil.Length; i++)   //의지
         {
             if (stat_wil[i] >= 10)
-                _img_WIL[i].sprite = _spr_diceSide[10];
+                _img_WIL[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[10];
             else if (stat_wil[i] <= 0)
-                _img_WIL[i].sprite = _spr_diceSide[0];
+                _img_WIL[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[0];
             else
-                _img_WIL[i].sprite = _spr_diceSide[stat_wil[i]];
+                _img_WIL[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[stat_wil[i]];
 
             _statUpCursor_WIL[i].SetActive(false);
             _statUpText_WIL[i].text = "";
@@ -256,13 +227,6 @@ public class LevelUpPannel : MonoBehaviour
                 statUpText = _statUpText_AGI;
                 statValue = PlayerSys.AGI[order];
                 break;
-            case ICreature.Stats.CON:
-                statText = _text_CON;
-                diceImg = _img_CON;
-                cursor = _statUpCursor_CON;
-                statUpText = _statUpText_CON;
-                statValue = PlayerSys.CON[order];
-                break;
             case ICreature.Stats.WIL:
                 statText = _text_WIL;
                 diceImg = _img_WIL;
@@ -277,13 +241,14 @@ public class LevelUpPannel : MonoBehaviour
 
         //상승한 스탯의 주사위 이미지 변경
         diceImg[order].color = Color.white;
+        diceImg[order].transform.GetChild(0).GetComponent<Image>().color = Color.white;
 
         if (statValue >= 10)
-            diceImg[order].sprite = _spr_diceSide[10];
+            diceImg[order].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[10];
         else if (statValue <= 0)
-            diceImg[order].sprite = _spr_diceSide[0];
+            diceImg[order].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[0];
         else
-            diceImg[order].sprite = _spr_diceSide[statValue];
+            diceImg[order].transform.GetChild(0).GetComponent<Image>().sprite = _spr_diceSide[statValue];
 
 
         //파티클 이펙트
@@ -310,7 +275,10 @@ public class LevelUpPannel : MonoBehaviour
         _text_STR.color = new Color(1, 1, 1, b ? 1 : 0.25f);
 
         foreach (Image img in _img_STR)
-            img.color = new Color(1, 1, 1, b ? 1 : 0.25f);
+        {
+            img.color = new Color(1, 1, 1, b ? 1 : 0.5f);
+            img.transform.GetChild(0).GetComponent<Image>().color = new Color(1, 1, 1, b ? 1 : 0.5f);
+        }
 
         if (b == false)
             ButtonActive_STR(false);
@@ -327,7 +295,10 @@ public class LevelUpPannel : MonoBehaviour
         _text_INT.color = new Color(1, 1, 1, b ? 1 : 0.25f);
 
         foreach (Image img in _img_INT)
-            img.color = new Color(1, 1, 1, b ? 1 : 0.25f);
+        {
+            img.color = new Color(1, 1, 1, b ? 1 : 0.5f);
+            img.transform.GetChild(0).GetComponent<Image>().color = new Color(1, 1, 1, b ? 1 : 0.5f);
+        }
 
         if (b == false)
             ButtonActive_INT(false);
@@ -344,7 +315,10 @@ public class LevelUpPannel : MonoBehaviour
         _text_DEX.color = new Color(1, 1, 1, b ? 1 : 0.25f);
 
         foreach (Image img in _img_DEX)
-            img.color = new Color(1, 1, 1, b ? 1 : 0.25f);
+        {
+            img.color = new Color(1, 1, 1, b ? 1 : 0.5f);
+            img.transform.GetChild(0).GetComponent<Image>().color = new Color(1, 1, 1, b ? 1 : 0.5f);
+        }
 
         if (b == false)
             ButtonActive_DEX(false);
@@ -361,7 +335,10 @@ public class LevelUpPannel : MonoBehaviour
         _text_AGI.color = new Color(1, 1, 1, b ? 1 : 0.25f);
 
         foreach (Image img in _img_AGI)
-            img.color = new Color(1, 1, 1, b ? 1 : 0.25f);
+        {
+            img.color = new Color(1, 1, 1, b ? 1 : 0.5f);
+            img.transform.GetChild(0).GetComponent<Image>().color = new Color(1, 1, 1, b ? 1 : 0.5f);
+        }
 
         if (b == false)
             ButtonActive_AGI(false);
@@ -373,29 +350,15 @@ public class LevelUpPannel : MonoBehaviour
         _trigger_AGI.enabled = b;
     }
 
-    public void ActiveUI_CON(bool b)  //건강 스탯 UI 활성화/비활성화
-    {
-        _text_CON.color = new Color(1, 1, 1, b ? 1 : 0.25f);
-
-        foreach (Image img in _img_CON)
-            img.color = new Color(1, 1, 1, b ? 1 : 0.25f);
-
-        if (b == false)
-            ButtonActive_CON(false);
-    }
-
-    public void ButtonActive_CON(bool b)    //건강 스탯 버튼 활성화/비활성화
-    {
-        _btn_CON.enabled = b;
-        _trigger_CON.enabled = b;
-    }
-
     public void ActiveUI_WIL(bool b)  //의지 스탯 UI 활성화/비활성화
     {
         _text_WIL.color = new Color(1, 1, 1, b ? 1 : 0.25f);
 
         foreach (Image img in _img_WIL)
-            img.color = new Color(1, 1, 1, b ? 1 : 0.25f);
+        {
+            img.color = new Color(1, 1, 1, b ? 1 : 0.5f);
+            img.transform.GetChild(0).GetComponent<Image>().color = new Color(1, 1, 1, b ? 1 : 0.5f);
+        }
 
         if (b == false)
             ButtonActive_WIL(false);
@@ -419,9 +382,6 @@ public class LevelUpPannel : MonoBehaviour
             obj.SetActive(false);
 
         foreach (GameObject obj in _statUpCursor_AGI)
-            obj.SetActive(false);
-
-        foreach (GameObject obj in _statUpCursor_CON)
             obj.SetActive(false);
 
         foreach (GameObject obj in _statUpCursor_WIL)

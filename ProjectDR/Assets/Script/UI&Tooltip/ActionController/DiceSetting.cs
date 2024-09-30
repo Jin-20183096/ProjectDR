@@ -53,6 +53,7 @@ public class DiceSetting : MonoBehaviour
         StartCoroutine("Check_DiceStop");
     }
     
+    /*
     IEnumerator Check_DiceStop()    //주사위 구르는 도중의 값을 족족 전달
     {
         while (true)
@@ -79,8 +80,8 @@ public class DiceSetting : MonoBehaviour
             yield return new WaitForSecondsRealtime(0.01f);
         }
     }
-
-    /*
+    */
+    
     IEnumerator Check_DiceStop()    //주사위가 멈췄을 떄 값 전달
     {
         while (true)
@@ -106,7 +107,7 @@ public class DiceSetting : MonoBehaviour
             yield return new WaitForSecondsRealtime(0.01f);
         }
     }
-    */
+    
 
     //주사위 결과 체크
     public int Check_DiceSide()

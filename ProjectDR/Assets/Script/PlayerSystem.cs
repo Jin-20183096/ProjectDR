@@ -124,13 +124,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
         get { return _stat_AGI; }
     }
     [SerializeField]
-    private int[] _stat_CON = { 0, 0, 0, 0, 0, 0 };     //∞«∞≠ Ω∫≈»
-    public int[] CON
-    {
-        get { return _stat_CON; }
-    }
-    [SerializeField]
-    private int[] _stat_WIL = { 0, 0, 0, 0, 0, 0 };     //∞«∞≠ Ω∫≈»
+    private int[] _stat_WIL = { 0, 0, 0, 0, 0, 0 };     //¿«¡ˆ Ω∫≈»
     public int[] WIL
     {
         get { return _stat_WIL; }
@@ -143,7 +137,7 @@ public class PlayerSystem : MonoBehaviour, ICreature
     }
 
     [SerializeField]
-    private int[] _reroll = new int[8];     //No, »˚, ¡ˆ¥…, º’¿Á¡÷, πŒ√∏, ∞«∞≠, ¿«¡ˆ, «‡øÓ
+    private int[] _reroll = new int[7];     //No, »˚, ¡ˆ¥…, º’¿Á¡÷, πŒ√∏, ¿«¡ˆ, «‡øÓ
 
     public int GetReroll(Stats stat)  //¿Á±º∏≤ π›»Ø
     {
@@ -536,9 +530,6 @@ public class PlayerSystem : MonoBehaviour, ICreature
             case Stats.AGI:
                 changingStat = _stat_AGI;
                 break;
-            case Stats.CON:
-                changingStat = _stat_CON;
-                break;
             case Stats.WIL:
                 changingStat = _stat_WIL;
                 break;
@@ -655,9 +646,6 @@ public class PlayerSystem : MonoBehaviour, ICreature
             case Stats.RE_AGI:
                 reroll_stat = Stats.AGI;
                 break;
-            case Stats.RE_CON:
-                reroll_stat = Stats.CON;
-                break;
             case Stats.RE_WIL:
                 reroll_stat = Stats.WIL;
                 break;
@@ -759,9 +747,6 @@ public class PlayerSystem : MonoBehaviour, ICreature
                 //πŒ√∏ Ω∫≈»
                 _statusScr.Change_Reroll(Stats.AGI, _reroll[(int)Stats.AGI]);
                 _statusScr.Change_ActionStat(Stats.AGI, _stat_AGI);
-                //∞«∞≠ Ω∫≈»
-                _statusScr.Change_Reroll(Stats.CON, _reroll[(int)Stats.CON]);
-                _statusScr.Change_ActionStat(Stats.CON, _stat_CON);
                 //¿«¡ˆ Ω∫≈»
                 _statusScr.Change_Reroll(Stats.WIL, _reroll[(int)Stats.WIL]);
                 _statusScr.Change_ActionStat(Stats.WIL, _stat_WIL);

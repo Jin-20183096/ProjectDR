@@ -20,17 +20,14 @@ MonoBehaviour:
   INT: 
   DEX: 
   AGI: 010000000100000001000000020000000200000003000000
-  CON: 
   WIL: 
   Act_Atk:
   - Data: {fileID: 11400000, guid: ff6fd2274d5692e469d5c6297aac4c1c, type: 2}
     Stat: 4
-    Upgrade: 0
   Act_Def: []
   Act_Dge:
   - Data: {fileID: 11400000, guid: 265887af914a6064c8d99ba5d0dcc83a, type: 2}
     Stat: 4
-    Upgrade: 0
   Act_Tac: []
   BT: {fileID: 4900000, guid: 0ac1b24186640c04e9c4dd5b6bd852fc, type: 3}
   ActClueLog:
@@ -43,5 +40,5 @@ MonoBehaviour:
     \uC6C3\uACE0 \uC788\uB2E4."
   DefaultSprite: {fileID: 1892043697, guid: 7e83bcd9fff855b4384f1b199ac901ed, type: 3}
   Anima_Ctrl: {fileID: 9100000, guid: 45442f3b01a8e154582fe4aa00728ea5, type: 2}
-  Exp: 0500000007000000
+  Exp: 3200000046000000
   Item: []

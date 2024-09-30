@@ -163,15 +163,15 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
     public void SetEventSpritePosition(bool isCenter, bool isLeft)  //이벤트 스프라이트의 위치 조정
     {
         if (isCenter)
-            _eventSpr.transform.localPosition = new Vector3(0, 0, -1.25f);
+            _eventSpr.transform.localPosition = new Vector3(0, 0, 1.25f);
         else
         {
             _eventSpr.flipX = isLeft;
 
             if (isLeft)
-                _eventSpr.transform.localPosition = new Vector3(-1.25f, 0, -1.25f);
+                _eventSpr.transform.localPosition = new Vector3(1.25f, 0, 1.25f);
             else
-                _eventSpr.transform.localPosition = new Vector3(1.25f, 0, -1.25f);
+                _eventSpr.transform.localPosition = new Vector3(-1.25f, 0, 1.25f);
         }
     }
 

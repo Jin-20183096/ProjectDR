@@ -23,7 +23,7 @@ public class DiceResultPannel : MonoBehaviour
     [SerializeField]
     private GameObject _pannel_diceResult;  //주사위 결과창
     [SerializeField]
-    private Image[] _img_diceSide;          //각 주사위의 결과 이미지
+    private Image[] _img_diceSide;          //각 주사위의 결과 이미지(첫 번쨰 차일드가 주사위 눈의 이미지)
 
     [Header("# Reroll Button")]
     [SerializeField]
@@ -60,13 +60,15 @@ public class DiceResultPannel : MonoBehaviour
     {
         for (int i = 0; i < _img_diceSide.Length; i++)
         {
-            _img_diceSide[i].enabled = i < nowDice; //굴리지 않는 주사위의 이미지 Off
+            //굴리지 않는 주사위의 이미지 Off
+            _img_diceSide[i].enabled = i < nowDice; 
+            _img_diceSide[i].transform.GetChild(0).GetComponent<Image>().enabled = i < nowDice;
 
             if (i < nowDice)
             {
                 //주사위의 이미지 미확정 상태로 표시
-                _img_diceSide[i].sprite = _spr_dice[0];
                 _img_diceSide[i].color = new Color(1, 1, 1, 0.3f);
+                _img_diceSide[i].transform.GetChild(0).GetComponent<Image>().sprite = _spr_dice[0];
             }
         }
         RefreshLayout();
@@ -78,13 +80,18 @@ public class DiceResultPannel : MonoBehaviour
     public void Set_MomentDiceResult(int order, int value)  //주사위 결과창 결과 변경(순간적인 주사위의 결과)
     {
         _img_diceSide[order].color = new Color(1, 1, 1, 0.3f);
-        _img_diceSide[order].sprite = _spr_dice[value];
+        //_img_diceSide[order].sprite = _spr_dice[value];
+
+        _img_diceSide[order].transform.GetChild(0).GetComponent<Image>().color = new Color(1, 1, 1, 0.3f);
+        //_img_diceSide[order].transform.GetChild(0).GetComponent<Image>().sprite = _spr_dice[value];
     }
 
     public void Set_StopDiceResult(int order, int value)    //주사위 결과창 결과 변경(멈춘 주사위의 결과)
     {
         _img_diceSide[order].color = new Color(1, 1, 1, 1);
-        _img_diceSide[order].sprite = _spr_dice[value];
+
+        _img_diceSide[order].transform.GetChild(0).GetComponent<Image>().color = new Color(1, 1, 1, 1);
+        _img_diceSide[order].transform.GetChild(0).GetComponent<Image>().sprite = _spr_dice[value];
     }
 
     public void Change_DiceTotal(string total)  //주사위 총합 텍스트 변경

@@ -17,8 +17,11 @@ MonoBehaviour:
   _type: 0
   BtlAct:
     NormalAtk_Arr:
+    - {fileID: 11400000, guid: 57fb52664e012754fbe0419910789155, type: 2}
     - {fileID: 11400000, guid: cf31cc61144b9de46aff278557ab3e3b, type: 2}
-    AtkAct_Arr: []
+    AtkAct_Arr:
+    - {fileID: 11400000, guid: cf31cc61144b9de46aff278557ab3e3b, type: 2}
+    - {fileID: 11400000, guid: ff6fd2274d5692e469d5c6297aac4c1c, type: 2}
     DefAct_Arr: []
     DgeAct_Arr: []
     TacAct_Arr: []

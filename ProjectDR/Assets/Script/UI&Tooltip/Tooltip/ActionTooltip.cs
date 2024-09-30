@@ -70,6 +70,14 @@ public class ActionTooltip : MonoBehaviour
                     _maxDice[i].SetActive(false);
             }
         }
+        else
+        {
+            for (int i = 0; i < _minDice.Length; i++)   //최소 주사위 표기 off
+                _minDice[i].SetActive(false);
+
+            for (int i = 0; i < _maxDice.Length; i++)   //최대 주사위 표기 off
+                _maxDice[i].SetActive(false);
+        }
 
         _txt_info.gameObject.SetActive(true);
         _txt_info.text = data.Info;
